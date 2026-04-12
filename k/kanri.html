@@ -1,9 +1,10 @@
+<!-- グループk用 kanri.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>アクセス管理 - 管理画面 [全グループ]</title>
+<title>アクセス管理 - 管理画面 [グループk]</title>
 
 <style>
   /* ===== リセット & ベース ===== */
@@ -556,7 +557,7 @@
     <div class="header-icon">🔐</div>
     <div>
       <h1>ACCESS CONTROL PANEL</h1>
-      <span class="subtitle">ユーザーアクセス管理システム｜全グループ管理</span>
+      <span class="subtitle">ユーザーアクセス管理システム｜グループk管理</span>
     </div>
   </div>
 </header>
@@ -713,6 +714,9 @@
 
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
+
+  // グループk用 ── ここがk/2の違い
+  const MY_GROUP = 'k';
 
   // ========================================
   // DOM要素
@@ -888,11 +892,11 @@
     try {
       let snapshot;
       try {
-        const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
+        const q = query(collection(db, "users"), where("group", "==", MY_GROUP), orderBy("createdAt", "desc"));
         snapshot = await getDocs(q);
       } catch (indexErr) {
         console.warn("orderBy失敗、フォールバック:", indexErr.message);
-        snapshot = await getDocs(collection(db, "users"));
+        snapshot = await getDocs(query(collection(db, "users"), where("group", "==", MY_GROUP)));
       }
       allUsers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       renderTable(allUsers);
@@ -920,7 +924,7 @@
 
   async function loadUserPageModes() {
     try {
-      const snap = await getDocs(collection(db, "users"));
+      const snap = await getDocs(query(collection(db, "users"), where("group", "==", MY_GROUP)));
       snap.docs.forEach(d => {
         userPageMode[d.id] = d.data().pageMode || 'peji';
       });
