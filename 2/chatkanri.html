@@ -490,7 +490,7 @@
   // ── 削除 ──
   window.delMsg = async function(id) {
     try {
-      await deleteDoc(doc(db, "chat", id));
+      await deleteDoc(doc(db, "chat_2", id));
       showToast('✅ 削除しました');
     } catch(e) { showToast('エラー: ' + e.message); }
   };
@@ -503,7 +503,7 @@
       closeConfirm();
       try {
         const snap = await getDocs(collection(db, "chat_2"));
-        await Promise.all(snap.docs.map(d => deleteDoc(doc(db, "chat", d.id))));
+        await Promise.all(snap.docs.map(d => deleteDoc(doc(db, "chat_2", d.id))));
         showToast('🗑 全メッセージを削除しました');
       } catch(e) { showToast('エラー: ' + e.message); }
     };
