@@ -657,11 +657,12 @@
   <table>
     <thead>
       <tr>
-        <th style="width:25%">Name</th>
-        <th style="width:12%">Status</th>
-        <th style="width:12%">グループ</th>
-        <th style="width:18%">表示先</th>
-        <th style="width:33%">操作</th>
+        <th style="width:22%">Name</th>
+        <th style="width:11%">Status</th>
+        <th style="width:10%">グループ</th>
+        <th style="width:10%">管理者</th>
+        <th style="width:16%">表示先</th>
+        <th style="width:31%">操作</th>
       </tr>
     </thead>
     <tbody id="userTableBody">
@@ -827,6 +828,15 @@
             >2</button>
           </div>
         </td>
+        <!-- 管理者 -->
+        <td>
+          <button
+            class="btn ${user.isAdmin ? 'btn-ok' : ''}"
+            onclick="toggleAdmin('${user.id}', '${escapeHTML(user.name)}', ${!!false})"
+            style="${user.isAdmin ? '' : 'opacity:0.4'}"
+            title="${user.isAdmin ? '管理者を解除' : '管理者に指定'}"
+          >${user.isAdmin ? '👑 管理者' : '👑'}</button>
+        </td>
         <!-- 表示先 -->
         <td>
           <div class="action-btns">
@@ -950,6 +960,21 @@
       if (user) user.group = group;
       renderTable(allUsers);
       showToast('✅ 「' + name + '」のグループ: ' + group);
+    } catch(e) { showToast('エラー: ' + e.message); }
+  };
+
+  window.toggleAdmin = async function(id, name, current) {
+    const user = allUsers.find(u => u.id === id);
+    if (!user) return;
+    const newVal = !user.isAdmin;
+    try {
+      await updateDoc(doc(db, "users", id), { isAdmin: newVal });
+      user.isAdmin = newVal;
+      renderTable(allUsers);
+      showToast(newVal
+        ? '👑 「' + name + '」を管理者に指定しました'
+        : '「' + name + '」の管理者を解除しました'
+      );
     } catch(e) { showToast('エラー: ' + e.message); }
   };
 
