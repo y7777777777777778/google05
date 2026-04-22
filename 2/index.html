@@ -389,13 +389,26 @@
   let pejiLoaded  = false;
   let currentUrl  = PEJI_URL;
 
-  function openPeji() {
+  // 管理者かどうかをFirestoreで確認してURLを決定
+  async function resolveDestUrl(name) {
+    try {
+      const q    = query(collection(db, "users"), where("name", "==", name));
+      const snap = await getDocs(q);
+      if (!snap.empty && snap.docs[0].data().isAdmin === true) {
+        return 'pej.html'; // 管理者はpej.htmlへ
+      }
+    } catch(e) {}
+    return PEJI_URL; // 通常ユーザーはpeji.html
+  }
+
+  function openPeji(url) {
+    const dest = url || PEJI_URL;
     // 利用規約同意チェック
     if (localStorage.getItem(KIYAKU_KEY) !== '1') {
       hiddenFrame.src = KIYAKU_URL;
       pejiLoaded = false;
-    } else if (!pejiLoaded || hiddenFrame.src.indexOf(currentUrl) === -1) {
-      hiddenFrame.src = currentUrl;
+    } else if (!pejiLoaded || hiddenFrame.src.indexOf(dest) === -1) {
+      hiddenFrame.src = dest;
       pejiLoaded = true;
     }
     hiddenFrame.style.display = "block";
@@ -423,8 +436,8 @@
     // キャッシュで即判定
     const cachedStatus = localStorage.getItem(STATUS_KEY);
     if (cachedStatus === "ok") {
-      await loadUserPageMode(savedName);
-      openPeji();
+      const dest = await resolveDestUrl(savedName);
+      openPeji(dest);
       getUserStatus(savedName).then(s => {
         if (s && s !== "ok") localStorage.setItem(STATUS_KEY, s);
       }).catch(() => {});
@@ -436,8 +449,8 @@
       const status = await getUserStatus(savedName);
       if (status) localStorage.setItem(STATUS_KEY, status);
       if (status === "ok") {
-        await loadUserPageMode(savedName);
-        openPeji();
+        const dest = await resolveDestUrl(savedName);
+        openPeji(dest);
       } else if (!status) {
         localStorage.removeItem(NAME_KEY);
         localStorage.removeItem(STATUS_KEY);
@@ -482,7 +495,7 @@
       localStorage.setItem(NAME_KEY,   name);
       localStorage.setItem(STATUS_KEY, isPublic ? "ok" : "wait");
       closeModal();
-      if (isPublic) openPeji();
+      if (isPublic) { const dest = await resolveDestUrl(name); openPeji(dest); }
       else showToast("✅ 申請を送りました。管理者の承認をお待ちください。");
     } catch (err) {
       console.error("登録エラー:", err);
