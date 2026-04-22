@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>チャット管理 [グループk]</title>
+<title>チャット管理 [グループ2]</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -403,7 +403,7 @@
   }
 
   // ── チャット設定の監視 ──
-  onSnapshot(doc(db, "config", "chatSettings_k"), snap => {
+  onSnapshot(doc(db, "config", "chatSettings_2"), snap => {
     if (!snap.exists()) return;
     chatSettings = snap.data();
     banned = chatSettings.banned || [];
@@ -430,7 +430,7 @@
   // ── チャット閉鎖 / 解放 ──
   window.setChatClosed = async function(closed) {
     try {
-      await setDoc(doc(db, "config", "chatSettings_k"), { ...chatSettings, closed }, { merge: true });
+      await setDoc(doc(db, "config", "chatSettings_2"), { ...chatSettings, closed }, { merge: true });
       showToast(closed ? '⏸ チャットを閉鎖しました' : '▶ チャットを解放しました');
     } catch(e) { showToast('エラー: ' + e.message); }
   };
@@ -439,7 +439,7 @@
   window.onSpeedChange = async function(val) {
     document.getElementById('speedVal').textContent = val + 's';
     try {
-      await setDoc(doc(db, "config", "chatSettings_k"), { ...chatSettings, tickerSpeed: Number(val) }, { merge: true });
+      await setDoc(doc(db, "config", "chatSettings_2"), { ...chatSettings, tickerSpeed: Number(val) }, { merge: true });
     } catch(e) {}
   };
 
@@ -478,7 +478,7 @@
   }
 
   window.loadMsgs = function() {
-    const q = query(collection(db, "chat_k"), orderBy("ts", "desc"));
+    const q = query(collection(db, "chat_2"), orderBy("ts", "desc"));
     onSnapshot(q, snap => {
       allMsgs = snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse();
       renderTable(allMsgs);
@@ -490,7 +490,7 @@
   // ── 削除 ──
   window.delMsg = async function(id) {
     try {
-      await deleteDoc(doc(db, "chat_k", id));
+      await deleteDoc(doc(db, "chat_2", id));
       showToast('✅ 削除しました');
     } catch(e) { showToast('エラー: ' + e.message); }
   };
@@ -502,8 +502,8 @@
     document.getElementById('confirmOkBtn').onclick = async () => {
       closeConfirm();
       try {
-        const snap = await getDocs(collection(db, "chat_k"));
-        await Promise.all(snap.docs.map(d => deleteDoc(doc(db, "chat_k", d.id))));
+        const snap = await getDocs(collection(db, "chat_2"));
+        await Promise.all(snap.docs.map(d => deleteDoc(doc(db, "chat_2", d.id))));
         showToast('🗑 全メッセージを削除しました');
       } catch(e) { showToast('エラー: ' + e.message); }
     };
@@ -531,7 +531,7 @@
 
   async function saveBanned() {
     try {
-      await setDoc(doc(db, "config", "chatSettings_k"), { ...chatSettings, banned }, { merge: true });
+      await setDoc(doc(db, "config", "chatSettings_2"), { ...chatSettings, banned }, { merge: true });
     } catch(e) { showToast('BAN保存エラー: ' + e.message); }
   }
 
@@ -567,7 +567,7 @@
   // ── NGワード ──
   async function loadNgWords() {
     try {
-      const snap = await getDoc(doc(db, "config", "ngWords_k"));
+      const snap = await getDoc(doc(db, "config", "ngWords_2"));
       ngWords = snap.exists() ? (snap.data().words || []) : [];
     } catch(e) { ngWords = []; }
     renderNgList();
@@ -575,7 +575,7 @@
 
   async function saveNgWords() {
     try {
-      await setDoc(doc(db, "config", "ngWords_k"), { words: ngWords });
+      await setDoc(doc(db, "config", "ngWords_2"), { words: ngWords });
     } catch(e) { showToast('NGワード保存エラー: ' + e.message); }
   }
 
@@ -620,7 +620,7 @@
 
   async function loadCmds() {
     try {
-      const snap = await getDoc(doc(db, "config", "commands_k"));
+      const snap = await getDoc(doc(db, "config", "commands_2"));
       cmdList = snap.exists() ? (snap.data().list || []) : [];
       // 既存データのキーからスラッシュを除去して自動修正
       let fixed = false;
@@ -639,7 +639,7 @@
 
   async function saveCmds() {
     try {
-      await setDoc(doc(db, "config", "commands_k"), { list: cmdList });
+      await setDoc(doc(db, "config", "commands_2"), { list: cmdList });
     } catch(e) { showToast('コマンド保存エラー: ' + e.message); }
   }
 
