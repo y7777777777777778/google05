@@ -213,7 +213,60 @@
 
   function startChat() {
     listenMessages();
+    startRealtimeCheck();
     document.getElementById("chatInput").focus();
+  }
+
+  // ── リアルタイム監視：アク禁・拒否を即反映 ──
+  function startRealtimeCheck() {
+    // usersのstatusを監視
+    const userQuery = query(collection(db, "users"), where("name", "==", myName));
+    onSnapshot(userQuery, snap => {
+      if (snap.empty) return;
+      const data = snap.docs[0].data();
+      if (data.status === "ng") {
+        localStorage.removeItem("chatName_all");
+        showBlocked("アクセスが拒否されました", myName);
+      }
+    });
+
+    // banListを監視
+    onSnapshot(doc(db, "config", "banList"), snap => {
+      if (!snap.exists()) return;
+      const data = snap.data();
+      if (data.allBanned === true) {
+        localStorage.removeItem("chatName_all");
+        showBlocked("全員アクセス停止中です", "");
+        return;
+      }
+      const names = data.names || [];
+      if (names.includes(myName)) {
+        localStorage.removeItem("chatName_all");
+        showBlocked("アクセスが停止されました", myName);
+      }
+    });
+
+    // chatSettings_allの閉鎖を監視
+    onSnapshot(doc(db, "config", "chatSettings_all"), snap => {
+      if (!snap.exists()) return;
+      const input = document.getElementById("chatInput");
+      const btn   = document.querySelector(".send-btn");
+      if (snap.data().closed) {
+        input.disabled = true;
+        input.placeholder = "チャットは現在閉鎖中です";
+        btn.disabled = true;
+      } else {
+        input.disabled = false;
+        input.placeholder = "メッセージを入力...";
+        btn.disabled = false;
+      }
+      // BANチェック
+      const banned = snap.data().banned || [];
+      if (banned.includes(myName)) {
+        localStorage.removeItem("chatName_all");
+        showBlocked("チャットから追放されました", myName);
+      }
+    });
   }
 
   // ── メッセージ送信 ──
