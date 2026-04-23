@@ -750,7 +750,7 @@
 
   <div class="grid">
 
-    <div class="card" onclick="openSite('../akuchat.html')">
+    <div class="card" id="akuchatCard" onclick="openSite('../akuchat.html')" style="display:none">
       <div class="card-id">01</div>
       <div class="card-badge">CHAT</div>
       <div class="card-title">共通チャット</div>
@@ -928,7 +928,7 @@
 <script type="module">
   import { initializeApp }    from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
   import { getFirestore, collection, addDoc, query, orderBy,
-           limit, onSnapshot, serverTimestamp, doc, getDoc }
+           limit, onSnapshot, serverTimestamp, doc, getDoc, getDocs, where }
     from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -942,6 +942,21 @@
 
   const app = initializeApp(firebaseConfig, "chat");
   const db  = getFirestore(app);
+
+  // ── akuchatカード表示制御 ──
+  (async function checkAkuchat() {
+    try {
+      const savedName = localStorage.getItem("accessUserName_2") || "";
+      if (!savedName) return;
+      const snap = await getDocs(query(collection(db, "users"), where("name", "==", savedName)));
+      if (!snap.empty) {
+        const data = snap.docs[0].data();
+        if (data.akuchat === true) {
+          document.getElementById("akuchatCard").style.display = "";
+        }
+      }
+    } catch(e) { console.error("akuchatチェックエラー:", e); }
+  })();
 
   // 名前：チャット専用の保存名 → なければ「名無し」
   const savedChatName = localStorage.getItem("chatName") || "名無し";
@@ -968,7 +983,7 @@
 
   // ── NGワード取得（リアルタイム監視） ──
   let ngWordsList = [];
-  onSnapshot(doc(db, "config", "ngWords"), snap => {
+  onSnapshot(doc(db, "config", "ngWords_2"), snap => {
     ngWordsList = snap.exists() ? (snap.data().words || []) : [];
   });
 
@@ -1007,7 +1022,7 @@
       if (cmd) {
         input.value = '';
         try {
-          await addDoc(collection(db, "chat_k"), {
+          await addDoc(collection(db, "chat_2"), {
             name: cmd.name || 'BOT',
             text: cmd.message || cmd.text || '',
             ts:   serverTimestamp()
@@ -1046,7 +1061,7 @@
 
     input.value = '';
     try {
-      await addDoc(collection(db, "chat_k"), {
+      await addDoc(collection(db, "chat_2"), {
         name: getMyName(), text: text, ts: serverTimestamp()
       });
     } catch(e) { console.error(e); }
@@ -1123,7 +1138,7 @@
   }
 
   // チャット設定監視（閉鎖・BAN）
-  onSnapshot(doc(db, "config", "chatSettings_k"), snap => {
+  onSnapshot(doc(db, "config", "chatSettings_2"), snap => {
     if (!snap.exists()) return;
     const data = snap.data();
     if (data.tickerSpeed) tickerSpeed = data.tickerSpeed;
@@ -1149,7 +1164,7 @@
     }
   });
 
-  const q = query(collection(db, "chat_k"), orderBy("ts", "desc"), limit(50));
+  const q = query(collection(db, "chat_2"), orderBy("ts", "desc"), limit(50));
   onSnapshot(q, snap => {
     const msgs = [];
     snap.forEach(d => msgs.push({ id: d.id, ...d.data() }));
