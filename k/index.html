@@ -266,7 +266,7 @@
 <!-- ========== Firebase SDK ========== -->
 <script type="module">
   import { initializeApp }          from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc }
+  import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, onSnapshot }
                                     from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -289,31 +289,46 @@
   const KIYAKU_URL      = 'kiyaku.html';
   const PEJI_URL        = 'peji.html';
 
-  // ── ページ読み込み時にアク禁チェック ──
-  (async function checkBan() {
-    try {
-      const savedName = localStorage.getItem(NAME_KEY);
-      if (!savedName) return;
-      // usersコレクションのstatusがngならgoogle.comへ
-      const snap = await getDocs(query(collection(db, "users"), where("name", "==", savedName)));
-      if (!snap.empty) {
-        const data = snap.docs[0].data();
-        if (data.status === "ng") { location.replace("https://www.google.com"); return; }
-        // グループ違いなら弾く
-        if (data.group && data.group !== MY_GROUP) { location.replace("https://www.google.com"); return; }
+  // ── リアルタイム監視：アク禁・拒否を即反映 ──
+  (function startRealtimeCheck() {
+    const savedName = localStorage.getItem(NAME_KEY);
+    if (!savedName) return;
+
+    // usersドキュメントを監視（status: ng になったら即追い出す）
+    const userQuery = query(collection(db, "users"), where("name", "==", savedName));
+    onSnapshot(userQuery, snap => {
+      if (snap.empty) return;
+      const data = snap.docs[0].data();
+      if (data.status === "ng") {
+        localStorage.removeItem(NAME_KEY);
+        localStorage.removeItem(STATUS_KEY);
+        location.replace("https://www.google.com");
+        return;
       }
-      // アク禁リストチェック（config/banList）
-      const banSnap = await getDoc(doc(db, "config", "banList"));
-      if (banSnap.exists()) {
-        const banned = banSnap.data().names || [];
-        if (banned.includes(savedName)) { location.replace("https://www.google.com"); return; }
-      }
-      // 全員アク禁チェック
-      const allBanSnap = await getDoc(doc(db, "config", "banList"));
-      if (allBanSnap.exists() && allBanSnap.data().allBanned === true) {
+      if (data.group && data.group !== MY_GROUP) {
+        localStorage.removeItem(NAME_KEY);
+        localStorage.removeItem(STATUS_KEY);
         location.replace("https://www.google.com");
       }
-    } catch(e) { console.error("アク禁チェックエラー:", e); }
+    });
+
+    // banListを監視（アク禁リストに追加されたら即追い出す）
+    onSnapshot(doc(db, "config", "banList"), snap => {
+      if (!snap.exists()) return;
+      const data = snap.data();
+      if (data.allBanned === true) {
+        localStorage.removeItem(NAME_KEY);
+        localStorage.removeItem(STATUS_KEY);
+        location.replace("https://www.google.com");
+        return;
+      }
+      const names = data.names || [];
+      if (names.includes(savedName)) {
+        localStorage.removeItem(NAME_KEY);
+        localStorage.removeItem(STATUS_KEY);
+        location.replace("https://www.google.com");
+      }
+    });
   })();
 
   const overlay     = document.getElementById("overlay");
