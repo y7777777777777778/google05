@@ -657,12 +657,13 @@
   <table>
     <thead>
       <tr>
-        <th style="width:22%">Name</th>
-        <th style="width:11%">Status</th>
-        <th style="width:10%">グループ</th>
-        <th style="width:10%">管理者</th>
-        <th style="width:16%">表示先</th>
-        <th style="width:31%">操作</th>
+        <th style="width:20%">Name</th>
+        <th style="width:10%">Status</th>
+        <th style="width:9%">グループ</th>
+        <th style="width:9%">管理者</th>
+        <th style="width:10%">芥chat</th>
+        <th style="width:14%">表示先</th>
+        <th style="width:28%">操作</th>
       </tr>
     </thead>
     <tbody id="userTableBody">
@@ -837,6 +838,15 @@
             title="${user.isAdmin ? '管理者を解除' : '管理者に指定'}"
           >${user.isAdmin ? '👑 管理者' : '👑'}</button>
         </td>
+        <!-- 芥chat -->
+        <td>
+          <button
+            class="btn ${user.akuchat ? 'btn-ok' : ''}"
+            onclick="toggleAkuchat('${user.id}', '${escapeHTML(user.name)}')"
+            title="${user.akuchat ? '芥chatを無効にする' : '芥chatを有効にする'}"
+            style="${user.akuchat ? '' : 'opacity:0.4'}"
+          >🌐</button>
+        </td>
         <!-- 表示先 -->
         <td>
           <div class="action-btns">
@@ -950,6 +960,21 @@
       if (user) user.pageMode = mode;
       renderTable(allUsers);
       showToast('✅ 「' + name + '」の表示先: ' + (mode === 'peji' ? 'peji.html' : 'pej.html'));
+    } catch(e) { showToast('エラー: ' + e.message); }
+  };
+
+  window.toggleAkuchat = async function(id, name) {
+    const user = allUsers.find(u => u.id === id);
+    if (!user) return;
+    const newVal = !user.akuchat;
+    try {
+      await updateDoc(doc(db, "users", id), { akuchat: newVal });
+      user.akuchat = newVal;
+      renderTable(allUsers);
+      showToast(newVal
+        ? '🌐 「' + name + '」の芥chatを有効にしました'
+        : '「' + name + '」の芥chatを無効にしました'
+      );
     } catch(e) { showToast('エラー: ' + e.message); }
   };
 
