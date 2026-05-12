@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>データリセット管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #020408;
+    --panel:   rgba(0,255,231,0.03);
+    --border:  rgba(0,255,231,0.10);
+    --border2: rgba(0,255,231,0.25);
+    --accent:  #00ffe7;
+    --text:    #c8f0ec;
+    --dim:     #3a6660;
+    --green:   #3dd68c;
+    --red:     #ff4466;
+    --amber:   #ffb300;
+    --mono:    'Share Tech Mono', monospace;
+    --head:    'Rajdhani', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { font-family: var(--mono); background: var(--bg); color: var(--text); min-height: 100vh; }
+  body::after { content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 44px 44px; }
+
+  .header { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; height: 54px; padding: 0 24px; background: rgba(0,0,0,0.85); border-bottom: 1px solid var(--border2); }
+  .header-logo { display: flex; align-items: center; gap: 10px; font-family: var(--head); font-size: 18px; font-weight: 700; letter-spacing: .15em; color: var(--red); text-shadow: 0 0 20px rgba(255,68,102,0.4); }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); box-shadow: 0 0 8px var(--red); animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 60%{opacity:.3} }
+
+  .main { position: relative; z-index: 1; padding: 24px; max-width: 900px; margin: 0 auto; }
+
+  .sec { margin-bottom: 32px; }
+  .sec-title { font-family: var(--head); font-size: 14px; letter-spacing: .15em; color: var(--accent); border-bottom: 1px solid var(--border2); padding-bottom: 8px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .sec-count { font-size: 11px; color: var(--dim); }
+
+  /* ユーザーカード */
+  .user-grid { display: flex; flex-direction: column; gap: 10px; }
+  .user-card { background: var(--panel); border: 1px solid var(--border2); border-radius: 8px; padding: 14px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .user-card.admin-card { border-color: rgba(255,200,0,0.4); background: rgba(255,200,0,0.04); }
+  .u-name { font-family: var(--head); font-size: 15px; font-weight: 700; color: var(--accent); min-width: 120px; }
+  .u-real { font-size: 11px; color: var(--dim); min-width: 100px; }
+  .u-grp { font-size: 11px; padding: 2px 8px; border-radius: 3px; border: 1px solid var(--border2); color: var(--dim); }
+  .u-status { font-size: 11px; padding: 3px 10px; border-radius: 3px; font-weight: 700; }
+  .s-ok   { background: rgba(61,214,140,0.1); color: var(--green); border: 1px solid rgba(61,214,140,0.3); }
+  .s-wait { background: rgba(255,179,0,0.1);  color: var(--amber); border: 1px solid rgba(255,179,0,0.3); }
+  .s-ng   { background: rgba(255,68,102,0.1); color: var(--red);   border: 1px solid rgba(255,68,102,0.3); }
+
+  .u-actions { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+  .abtn { font-family: var(--mono); font-size: 10px; padding: 5px 12px; border-radius: 4px; cursor: pointer; transition: all .15s; letter-spacing: .06em; border: 1px solid; }
+  .abtn-ok   { border-color: rgba(61,214,140,.4); color: var(--green); background: rgba(61,214,140,.06); }
+  .abtn-ok:hover { background: rgba(61,214,140,.18); }
+  .abtn-ng   { border-color: rgba(255,68,102,.4); color: var(--red); background: rgba(255,68,102,.06); }
+  .abtn-ng:hover { background: rgba(255,68,102,.18); }
+  .abtn-del  { border-color: rgba(255,68,102,.4); color: var(--red); background: rgba(255,68,102,.06); }
+  .abtn-del:hover { background: rgba(255,68,102,.25); border-color: var(--red); }
+  .abtn-reset { border-color: rgba(255,179,0,.4); color: var(--amber); background: rgba(255,179,0,.06); }
+  .abtn-reset:hover { background: rgba(255,179,0,.18); }
+
+  /* 危険ゾーン */
+  .danger-box { background: rgba(255,68,102,0.05); border: 1px solid rgba(255,68,102,0.3); border-radius: 8px; padding: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .danger-label { font-size: 11px; color: var(--red); letter-spacing: .1em; flex: 1; min-width: 200px; }
+
+  .big-btn { font-family: var(--mono); font-size: 11px; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: all .15s; letter-spacing: .08em; border: 1px solid; text-transform: uppercase; }
+  .big-btn-red { border-color: rgba(255,68,102,.5); color: var(--red); background: rgba(255,68,102,.08); }
+  .big-btn-red:hover { background: rgba(255,68,102,.22); border-color: var(--red); }
+  .big-btn-amber { border-color: rgba(255,179,0,.5); color: var(--amber); background: rgba(255,179,0,.08); }
+  .big-btn-amber:hover { background: rgba(255,179,0,.22); border-color: var(--amber); }
+  .big-btn-green { border-color: rgba(61,214,140,.5); color: var(--green); background: rgba(61,214,140,.08); }
+  .big-btn-green:hover { background: rgba(61,214,140,.22); border-color: var(--green); }
+
+  /* ローディング */
+  .loading { text-align: center; padding: 40px; color: var(--dim); font-size: 12px; letter-spacing: .1em; }
+  .spinner { display: inline-block; width: 22px; height: 22px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin-bottom: 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* トースト */
+  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(12px); background: rgba(10,20,30,0.97); border: 1px solid var(--border2); color: var(--text); padding: 10px 22px; border-radius: 6px; font-size: 11px; opacity: 0; transition: .25s; z-index: 500; pointer-events: none; white-space: nowrap; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* 確認ダイアログ */
+  #confirmOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 300; justify-content: center; align-items: center; }
+  #confirmOverlay.active { display: flex; }
+  #confirmBox { background: #0a0e1a; border: 1px solid rgba(255,68,102,0.4); border-radius: 10px; padding: 28px 24px; width: 340px; text-align: center; }
+  #confirmBox h3 { color: var(--red); font-family: var(--head); font-size: 16px; margin-bottom: 10px; }
+  #confirmBox p { font-size: 11px; color: var(--dim); line-height: 1.8; margin-bottom: 20px; }
+  .confirm-btns { display: flex; gap: 10px; justify-content: center; }
+  .btn-cc { font-family: var(--mono); font-size: 11px; padding: 8px 20px; border-radius: 4px; cursor: pointer; background: var(--panel); border: 1px solid var(--border2); color: var(--dim); }
+  .btn-cc:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-co { font-family: var(--mono); font-size: 11px; padding: 8px 20px; border-radius: 4px; cursor: pointer; background: rgba(255,68,102,.1); border: 1px solid rgba(255,68,102,.4); color: var(--red); }
+  .btn-co:hover { background: rgba(255,68,102,.25); border-color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-dot"></div>
+    DATA RESET / USER MANAGER
+  </div>
+  <div style="font-size:10px;color:var(--dim);">全ユーザー管理・強制リセット</div>
+</div>
+
+<div class="main">
+
+  <!-- ユーザー一覧 -->
+  <div class="sec">
+    <div class="sec-title">
+      // ALL USERS
+      <span class="sec-count" id="userCount"></span>
+      <button class="big-btn big-btn-green" style="margin-left:auto;" onclick="loadUsers()">🔄 再読込</button>
+    </div>
+    <div id="userList" class="user-grid">
+      <div class="loading"><div class="spinner"></div><br>読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- 全体操作 -->
+  <div class="sec">
+    <div class="sec-title">// BULK ACTIONS（全体操作）</div>
+    <div class="danger-box">
+      <div class="danger-label">⚠ 全ユーザーのlocalStorageキャッシュをリセット<br><span style="opacity:.6;font-size:10px;">全員のstatusをwaitに戻す（再申請が必要になる）</span></div>
+      <button class="big-btn big-btn-amber" onclick="confirmAction('全員をwait（再申請）にする', '全ユーザーのstatusをwaitに変更します。全員が再度申請が必要になります。', resetAllToWait)">全員をwaitに</button>
+    </div>
+    <div class="danger-box" style="margin-top:10px;">
+      <div class="danger-label">🗑 全ユーザーデータを完全削除<br><span style="opacity:.6;font-size:10px;">Firestoreのusersコレクションを全削除する</span></div>
+      <button class="big-btn big-btn-red" onclick="confirmAction('全ユーザー削除', 'usersコレクションの全データを削除します。\nこの操作は取り消せません。', deleteAllUsers)">全削除</button>
+    </div>
+    <div class="danger-box" style="margin-top:10px;">
+      <div class="danger-label">💬 全チャットログを削除<br><span style="opacity:.6;font-size:10px;">chat_k / chat_2 / chat_all の全メッセージを削除</span></div>
+      <button class="big-btn big-btn-red" onclick="confirmAction('全チャット削除', 'chat_k / chat_2 / chat_all の全メッセージを削除します。', deleteAllChats)">全チャット削除</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+<div id="confirmOverlay">
+  <div id="confirmBox">
+    <h3 id="confirmTitle">確認</h3>
+    <p id="confirmText"></p>
+    <div class="confirm-btns">
+      <button class="btn-cc" onclick="closeConfirm()">キャンセル</button>
+      <button class="btn-co" id="confirmOkBtn">実行する</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy }
+    from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
+    authDomain:        "fir-66339.firebaseapp.com",
+    projectId:         "fir-66339",
+    storageBucket:     "fir-66339.firebasestorage.app",
+    messagingSenderId: "876017617963",
+    appId:             "1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
+  };
+
+  const app = initializeApp(firebaseConfig, "reset");
+  const db  = getFirestore(app);
+
+  const toast = document.getElementById('toast');
+  function showToast(msg, dur = 3000) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), dur);
+  }
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ── ユーザー一覧 ──
+  window.loadUsers = async function() {
+    document.getElementById('userList').innerHTML = '<div class="loading"><div class="spinner"></div><br>読み込み中...</div>';
+    try {
+      const snap = await getDocs(query(collection(db, 'users'), orderBy('createdAt', 'desc')));
+      const users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      document.getElementById('userCount').textContent = users.length + ' users';
+
+      if (users.length === 0) {
+        document.getElementById('userList').innerHTML = '<div class="loading">ユーザーなし</div>';
+        return;
+      }
+
+      document.getElementById('userList').innerHTML = users.map(u => {
+        const sClass = u.status === 'ok' ? 's-ok' : u.status === 'ng' ? 's-ng' : 's-wait';
+        const isAdmin = !!u.isAdmin;
+        return `<div class="user-card ${isAdmin ? 'admin-card' : ''}" id="card-${u.id}">
+          <div class="u-name">${isAdmin ? '👑 ' : ''}${esc(u.name)}</div>
+          <div class="u-real">本名: ${esc(u.realName || '—')}</div>
+          <div class="u-grp">グループ: ${esc(u.group || '?')}</div>
+          <div class="u-status ${sClass}">${esc(u.status)}</div>
+          <div class="u-actions">
+            <button class="abtn abtn-ok"    onclick="setStatus('${u.id}','ok')">✓ 許可</button>
+            <button class="abtn abtn-ng"    onclick="setStatus('${u.id}','ng')">✕ 拒否</button>
+            <button class="abtn abtn-reset" onclick="setStatus('${u.id}','wait')">↺ wait</button>
+            <button class="abtn abtn-del"   onclick="delUser('${u.id}','${esc(u.name)}')">🗑 削除</button>
+          </div>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      document.getElementById('userList').innerHTML = '<div class="loading" style="color:var(--red);">読み込みエラー: ' + e.message + '</div>';
+    }
+  };
+
+  // ── 個別ステータス変更 ──
+  window.setStatus = async function(id, status) {
+    try {
+      await updateDoc(doc(db, 'users', id), { status });
+      showToast('✅ statusを ' + status + ' に変更しました');
+      loadUsers();
+    } catch(e) { showToast('エラー: ' + e.message); }
+  };
+
+  // ── 個別削除 ──
+  window.delUser = async function(id, name) {
+    try {
+      await deleteDoc(doc(db, 'users', id));
+      showToast('🗑 「' + name + '」を削除しました');
+      const card = document.getElementById('card-' + id);
+      if (card) { card.style.opacity = '0'; card.style.transform = 'scale(0.95)'; card.style.transition = '.3s'; setTimeout(() => card.remove(), 300); }
+      const cnt = document.getElementById('userCount');
+      const n = parseInt(cnt.textContent) - 1;
+      cnt.textContent = n + ' users';
+    } catch(e) { showToast('エラー: ' + e.message); }
+  };
+
+  // ── 全員wait ──
+  window.resetAllToWait = async function() {
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      await Promise.all(snap.docs.map(d => updateDoc(doc(db, 'users', d.id), { status: 'wait' })));
+      showToast('✅ 全員をwaitにしました');
+      loadUsers();
+    } catch(e) { showToast('エラー: ' + e.message); }
+  };
+
+  // ── 全ユーザー削除 ──
+  window.deleteAllUsers = async function() {
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      await Promise.all(snap.docs.map(d => deleteDoc(doc(db, 'users', d.id))));
+      showToast('🗑 全ユーザーを削除しました');
+      loadUsers();
+    } catch(e) { showToast('エラー: ' + e.message); }
+  };
+
+  // ── 全チャット削除 ──
+  window.deleteAllChats = async function() {
+    try {
+      const cols = ['chat_k', 'chat_2', 'chat_all'];
+      for (const col of cols) {
+        const snap = await getDocs(collection(db, col));
+        await Promise.all(snap.docs.map(d => deleteDoc(doc(db, col, d.id))));
+      }
+      showToast('🗑 全チャットを削除しました');
+    } catch(e) { showToast('エラー: ' + e.message); }
+  };
+
+  // ── 確認ダイアログ ──
+  window.confirmAction = function(title, text, fn) {
+    document.getElementById('confirmTitle').textContent = '⚠ ' + title;
+    document.getElementById('confirmText').textContent = text;
+    document.getElementById('confirmOkBtn').onclick = () => { closeConfirm(); fn(); };
+    document.getElementById('confirmOverlay').classList.add('active');
+  };
+  window.closeConfirm = function() {
+    document.getElementById('confirmOverlay').classList.remove('active');
+  };
+
+  // 初期ロード
+  loadUsers();
+</script>
+</body>
+</html>
