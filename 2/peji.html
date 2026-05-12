@@ -11,7 +11,6 @@
    DESIGN TOKENS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 :root {
-  /* iOS 18 dark system */
   --bg:        #000;
   --bg2:       #1C1C1E;
   --bg3:       #2C2C2E;
@@ -25,7 +24,6 @@
   --t2:        rgba(235,235,245,.6);
   --t3:        rgba(235,235,245,.3);
   --t4:        rgba(235,235,245,.16);
-  /* system accents */
   --blue:      #0A84FF;
   --blue-l:    #409CFF;
   --green:     #30D158;
@@ -36,14 +34,11 @@
   --indigo:    #5E5CE6;
   --pink:      #FF375F;
   --yellow:    #FFD60A;
-  /* glass */
   --glass:     rgba(28,28,30,.88);
   --glass2:    rgba(44,44,46,.9);
   --blur:      blur(32px) saturate(180%);
   --blur2:     blur(48px) saturate(200%);
-  /* radii */
   --r1: 8px; --r2: 12px; --r3: 16px; --r4: 20px; --r5: 26px;
-  /* layout */
   --tabH:   38px;
   --ubarH:  44px;
   --dockH:  82px;
@@ -62,9 +57,7 @@ body{
   user-select:none;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   WALLPAPER — iOS 18 cinematic blue mesh
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ WALLPAPER ━━━ */
 .wall{
   position:fixed;inset:0;z-index:0;pointer-events:none;
   background:
@@ -80,21 +73,13 @@ body{
   50%{filter:hue-rotate(10deg) brightness(1.05);}
   100%{filter:hue-rotate(-5deg) brightness(.96);}
 }
-/* noise grain */
 .wall::after{
   content:'';position:absolute;inset:0;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
   background-size:180px;opacity:.6;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   HIDDEN SVG SPRITE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-/* inline below body open */
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   TAB BAR — macOS Safari pill style
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ TAB BAR ━━━ */
 #tabBar{
   position:relative;z-index:60;
   height:var(--tabH);
@@ -108,7 +93,6 @@ body{
   scrollbar-width:none;
 }
 #tabBar::-webkit-scrollbar{display:none;}
-
 .tab{
   display:flex;align-items:center;gap:5px;
   height:26px;padding:0 10px;
@@ -143,7 +127,6 @@ body{
   box-shadow:0 1px 4px rgba(0,0,0,.4),0 0 0 .5px rgba(10,132,255,.38);
 }
 .tab-div{width:.5px;height:16px;background:var(--sep2);flex-shrink:0;}
-
 #newTabBtn{
   width:26px;height:26px;border-radius:var(--r1);
   border:none;background:none;
@@ -154,9 +137,7 @@ body{
 }
 #newTabBtn:hover{background:var(--fill2);color:var(--t1);}
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   URL BAR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ URL BAR ━━━ */
 #uBar{
   position:relative;z-index:59;
   height:var(--ubarH);
@@ -202,9 +183,7 @@ body{
 }
 .ubtn-close:hover{background:rgba(255,69,58,.12);color:var(--red);}
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CONTENT AREA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ CONTENT AREA ━━━ */
 #content{
   position:relative;z-index:10;
   flex:1;overflow:hidden;
@@ -215,9 +194,7 @@ body{
 }
 .tview.active{display:flex;}
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   HOME VIEW
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ HOME VIEW ━━━ */
 #homeV{
   overflow-y:auto;
   padding-bottom:calc(var(--dockH) + 20px);
@@ -357,8 +334,6 @@ body{
   display:flex;flex-direction:column;align-items:center;gap:6px;
   cursor:pointer;-webkit-tap-highlight-color:transparent;
 }
-
-/* icon shell */
 .app-shell{
   width:62px;height:62px;
   border-radius:14.4px;
@@ -371,7 +346,6 @@ body{
     0 -1px 0 rgba(0,0,0,.25) inset;
   overflow:hidden;
 }
-/* gloss overlay */
 .app-shell::before{
   content:'';position:absolute;inset:0;
   background:linear-gradient(155deg,
@@ -383,12 +357,16 @@ body{
 }
 .app-item:active .app-shell{transform:scale(.84);filter:brightness(.77);}
 .app-symbol{position:relative;z-index:2;}
-
 .app-lbl{
   font-size:11px;font-weight:400;
   color:var(--t1);text-align:center;line-height:1.25;
   text-shadow:0 1px 5px rgba(0,0,0,.65);
   max-width:66px;
+  /* 長いラベルも2行で収まるように */
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
 }
 
 /* colour skins */
@@ -405,15 +383,11 @@ body{
 .sk-graphite{background:linear-gradient(155deg,#58585a 0%,#1c1c1e 100%);}
 .sk-wine    {background:linear-gradient(155deg,#ff3c5e 0%,#a0102c 100%);}
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   IFRAME VIEWS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ IFRAME VIEWS ━━━ */
 .iframe-v{flex:1;}
 .iframe-v iframe{width:100%;height:100%;border:none;display:block;background:#fff;}
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   DOCK
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ DOCK ━━━ */
 #dock{
   position:fixed;bottom:0;left:0;right:0;z-index:70;
   height:var(--dockH);
@@ -446,8 +420,6 @@ body{
 .dock-icon:active{transform:scale(.84);}
 .dock-icon .app-symbol{position:relative;z-index:2;}
 .dock-sep{width:.5px;height:34px;background:rgba(255,255,255,.14);}
-
-/* unread badge */
 .badge{
   position:absolute;top:-4px;right:-4px;
   min-width:17px;height:17px;
@@ -459,9 +431,7 @@ body{
 }
 .badge.on{display:flex;}
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CHAT PANEL (floating)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ CHAT PANEL ━━━ */
 #chatPanel{
   position:fixed;bottom:96px;right:14px;
   width:288px;height:368px;
@@ -542,17 +512,13 @@ body{
 }
 #pSend:hover{background:var(--blue-l);}
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ANIMATION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ ANIMATIONS ━━━ */
 @keyframes slideUp{
   from{opacity:0;transform:translateY(20px);}
   to{opacity:1;transform:translateY(0);}
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   RESPONSIVE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ RESPONSIVE ━━━ */
 @media(max-width:390px){
   .app-shell{width:54px;height:54px;border-radius:13px;}
   .app-grid{gap:18px 4px;}
@@ -567,38 +533,32 @@ body{
 <!-- ━━━ SVG SPRITE ━━━ -->
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
 <defs>
-
 <symbol id="s-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
   <path d="M3 10L12 3l9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10z"/>
   <path d="M9 21V12h6v9"/>
 </symbol>
-
 <symbol id="s-home-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
   <path d="M2 7L8 2l6 5v7a.67.67 0 0 1-.67.67H2.67A.67.67 0 0 1 2 14V7z"/>
   <path d="M6 14.67V9h4v5.67"/>
 </symbol>
-
 <symbol id="s-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
   <circle cx="12" cy="12" r="9.25"/>
   <path d="M12 2.75c-2.7 3.1-4.25 5.8-4.25 9.25s1.55 6.15 4.25 9.25"/>
   <path d="M12 2.75c2.7 3.1 4.25 5.8 4.25 9.25s-1.55 6.15-4.25 9.25"/>
   <path d="M3 9.25h18M3 14.75h18"/>
 </symbol>
-
 <symbol id="s-globe-sm" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
   <circle cx="7" cy="7" r="5.5"/>
   <path d="M7 1.5c-1.6 1.8-2.5 3.4-2.5 5.5s.9 3.7 2.5 5.5"/>
   <path d="M7 1.5c1.6 1.8 2.5 3.4 2.5 5.5s-.9 3.7-2.5 5.5"/>
   <path d="M1.7 5.5h10.6M1.7 8.5h10.6"/>
 </symbol>
-
 <symbol id="s-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
   <rect x="2" y="7" width="20" height="11" rx="5"/>
   <path d="M7 12h4M9 10v4"/>
   <circle cx="15.5" cy="11" r=".9" fill="currentColor" stroke="none"/>
   <circle cx="17.5" cy="13" r=".9" fill="currentColor" stroke="none"/>
 </symbol>
-
 <symbol id="s-shuffle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="16 3 21 3 21 8"/>
   <line x1="4" y1="20" x2="21" y2="3"/>
@@ -606,31 +566,25 @@ body{
   <line x1="15" y1="15" x2="21" y2="21"/>
   <line x1="4" y1="4" x2="9" y2="9"/>
 </symbol>
-
 <symbol id="s-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
 </symbol>
-
 <symbol id="s-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
   <polyline points="7 10 12 15 17 10"/>
   <line x1="12" y1="15" x2="12" y2="3"/>
 </symbol>
-
 <symbol id="s-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
 </symbol>
-
 <symbol id="s-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
   <polygon points="5 3 19 12 5 21 5 3"/>
 </symbol>
-
 <symbol id="s-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="1 4 1 10 7 10"/>
   <path d="M3.51 15a9 9 0 1 0 .49-4.93"/>
   <polyline points="12 7 12 12 15 15"/>
 </symbol>
-
 <symbol id="s-board" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
   <rect x="2" y="3" width="20" height="14" rx="2"/>
   <line x1="8" y1="21" x2="16" y2="21"/>
@@ -638,35 +592,28 @@ body{
   <line x1="7" y1="9" x2="17" y2="9"/>
   <line x1="7" y1="13" x2="13" y2="13"/>
 </symbol>
-
 <symbol id="s-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
   <line x1="18" y1="6" x2="6" y2="18"/>
   <line x1="6" y1="6" x2="18" y2="18"/>
 </symbol>
-
 <symbol id="s-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
   <rect x="3" y="11" width="18" height="11" rx="2"/>
   <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
 </symbol>
-
 <symbol id="s-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="23 4 23 10 17 10"/>
   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
 </symbol>
-
 <symbol id="s-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
   <line x1="12" y1="19" x2="12" y2="5"/>
   <polyline points="5 12 12 5 19 12"/>
 </symbol>
-
 <symbol id="s-chevron-l" viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
   <path d="M8 2L2 9l6 7"/>
 </symbol>
-
 <symbol id="s-chevron-r" viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
   <path d="M2 2l6 7-6 7"/>
 </symbol>
-
 </defs>
 </svg>
 
@@ -742,7 +689,7 @@ body{
       </div>
     </div>
 
-    <!-- Apps -->
+    <!-- ━━━ アプリ ━━━ -->
     <div class="apps-section">
       <div class="apps-label">アプリ</div>
       <div class="app-grid">
@@ -810,128 +757,46 @@ body{
           <div class="app-lbl">共通チャット</div>
         </div>
 
-        <div class="app-item" onclick="openApp('kanri.html','管理画面','s-tool')">
-          <div class="app-shell sk-blue">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-tool"/></svg>
-          </div>
-          <div class="app-lbl">管理画面</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('chatkanri.html','チャット管理','s-chat')">
-          <div class="app-shell sk-blue">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-chat"/></svg>
-          </div>
-          <div class="app-lbl">チャット管理</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://google-one-red.vercel.app/akuchat.html','芥チャット管理','s-chat')">
-          <div class="app-shell sk-blue">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-chat"/></svg>
-          </div>
-          <div class="app-lbl">芥チャット管理</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://kiuytgfcvbnkiuy.vercel.app/','プロキシ1（動作未確認）','s-shuffle')">
+        <div class="app-item" onclick="openApp('https://kiuytgfcvbnkiuy.vercel.app/','プロキシ1','s-shuffle')">
           <div class="app-shell sk-purple">
             <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
           </div>
-          <div class="app-lbl">プロキシ1（動作未確認）</div>
+          <div class="app-lbl">プロキシ1</div>
         </div>
 
-        <div class="app-item" onclick="openApp('https://min-tube-ver-1-4-2.vercel.app/','プロキシ2（動作未確認）','s-shuffle')">
+        <div class="app-item" onclick="openApp('https://min-tube-ver-1-4-2.vercel.app/','プロキシ2','s-shuffle')">
           <div class="app-shell sk-purple">
             <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
           </div>
-          <div class="app-lbl">プロキシ2（動作未確認）</div>
+          <div class="app-lbl">プロキシ2</div>
         </div>
 
-        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/proxy/','新しいアプリ','s-shuffle')">
+        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/proxy/','プロキシ3','s-shuffle')">
           <div class="app-shell sk-purple">
             <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
           </div>
-          <div class="app-lbl">新しいアプリ</div>
+          <div class="app-lbl">プロキシ3</div>
         </div>
 
-        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/nautilus-os','新しいアプリ','s-shuffle')">
-          <div class="app-shell sk-purple">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
-          </div>
-          <div class="app-lbl">新しいアプリ</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/helios','新しいアプリ','s-shuffle')">
-          <div class="app-shell sk-purple">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
-          </div>
-          <div class="app-lbl">新しいアプリ</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/gust','新しいアプリ','s-shuffle')">
-          <div class="app-shell sk-purple">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
-          </div>
-          <div class="app-lbl">新しいアプリ</div>
-        </div>
-        <!-- akuchat（権限制） -->
-        <div class="app-item" id="akuApp" style="display:none"
-             onclick="openApp('../akuchat.html','共通チャット','s-chat')">
-          <div class="app-shell sk-indigo">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-chat"/></svg>
-          </div>
-          <div class="app-lbl">共通チャット</div>
-        </div>
-
-      </div>
-          <div class="app-lbl">iframeサイト</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('../gamemenu.html','ゲーム','s-gamepad')">
-          <div class="app-shell sk-purple">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-gamepad"/></svg>
-          </div>
-          <div class="app-lbl">ゲーム</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://google-one-red.vercel.app/purokisi.html','プロキシ','s-shuffle')">
-          <div class="app-shell sk-orange">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
-          </div>
-          <div class="app-lbl">プロキシ</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://x.gd/gakkou2','gakkou2','s-star')">
-          <div class="app-shell sk-gold">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-star"/></svg>
-          </div>
-          <div class="app-lbl">gakkou2</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://www.freemake.com/jp/free_video_downloader/','YT DL','s-download')">
-          <div class="app-shell sk-red">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-download"/></svg>
-          </div>
-          <div class="app-lbl">YTダウンロード</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://script.google.com/macros/s/AKfycbzZr6_OlbryeiykIF5KDlPXlT8M5UEdRyietdS9jMsHfqCeeGOcG1H-VO3RZd5CW7bn/exec','6ch','s-board')">
+        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/nautilus-os','Nautilus OS','s-shuffle')">
           <div class="app-shell sk-teal">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-board"/></svg>
+            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
           </div>
-          <div class="app-lbl">6ch</div>
+          <div class="app-lbl">Nautilus OS</div>
         </div>
 
-        <div class="app-item" onclick="openApp('https://script.google.com/macros/s/AKfycbyvrK__4OqTvTCXmX8u3Q4qtNKw7iEPunnli6xxFbU9GN8381Yas2f0vPd6PLxHlHLX/exec','YouTube','s-play')">
-          <div class="app-shell sk-wine">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-play"/></svg>
+        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/helios','Helios','s-shuffle')">
+          <div class="app-shell sk-gold">
+            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
           </div>
-          <div class="app-lbl">YouTube</div>
+          <div class="app-lbl">Helios</div>
         </div>
 
-        <div class="app-item" onclick="openApp('https://x.gd/rirekiume','履歴埋め','s-history')">
-          <div class="app-shell sk-graphite">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-history"/></svg>
+        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/gust','Gust','s-shuffle')">
+          <div class="app-shell sk-slate">
+            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
           </div>
-          <div class="app-lbl">履歴埋め</div>
+          <div class="app-lbl">Gust</div>
         </div>
 
         <!-- akuchat（権限制） -->
@@ -1002,24 +867,18 @@ body{
 <!-- ━━━ DOCK ━━━ -->
 <div id="dock">
   <div class="dock-shelf">
-
     <div class="dock-icon sk-cobalt" onclick="switchTab('home')" title="ホーム">
       <svg class="app-symbol" width="26" height="26" color="#fff"><use href="#s-home"/></svg>
     </div>
-
     <div class="dock-sep"></div>
-
     <div class="dock-icon sk-blue" onclick="togglePanel()" title="チャット" style="position:relative">
       <svg class="app-symbol" width="26" height="26" color="#fff"><use href="#s-chat"/></svg>
       <span class="badge" id="chatBadge"></span>
     </div>
-
     <div class="dock-sep"></div>
-
     <div class="dock-icon sk-slate" onclick="hidePanel()" title="非表示">
       <svg class="app-symbol" width="22" height="22" color="#fff"><use href="#s-close"/></svg>
     </div>
-
   </div>
 </div>
 
