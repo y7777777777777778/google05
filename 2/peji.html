@@ -7,9 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
 <style>
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   DESIGN TOKENS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 :root {
   --bg:        #000;
   --bg2:       #1C1C1E;
@@ -37,11 +34,9 @@
   --glass:     rgba(28,28,30,.88);
   --glass2:    rgba(44,44,46,.9);
   --blur:      blur(32px) saturate(180%);
-  --blur2:     blur(48px) saturate(200%);
   --r1: 8px; --r2: 12px; --r3: 16px; --r4: 20px; --r5: 26px;
   --tabH:   38px;
   --ubarH:  44px;
-  --dockH:  82px;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -57,7 +52,6 @@ body{
   user-select:none;
 }
 
-/* ━━━ WALLPAPER ━━━ */
 .wall{
   position:fixed;inset:0;z-index:0;pointer-events:none;
   background:
@@ -79,6 +73,75 @@ body{
   background-size:180px;opacity:.6;
 }
 
+/* ━━━ SVG SPRITE ━━━ */
+svg.sprite-defs{display:none;}
+
+/* ━━━ iOS バナー通知 ━━━ */
+#iosBanner{
+  position:fixed;
+  top:8px;
+  left:50%;
+  transform:translateX(-50%) translateY(-120px);
+  width:min(340px, calc(100vw - 24px));
+  z-index:9999;
+  pointer-events:none;
+  transition:transform .45s cubic-bezier(.34,1.28,.64,1), opacity .3s;
+  opacity:0;
+}
+#iosBanner.show{
+  transform:translateX(-50%) translateY(0);
+  opacity:1;
+  pointer-events:auto;
+}
+#iosBanner.hide{
+  transform:translateX(-50%) translateY(-120px);
+  opacity:0;
+  pointer-events:none;
+  transition:transform .3s cubic-bezier(.4,0,1,1), opacity .25s;
+}
+.banner-inner{
+  background:rgba(36,36,40,.92);
+  backdrop-filter:blur(40px) saturate(200%);
+  -webkit-backdrop-filter:blur(40px) saturate(200%);
+  border:.5px solid rgba(255,255,255,.12);
+  border-radius:20px;
+  padding:11px 14px;
+  box-shadow:0 16px 48px rgba(0,0,0,.65), 0 2px 8px rgba(0,0,0,.4);
+  display:flex;align-items:center;gap:11px;
+  cursor:pointer;
+}
+.banner-icon{
+  width:36px;height:36px;
+  border-radius:8px;
+  background:linear-gradient(145deg,#1a6eff,#0a84ff);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 2px 8px rgba(10,132,255,.4);
+}
+.banner-body{flex:1;overflow:hidden;}
+.banner-app{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px;}
+.banner-msg{font-size:13px;font-weight:500;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.banner-ts{font-size:10px;color:var(--t4);margin-top:1px;}
+.banner-close{
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:none;
+  color:var(--t3);cursor:pointer;font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:background .12s;font-family:inherit;
+}
+.banner-close:hover{background:rgba(255,255,255,.16);}
+
+/* バナー hype モード */
+#iosBanner.hype .banner-icon{
+  background:linear-gradient(145deg,#ff9f0a,#ff6b00);
+  box-shadow:0 2px 8px rgba(255,159,10,.5);
+  animation:iconPulse 1s ease infinite alternate;
+}
+@keyframes iconPulse{
+  from{box-shadow:0 2px 8px rgba(255,159,10,.4);}
+  to{box-shadow:0 4px 18px rgba(255,159,10,.8);}
+}
+
 /* ━━━ TAB BAR ━━━ */
 #tabBar{
   position:relative;z-index:60;
@@ -93,6 +156,7 @@ body{
   scrollbar-width:none;
 }
 #tabBar::-webkit-scrollbar{display:none;}
+
 .tab{
   display:flex;align-items:center;gap:5px;
   height:26px;padding:0 10px;
@@ -127,6 +191,7 @@ body{
   box-shadow:0 1px 4px rgba(0,0,0,.4),0 0 0 .5px rgba(10,132,255,.38);
 }
 .tab-div{width:.5px;height:16px;background:var(--sep2);flex-shrink:0;}
+
 #newTabBtn{
   width:26px;height:26px;border-radius:var(--r1);
   border:none;background:none;
@@ -136,6 +201,140 @@ body{
   transition:background .12s,color .12s;
 }
 #newTabBtn:hover{background:var(--fill2);color:var(--t1);}
+
+/* ━━━ タブバー右端: 通知エリア ━━━ */
+#tabRight{
+  margin-left:auto;
+  display:flex;align-items:center;gap:6px;
+  padding:0 8px 0 10px;
+  height:100%;
+  border-left:.5px solid var(--sep2);
+  flex-shrink:0;
+}
+
+/* 通知トグルボタン */
+#notifToggleBtn{
+  width:28px;height:28px;border-radius:var(--r1);
+  border:none;background:none;
+  color:var(--t3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-family:inherit;
+  transition:background .12s,color .12s;
+  position:relative;
+}
+#notifToggleBtn:hover{background:var(--fill2);}
+#notifToggleBtn.notif-on{color:var(--green);}
+#notifToggleBtn.notif-off{color:var(--t4);}
+.notif-on-dot{
+  position:absolute;bottom:3px;right:3px;
+  width:5px;height:5px;border-radius:50%;
+  background:var(--green);
+  border:1px solid var(--bg);
+  display:none;
+}
+#notifToggleBtn.notif-on .notif-on-dot{display:block;}
+
+/* メールボックスボタン（通知OFFのとき） */
+#mailboxBtn{
+  display:flex;align-items:center;gap:5px;
+  height:26px;padding:0 8px;
+  border-radius:var(--r1);border:none;
+  background:none;color:var(--t3);
+  font-size:11px;font-weight:500;font-family:inherit;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+  transition:background .12s,color .12s;
+  position:relative;
+}
+#mailboxBtn:hover{background:var(--fill2);color:var(--t1);}
+#mailboxUnread{
+  min-width:14px;height:14px;padding:0 3px;
+  background:var(--red);border-radius:7px;
+  font-size:9px;font-weight:700;color:#fff;
+  display:none;align-items:center;justify-content:center;
+}
+#mailboxUnread.on{display:flex;}
+
+/* チャット開くボタン（常時表示） */
+#chatOpenBtn{
+  width:26px;height:26px;border-radius:var(--r1);
+  border:none;background:rgba(10,132,255,.12);
+  color:var(--blue-l);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-family:inherit;font-size:14px;
+  transition:background .12s;
+  position:relative;
+}
+#chatOpenBtn:hover{background:rgba(10,132,255,.25);}
+#chatBadge{
+  position:absolute;top:-4px;right:-4px;
+  min-width:14px;height:14px;padding:0 3px;
+  background:var(--red);border-radius:7px;
+  font-size:9px;font-weight:700;color:#fff;
+  display:none;align-items:center;justify-content:center;
+}
+#chatBadge.on{display:flex;}
+
+/* ━━━ メールボックス ドロップダウン ━━━ */
+#mailboxDropdown{
+  position:fixed;
+  top:calc(var(--tabH) + 4px);
+  right:8px;
+  width:300px;
+  max-height:320px;
+  z-index:500;
+  background:rgba(36,36,40,.96);
+  backdrop-filter:blur(40px) saturate(200%);
+  -webkit-backdrop-filter:blur(40px) saturate(200%);
+  border:.5px solid rgba(255,255,255,.1);
+  border-radius:var(--r3);
+  box-shadow:0 24px 64px rgba(0,0,0,.7);
+  overflow:hidden;
+  display:none;
+  flex-direction:column;
+  animation:dropIn .2s cubic-bezier(.34,1.4,.64,1);
+}
+#mailboxDropdown.open{display:flex;}
+@keyframes dropIn{
+  from{opacity:0;transform:translateY(-12px) scale(.95);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+.mail-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px 8px;
+  border-bottom:.5px solid var(--sep2);
+  flex-shrink:0;
+}
+.mail-hd-title{font-size:12px;font-weight:700;color:var(--t2);letter-spacing:.04em;}
+.mail-clear{
+  font-size:11px;color:var(--blue-l);
+  background:none;border:none;cursor:pointer;font-family:inherit;
+}
+.mail-list{overflow-y:auto;flex:1;scrollbar-width:none;}
+.mail-list::-webkit-scrollbar{display:none;}
+.mail-item{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:9px 14px;
+  border-bottom:.5px solid var(--sep2);
+  cursor:default;
+  transition:background .1s;
+}
+.mail-item:hover{background:var(--fill3);}
+.mail-item:last-child{border-bottom:none;}
+.mail-item-icon{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(145deg,#1a6eff,#0a84ff);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:13px;
+}
+.mail-item-icon.hype{background:linear-gradient(145deg,#ff9f0a,#ff6b00);}
+.mail-item-body{flex:1;overflow:hidden;}
+.mail-item-name{font-size:11px;font-weight:600;color:var(--t2);}
+.mail-item-txt{font-size:12px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mail-item-ts{font-size:10px;color:var(--t4);margin-top:1px;}
+.mail-empty{
+  padding:28px;text-align:center;
+  font-size:12px;color:var(--t4);
+}
 
 /* ━━━ URL BAR ━━━ */
 #uBar{
@@ -183,7 +382,7 @@ body{
 }
 .ubtn-close:hover{background:rgba(255,69,58,.12);color:var(--red);}
 
-/* ━━━ CONTENT AREA ━━━ */
+/* ━━━ CONTENT ━━━ */
 #content{
   position:relative;z-index:10;
   flex:1;overflow:hidden;
@@ -197,12 +396,11 @@ body{
 /* ━━━ HOME VIEW ━━━ */
 #homeV{
   overflow-y:auto;
-  padding-bottom:calc(var(--dockH) + 20px);
+  padding-bottom:20px;
   scrollbar-width:none;
 }
 #homeV::-webkit-scrollbar{display:none;}
 
-/* CLOCK */
 .clock-wrap{
   text-align:center;
   padding:44px 0 28px;
@@ -222,100 +420,6 @@ body{
   color:var(--t2);margin-top:9px;letter-spacing:.01em;
 }
 
-/* CHAT CARD */
-.chat-card{
-  margin:0 14px 16px;
-  background:var(--glass2);
-  backdrop-filter:var(--blur2);
-  -webkit-backdrop-filter:var(--blur2);
-  border:.5px solid var(--sep);
-  border-radius:var(--r3);
-  overflow:hidden;
-  box-shadow:0 6px 30px rgba(0,0,0,.4);
-  animation:slideUp .65s .08s cubic-bezier(.22,1,.36,1) both;
-}
-.card-hd{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;
-  border-bottom:.5px solid var(--sep2);
-}
-.card-title{
-  display:flex;align-items:center;gap:7px;
-  font-size:13px;font-weight:600;letter-spacing:-.01em;
-}
-.live-dot{
-  width:7px;height:7px;border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 8px var(--green);
-  animation:livePulse 2.5s ease-in-out infinite;
-}
-@keyframes livePulse{0%,100%{opacity:1}55%{opacity:.3}}
-.card-btn{
-  font-size:12px;font-weight:500;color:var(--blue);
-  background:none;border:none;cursor:pointer;font-family:inherit;
-  padding:3px 7px;border-radius:6px;letter-spacing:-.01em;
-  transition:background .1s;
-}
-.card-btn:hover{background:rgba(10,132,255,.12);}
-
-/* ticker */
-.ticker-row{
-  display:flex;align-items:center;gap:8px;
-  padding:4px 14px;border-bottom:.5px solid var(--sep2);
-  overflow:hidden;
-}
-.ticker-tag{
-  font-size:9px;font-weight:700;letter-spacing:.1em;
-  color:var(--green);background:rgba(48,209,88,.1);
-  padding:2px 6px;border-radius:4px;flex-shrink:0;
-  text-transform:uppercase;
-}
-.ticker-track{flex:1;overflow:hidden;position:relative;height:16px;}
-.ticker-txt{
-  position:absolute;white-space:nowrap;
-  font-size:11px;color:var(--t3);
-  animation:tickScroll 22s linear infinite;
-  top:50%;transform:translateY(-50%);
-}
-@keyframes tickScroll{from{left:100%}to{left:-300%}}
-
-/* messages preview */
-.card-msgs{
-  padding:8px 14px;min-height:60px;max-height:78px;
-  overflow-y:auto;display:flex;flex-direction:column;gap:5px;
-  scrollbar-width:none;
-}
-.card-msgs::-webkit-scrollbar{display:none;}
-.cmsg{font-size:12px;color:var(--t2);line-height:1.5;display:flex;gap:5px;}
-.cmsg-name{font-weight:600;color:var(--blue-l);flex-shrink:0;}
-.cmsg-name.me{color:var(--teal);}
-
-/* input */
-.card-input{
-  display:flex;align-items:center;gap:7px;
-  padding:8px 10px;border-top:.5px solid var(--sep2);
-}
-.card-input input{
-  flex:1;height:32px;
-  background:var(--fill2);border:.5px solid var(--sep2);
-  border-radius:16px;color:var(--t1);
-  font-size:13px;padding:0 13px;outline:none;font-family:inherit;
-  transition:border .15s,background .15s;
-}
-.card-input input:focus{border-color:var(--blue);background:rgba(10,132,255,.06);}
-.card-input input::placeholder{color:var(--t4);}
-.send-btn{
-  width:32px;height:32px;border-radius:50%;
-  background:var(--blue);border:none;color:#fff;
-  cursor:pointer;flex-shrink:0;font-family:inherit;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 12px rgba(10,132,255,.45);
-  transition:background .15s,transform .1s;
-}
-.send-btn:hover{background:var(--blue-l);}
-.send-btn:active{transform:scale(.9);}
-
-/* APP GRID */
 .apps-section{
   padding:0 18px;
   animation:slideUp .65s .14s cubic-bezier(.22,1,.36,1) both;
@@ -362,12 +466,17 @@ body{
   color:var(--t1);text-align:center;line-height:1.25;
   text-shadow:0 1px 5px rgba(0,0,0,.65);
   max-width:66px;
-  /* 長いラベルも2行で収まるように */
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
 }
+.badge{
+  position:absolute;top:-4px;right:-4px;
+  min-width:17px;height:17px;
+  background:var(--red);border-radius:9px;
+  border:2px solid var(--bg);
+  font-size:10px;font-weight:700;color:#fff;
+  display:none;align-items:center;justify-content:center;
+  padding:0 3px;z-index:10;
+}
+.badge.on{display:flex;}
 
 /* colour skins */
 .sk-blue    {background:linear-gradient(155deg,#2090ff 0%,#0055d4 100%);}
@@ -383,146 +492,44 @@ body{
 .sk-graphite{background:linear-gradient(155deg,#58585a 0%,#1c1c1e 100%);}
 .sk-wine    {background:linear-gradient(155deg,#ff3c5e 0%,#a0102c 100%);}
 
-/* ━━━ IFRAME VIEWS ━━━ */
+/* ━━━ iframe views ━━━ */
 .iframe-v{flex:1;}
 .iframe-v iframe{width:100%;height:100%;border:none;display:block;background:#fff;}
 
-/* ━━━ DOCK ━━━ */
-#dock{
-  position:fixed;bottom:0;left:0;right:0;z-index:70;
-  height:var(--dockH);
-  display:flex;align-items:flex-start;justify-content:center;
-  padding-top:9px;pointer-events:none;
-}
-.dock-shelf{
-  display:flex;align-items:center;gap:14px;
-  background:rgba(255,255,255,.105);
-  backdrop-filter:var(--blur2);
-  -webkit-backdrop-filter:var(--blur2);
-  border:.5px solid rgba(255,255,255,.17);
-  border-radius:var(--r5);
-  padding:9px 18px;
-  pointer-events:all;
-  box-shadow:0 10px 44px rgba(0,0,0,.55),0 1px 0 rgba(255,255,255,.06) inset;
-}
-.dock-icon{
-  width:50px;height:50px;border-radius:12px;
-  position:relative;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;overflow:hidden;
-  transition:transform .15s cubic-bezier(.34,1.56,.64,1);
-  box-shadow:0 2px 9px rgba(0,0,0,.5),0 .5px 0 rgba(255,255,255,.09) inset;
-}
-.dock-icon::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(155deg,rgba(255,255,255,.22) 0%,transparent 55%);
-  z-index:1;pointer-events:none;
-}
-.dock-icon:active{transform:scale(.84);}
-.dock-icon .app-symbol{position:relative;z-index:2;}
-.dock-sep{width:.5px;height:34px;background:rgba(255,255,255,.14);}
-.badge{
-  position:absolute;top:-4px;right:-4px;
-  min-width:17px;height:17px;
-  background:var(--red);border-radius:9px;
-  border:2px solid var(--bg);
-  font-size:10px;font-weight:700;color:#fff;
-  display:none;align-items:center;justify-content:center;
-  padding:0 3px;z-index:10;
-}
-.badge.on{display:flex;}
-
-/* ━━━ CHAT PANEL ━━━ */
+/* ━━━ chat panel ━━━ */
 #chatPanel{
-  position:fixed;bottom:96px;right:14px;
+  position:fixed;bottom:14px;right:14px;
   width:288px;height:368px;
-  background:rgba(26,26,28,.97);
-  backdrop-filter:var(--blur2);
-  -webkit-backdrop-filter:var(--blur2);
-  border:.5px solid var(--sep);
   border-radius:var(--r4);
   z-index:200;
-  display:none;flex-direction:column;
+  display:none;
   box-shadow:0 28px 72px rgba(0,0,0,.75),0 0 0 .5px rgba(255,255,255,.04);
   overflow:hidden;transform-origin:bottom right;
 }
 #chatPanel.open{
-  display:flex;
+  display:block;
   animation:panelIn .28s cubic-bezier(.34,1.56,.64,1) both;
 }
 @keyframes panelIn{
   from{opacity:0;transform:scale(.78) translateY(24px);}
   to{opacity:1;transform:scale(1) translateY(0);}
 }
-.panel-hd{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:11px 13px 10px;
-  border-bottom:.5px solid var(--sep2);flex-shrink:0;
-}
-.panel-title{
-  display:flex;align-items:center;gap:7px;
-  font-size:14px;font-weight:600;letter-spacing:-.01em;
-}
-.panel-close{
-  width:22px;height:22px;border-radius:50%;
-  background:var(--fill2);border:none;
-  color:var(--t3);font-size:11px;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  font-family:inherit;transition:background .1s,color .1s;
-}
-.panel-close:hover{background:var(--fill);color:var(--t1);}
-#panelMsgs{
-  flex:1;overflow-y:auto;padding:10px 12px;
-  display:flex;flex-direction:column;gap:7px;
-  scrollbar-width:none;
-}
-#panelMsgs::-webkit-scrollbar{display:none;}
-.pmsg{display:flex;gap:5px;align-items:baseline;}
-.pmsg-n{font-size:11px;font-weight:600;color:var(--blue-l);flex-shrink:0;}
-.pmsg-n.me{color:var(--teal);}
-.pmsg-t{font-size:12.5px;color:var(--t2);word-break:break-all;flex:1;line-height:1.5;}
-.pmsg-ts{font-size:10px;color:var(--t4);flex-shrink:0;}
-.panel-ft{border-top:.5px solid var(--sep2);padding:8px 10px;flex-shrink:0;}
-.ft-name{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
-.ft-label{font-size:10px;font-weight:600;letter-spacing:.07em;color:var(--t4);text-transform:uppercase;}
-#pName{
-  flex:1;height:26px;
-  background:var(--fill2);border:.5px solid var(--sep2);
-  border-radius:7px;color:var(--t1);
-  font-size:12px;padding:0 9px;outline:none;font-family:inherit;
-  transition:border .15s;
-}
-#pName:focus{border-color:var(--blue);}
-.ft-msg{display:flex;gap:7px;}
-#pInput{
-  flex:1;height:32px;
-  background:var(--fill2);border:.5px solid var(--sep2);
-  border-radius:16px;color:var(--t1);
-  font-size:12.5px;padding:0 12px;outline:none;font-family:inherit;
-  transition:border .15s,background .15s;
-}
-#pInput:focus{border-color:var(--blue);background:rgba(10,132,255,.05);}
-#pInput::placeholder{color:var(--t4);}
-#pSend{
-  width:32px;height:32px;border-radius:50%;
-  background:var(--blue);border:none;color:#fff;
-  cursor:pointer;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 12px rgba(10,132,255,.42);
-  transition:background .15s;
-}
-#pSend:hover{background:var(--blue-l);}
 
-/* ━━━ ANIMATIONS ━━━ */
 @keyframes slideUp{
   from{opacity:0;transform:translateY(20px);}
   to{opacity:1;transform:translateY(0);}
 }
 
-/* ━━━ RESPONSIVE ━━━ */
+@keyframes onlinePulse{
+  0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(48,209,88,.5);}
+  50%{opacity:.7;box-shadow:0 0 0 4px rgba(48,209,88,0);}
+}
+
 @media(max-width:390px){
   .app-shell{width:54px;height:54px;border-radius:13px;}
   .app-grid{gap:18px 4px;}
   #chatPanel{width:calc(100vw - 28px);}
+  #mailboxDropdown{width:calc(100vw - 16px);right:8px;}
 }
 </style>
 </head>
@@ -530,13 +537,9 @@ body{
 
 <div class="wall"></div>
 
-<!-- ━━━ SVG SPRITE ━━━ -->
-<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+<!-- SVG sprite (hidden) -->
+<svg class="sprite-defs" xmlns="http://www.w3.org/2000/svg">
 <defs>
-<symbol id="s-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M3 10L12 3l9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10z"/>
-  <path d="M9 21V12h6v9"/>
-</symbol>
 <symbol id="s-home-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
   <path d="M2 7L8 2l6 5v7a.67.67 0 0 1-.67.67H2.67A.67.67 0 0 1 2 14V7z"/>
   <path d="M6 14.67V9h4v5.67"/>
@@ -604,23 +607,52 @@ body{
   <polyline points="23 4 23 10 17 10"/>
   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
 </symbol>
-<symbol id="s-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-  <line x1="12" y1="19" x2="12" y2="5"/>
-  <polyline points="5 12 12 5 19 12"/>
-</symbol>
 <symbol id="s-chevron-l" viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
   <path d="M8 2L2 9l6 7"/>
 </symbol>
 <symbol id="s-chevron-r" viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
   <path d="M2 2l6 7-6 7"/>
 </symbol>
+<!-- ベル -->
+<symbol id="s-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+</symbol>
+<!-- ベルオフ -->
+<symbol id="s-bell-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+  <path d="M18.63 13A17.9 17.9 0 0 1 18 8"/>
+  <path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"/>
+  <path d="M18 8a6 6 0 0 0-9.33-5"/>
+  <line x1="1" y1="1" x2="23" y2="23"/>
+</symbol>
+<!-- メール -->
+<symbol id="s-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+  <polyline points="22,6 12,13 2,6"/>
+</symbol>
 </defs>
 </svg>
+
+<!-- ━━━ iOS バナー通知 ━━━ -->
+<div id="iosBanner">
+  <div class="banner-inner" onclick="onBannerClick()">
+    <div class="banner-icon" id="bannerIcon">
+      <svg width="18" height="18" color="#fff"><use href="#s-chat"/></svg>
+    </div>
+    <div class="banner-body">
+      <div class="banner-app">チャット通知</div>
+      <div class="banner-msg" id="bannerMsg">メッセージ</div>
+      <div class="banner-ts"  id="bannerTs"></div>
+    </div>
+    <button class="banner-close" onclick="event.stopPropagation();dismissBanner()">✕</button>
+  </div>
+</div>
 
 <!-- ━━━ TAB BAR ━━━ -->
 <div id="tabBar">
   <div class="tab tab-home active" id="homeTab" onclick="switchTab('home')">
-    <svg class="tab-fav" color="var(--blue-l)"><use href="#s-home-sm"/></svg>
+    <svg class="tab-fav" color="var(--blue-l)" width="13" height="13"><use href="#s-home-sm"/></svg>
     <span class="tab-lbl">ホーム</span>
   </div>
   <div class="tab-div" id="tabDiv" style="display:none"></div>
@@ -631,6 +663,64 @@ body{
       <line x1=".5" y1="6.5" x2="12.5" y2="6.5"/>
     </svg>
   </button>
+
+  <!-- 右端エリア: 通知トグル + メールボックス/ライブテキスト + チャット -->
+  <div id="tabRight">
+
+    <!-- オンライン人数 -->
+    <div id="onlineCount" style="
+      display:flex;align-items:center;gap:4px;
+      padding:0 8px;height:26px;
+      background:rgba(48,209,88,.08);
+      border:.5px solid rgba(48,209,88,.22);
+      border-radius:13px;
+      flex-shrink:0;
+    ">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--green);
+        display:inline-block;flex-shrink:0;
+        animation:onlinePulse 2s ease infinite;"></span>
+      <span id="onlineCnt" style="font-size:11px;font-weight:700;color:var(--green);letter-spacing:.02em;">…</span>
+      <span style="font-size:10px;color:rgba(48,209,88,.6);letter-spacing:.02em;">人</span>
+    </div>
+
+    <!-- 通知ONOFFトグル -->
+    <button id="notifToggleBtn" class="notif-on" title="通知をON/OFFする" onclick="toggleNotif()">
+      <svg width="15" height="15"><use href="#s-bell"/></svg>
+      <div class="notif-on-dot"></div>
+    </button>
+
+    <!-- メールボックス (通知OFFのとき) -->
+    <button id="mailboxBtn" onclick="toggleMailbox()" title="通知ボックス" style="display:none;">
+      <svg width="15" height="13"><use href="#s-mail"/></svg>
+      <span id="mailboxUnread"></span>
+    </button>
+
+    <!-- 通知ライブテキスト (通知ONのとき) -->
+    <span id="liveNotifTxt" style="
+      font-size:11px;color:var(--t3);
+      max-width:150px;overflow:hidden;
+      text-overflow:ellipsis;white-space:nowrap;
+      letter-spacing:-.01em;cursor:default;
+    ">接続中...</span>
+
+    <!-- チャットを開く（常時） -->
+    <button id="chatOpenBtn" onclick="togglePanel()" title="チャットを開く">
+      <svg width="14" height="14"><use href="#s-chat"/></svg>
+      <span id="chatBadge"></span>
+    </button>
+
+  </div>
+</div>
+
+<!-- ━━━ メールボックス ドロップダウン ━━━ -->
+<div id="mailboxDropdown">
+  <div class="mail-hd">
+    <span class="mail-hd-title">📬 通知ボックス</span>
+    <button class="mail-clear" onclick="clearMailbox()">全消去</button>
+  </div>
+  <div class="mail-list" id="mailList">
+    <div class="mail-empty">通知なし</div>
+  </div>
 </div>
 
 <!-- ━━━ URL BAR ━━━ -->
@@ -655,41 +745,11 @@ body{
 
 <!-- ━━━ CONTENT ━━━ -->
 <div id="content">
-
-  <!-- HOME -->
   <div class="tview active" id="homeV">
-
-    <!-- Clock -->
     <div class="clock-wrap">
       <div class="clock-hm" id="clockFace">00:00</div>
       <div class="clock-dt"  id="clockDate">読み込み中</div>
     </div>
-
-    <!-- Chat card -->
-    <div class="chat-card">
-      <div class="card-hd">
-        <div class="card-title">
-          <div class="live-dot"></div>
-          ライブチャット
-        </div>
-        <button class="card-btn" onclick="openPanel()">全画面</button>
-      </div>
-      <div class="ticker-row">
-        <span class="ticker-tag">live</span>
-        <div class="ticker-track">
-          <span class="ticker-txt" id="tickerTxt">接続中...</span>
-        </div>
-      </div>
-      <div class="card-msgs" id="cardMsgs"></div>
-      <div class="card-input">
-        <input id="homeInput" placeholder="メッセージ..." maxlength="100">
-        <button class="send-btn" onclick="sendHome()">
-          <svg width="14" height="14"><use href="#s-send"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- ━━━ アプリ ━━━ -->
     <div class="apps-section">
       <div class="apps-label">アプリ</div>
       <div class="app-grid">
@@ -726,7 +786,7 @@ body{
           <div class="app-shell sk-red">
             <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-download"/></svg>
           </div>
-          <div class="app-lbl">YT DL</div>
+          <div class="app-lbl">YTダウンロード</div>
         </div>
 
         <div class="app-item" onclick="openApp('https://script.google.com/macros/s/AKfycbzZr6_OlbryeiykIF5KDlPXlT8M5UEdRyietdS9jMsHfqCeeGOcG1H-VO3RZd5CW7bn/exec','6ch','s-board')">
@@ -809,103 +869,15 @@ body{
         </div>
 
       </div>
-    </div><!-- /apps-section -->
-
-    <!-- ━━━ 管理者専用セクション（isAdmin=trueのみ表示） ━━━ -->
-    <div class="apps-section" id="adminSection" style="display:none;margin-top:24px;">
-      <div class="apps-label" style="display:flex;align-items:center;gap:6px;">
-        <span style="color:var(--purple);">⚙</span>
-        <span style="color:var(--purple);">管理者</span>
-      </div>
-      <div class="app-grid">
-
-        <div class="app-item" onclick="openApp('kanri.html','管理画面','s-lock')">
-          <div class="app-shell" style="background:linear-gradient(145deg,#1c1c2e,#2a1a3e);border:.5px solid rgba(191,90,242,.35);">
-            <svg class="app-symbol" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#BF5AF2" stroke-width="1.7" stroke-linecap="round">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-            </svg>
-          </div>
-          <div class="app-lbl">管理画面</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('chatkanri.html','チャット管理','s-chat')">
-          <div class="app-shell" style="background:linear-gradient(145deg,#0e1e1a,#0a2e28);border:.5px solid rgba(0,255,231,.25);">
-            <svg class="app-symbol" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5AC8FA" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-          </div>
-          <div class="app-lbl">チャット管理</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://google-one-red.vercel.app/akuchat.html','芥チャット管理','s-chat')">
-          <div class="app-shell" style="background:linear-gradient(145deg,#1e0a0a,#2e1010);border:.5px solid rgba(255,68,102,.25);">
-            <svg class="app-symbol" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF453A" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-          </div>
-          <div class="app-lbl">芥チャット管理</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('pej.html','SECRET','s-lock')">
-          <div class="app-shell" style="background:linear-gradient(145deg,#0a0e1a,#141830);border:.5px solid rgba(0,168,255,.25);">
-            <svg class="app-symbol" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#409CFF" stroke-width="1.7" stroke-linecap="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-          </div>
-          <div class="app-lbl">SECRET</div>
-        </div>
-
-      </div>
-    </div><!-- /adminSection -->
-
-  </div><!-- /homeV -->
-
-</div><!-- /content -->
-
-<!-- ━━━ DOCK ━━━ -->
-<div id="dock">
-  <div class="dock-shelf">
-    <div class="dock-icon sk-cobalt" onclick="switchTab('home')" title="ホーム">
-      <svg class="app-symbol" width="26" height="26" color="#fff"><use href="#s-home"/></svg>
-    </div>
-    <div class="dock-sep"></div>
-    <div class="dock-icon sk-blue" onclick="togglePanel()" title="チャット" style="position:relative">
-      <svg class="app-symbol" width="26" height="26" color="#fff"><use href="#s-chat"/></svg>
-      <span class="badge" id="chatBadge"></span>
-    </div>
-    <div class="dock-sep"></div>
-    <div class="dock-icon sk-slate" onclick="hidePanel()" title="非表示">
-      <svg class="app-symbol" width="22" height="22" color="#fff"><use href="#s-close"/></svg>
     </div>
   </div>
 </div>
 
-<!-- ━━━ CHAT PANEL ━━━ -->
+<!-- ━━━ CHAT PANEL (floating) ━━━ -->
 <div id="chatPanel">
-  <div class="panel-hd">
-    <div class="panel-title">
-      <div class="live-dot"></div>
-      ライブチャット
-    </div>
-    <button class="panel-close" onclick="closePanel()">
-      <svg width="10" height="10"><use href="#s-close" stroke="currentColor" fill="none" stroke-width="2.5"/></svg>
-    </button>
-  </div>
-  <div id="panelMsgs"></div>
-  <div class="panel-ft">
-    <div class="ft-name">
-      <span class="ft-label">Name</span>
-      <input id="pName" placeholder="表示名（本名NG）" maxlength="20">
-    </div>
-    <div class="ft-msg">
-      <input id="pInput" placeholder="メッセージを入力..." maxlength="100">
-      <button id="pSend" onclick="sendPanel()">
-        <svg width="14" height="14" color="#fff"><use href="#s-send"/></svg>
-      </button>
-    </div>
-  </div>
+  <iframe id="chatFrame" src="chat.html"
+    style="width:100%;height:100%;border:none;border-radius:var(--r4);display:block;"
+    allow="same-origin scripts"></iframe>
 </div>
 
 <!-- ━━━ JS ━━━ -->
@@ -921,7 +893,197 @@ function tick(){
 }
 tick();setInterval(tick,1000);
 
-/* tab system */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   通知 ON/OFF システム
+━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+let notifOn = (localStorage.getItem('peji_notif') !== 'off');
+let mailboxItems = JSON.parse(localStorage.getItem('peji_mailbox')||'[]');
+let mailboxOpen = false;
+let bannerTimer = null;
+
+function applyNotifMode(){
+  const btn  = document.getElementById('notifToggleBtn');
+  const mail = document.getElementById('mailboxBtn');
+  const live = document.getElementById('liveNotifTxt');
+  const mailIcon = mail.querySelector('svg use');
+
+  if(notifOn){
+    btn.className = 'notif-on';
+    btn.innerHTML = '<svg width="15" height="15"><use href="#s-bell"/></svg><div class="notif-on-dot"></div>';
+    btn.title = '通知ON（クリックでOFF）';
+    mail.style.display = 'none';
+    live.style.display = '';
+  } else {
+    btn.className = 'notif-off';
+    btn.innerHTML = '<svg width="15" height="15"><use href="#s-bell-off"/></svg><div class="notif-on-dot"></div>';
+    btn.title = '通知OFF（クリックでON）';
+    mail.style.display = 'flex';
+    live.style.display = 'none';
+    updateMailboxBadge();
+    // ドロップダウンが開いていれば閉じる
+    closeMailbox();
+  }
+  localStorage.setItem('peji_notif', notifOn ? 'on' : 'off');
+}
+
+function toggleNotif(){
+  notifOn = !notifOn;
+  applyNotifMode();
+}
+
+/* バナー表示 */
+function showBanner(msg, isHype){
+  const el = document.getElementById('iosBanner');
+  const msgEl = document.getElementById('bannerMsg');
+  const tsEl  = document.getElementById('bannerTs');
+  const icon  = document.getElementById('bannerIcon');
+
+  msgEl.textContent = msg;
+  tsEl.textContent  = new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+
+  if(isHype){
+    el.classList.add('hype');
+    icon.innerHTML = '🔥';
+  } else {
+    el.classList.remove('hype');
+    icon.innerHTML = '<svg width="18" height="18" color="#fff"><use href="#s-chat"/></svg>';
+  }
+
+  el.classList.remove('hide');
+  el.classList.add('show');
+
+  clearTimeout(bannerTimer);
+  bannerTimer = setTimeout(()=>dismissBanner(), 4500);
+}
+
+function dismissBanner(){
+  const el = document.getElementById('iosBanner');
+  el.classList.remove('show');
+  el.classList.add('hide');
+}
+
+function onBannerClick(){
+  dismissBanner();
+  togglePanel();
+}
+
+/* メールボックス */
+function addToMailbox(msg, isHype, senderName){
+  const item = {
+    msg, isHype, name: senderName||'',
+    ts: new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})
+  };
+  mailboxItems.unshift(item);
+  if(mailboxItems.length > 50) mailboxItems.length = 50;
+  localStorage.setItem('peji_mailbox', JSON.stringify(mailboxItems));
+  updateMailboxBadge();
+  renderMailboxList();
+}
+
+let mailboxUnreadCount = 0;
+function updateMailboxBadge(){
+  const el = document.getElementById('mailboxUnread');
+  if(mailboxUnreadCount > 0){
+    el.textContent = mailboxUnreadCount > 9 ? '9+' : String(mailboxUnreadCount);
+    el.classList.add('on');
+  } else {
+    el.textContent = '';
+    el.classList.remove('on');
+  }
+}
+
+function toggleMailbox(){
+  if(mailboxOpen) closeMailbox();
+  else openMailbox();
+}
+
+function openMailbox(){
+  mailboxOpen = true;
+  mailboxUnreadCount = 0;
+  updateMailboxBadge();
+  renderMailboxList();
+  document.getElementById('mailboxDropdown').classList.add('open');
+  // 外クリックで閉じる
+  setTimeout(()=>document.addEventListener('click', outsideMailboxClick), 10);
+}
+
+function closeMailbox(){
+  mailboxOpen = false;
+  document.getElementById('mailboxDropdown').classList.remove('open');
+  document.removeEventListener('click', outsideMailboxClick);
+}
+
+function outsideMailboxClick(e){
+  const dd = document.getElementById('mailboxDropdown');
+  const btn = document.getElementById('mailboxBtn');
+  if(!dd.contains(e.target) && !btn.contains(e.target)) closeMailbox();
+}
+
+function renderMailboxList(){
+  const el = document.getElementById('mailList');
+  if(!mailboxItems.length){
+    el.innerHTML = '<div class="mail-empty">通知なし</div>';
+    return;
+  }
+  el.innerHTML = mailboxItems.map(item=>`
+    <div class="mail-item">
+      <div class="mail-item-icon ${item.isHype?'hype':''}">
+        ${item.isHype ? '🔥' : '<svg width="14" height="14" color="#fff"><use href="#s-chat"/></svg>'}
+      </div>
+      <div class="mail-item-body">
+        <div class="mail-item-name">${item.name ? esc(item.name) : 'チャット'}</div>
+        <div class="mail-item-txt">${esc(item.msg)}</div>
+        <div class="mail-item-ts">${item.ts}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function clearMailbox(){
+  mailboxItems = [];
+  mailboxUnreadCount = 0;
+  localStorage.removeItem('peji_mailbox');
+  updateMailboxBadge();
+  renderMailboxList();
+}
+
+/* 通知を受け取ったときの処理 */
+function receiveNotif(msg, isHype, senderName){
+  if(notifOn){
+    // ONならバナー
+    showBanner(msg, isHype);
+    // ライブテキストも更新
+    const lt = document.getElementById('liveNotifTxt');
+    if(isHype){
+      lt.style.color = 'var(--green)';
+      lt.textContent = msg;
+      setTimeout(()=>{ lt.style.color = ''; }, 8000);
+    } else {
+      lt.textContent = (senderName ? senderName + '：' : '') + msg;
+    }
+  } else {
+    // OFFならメールボックスへ
+    mailboxUnreadCount++;
+    addToMailbox(msg, isHype, senderName);
+    if(mailboxOpen) openMailbox(); // 開いてたらリフレッシュ
+  }
+
+  // チャットバッジ（パネルが閉じている時）
+  if(!document.getElementById('chatPanel').classList.contains('open')){
+    const b = document.getElementById('chatBadge');
+    const cur = parseInt(b.textContent||'0')||0;
+    b.textContent = Math.min(cur+1, 99);
+    b.classList.add('on');
+  }
+}
+
+// メールボックスを復元
+renderMailboxList();
+applyNotifMode();
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   タブシステム
+━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 let tabs=[],activeId='home',cnt=0;
 
 function switchTab(id){
@@ -963,7 +1125,7 @@ function openApp(url,title,iconId){
   el.className='tab';
   el.onclick=()=>switchTab(id);
   el.innerHTML=
-    `<svg class="tab-fav" color="var(--t3)"><use href="#s-globe-sm"/></svg>`+
+    `<svg class="tab-fav" color="var(--t3)" width="13" height="13"><use href="#s-globe-sm"/></svg>`+
     `<span class="tab-lbl">${esc(title)}</span>`+
     `<button class="tab-x" onclick="closeTab(event,'${id}')">✕</button>`;
   document.getElementById('dynTabs').appendChild(el);
@@ -1002,14 +1164,16 @@ document.getElementById('newTabBtn').addEventListener('click',()=>{
   openApp(full,full.replace(/^https?:\/\//,'').split('/')[0],'s-globe');
 });
 
-/* chat panel */
+/* チャットパネル */
+function openFullChat(){
+  openApp('chat.html','チャット','s-chat');
+}
+
 function openPanel(){
   document.getElementById('chatPanel').classList.add('open');
-  const b=document.getElementById('chatBadge');b.classList.remove('on');b.textContent='';
-  setTimeout(()=>{
-    const n=document.getElementById('pName');
-    (n.value.trim()?document.getElementById('pInput'):n).focus();
-  },200);
+  // チャットバッジクリア
+  const b=document.getElementById('chatBadge');
+  b.classList.remove('on');b.textContent='';
 }
 function closePanel(){document.getElementById('chatPanel').classList.remove('open');}
 function togglePanel(){
@@ -1034,10 +1198,11 @@ function hidePanel(){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 
-<!-- Firebase -->
+<!-- Firebase (通知用) -->
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import{getFirestore,collection,addDoc,query,orderBy,limit,onSnapshot,serverTimestamp,doc,getDocs,where}
+import{getFirestore,collection,query,orderBy,limit,onSnapshot,doc,getDocs,where,
+  setDoc,deleteDoc,serverTimestamp}
   from"https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const db=getFirestore(initializeApp({
@@ -1047,103 +1212,112 @@ const db=getFirestore(initializeApp({
   storageBucket:"fir-66339.firebasestorage.app",
   messagingSenderId:"876017617963",
   appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
-},"chat2"));
+},"peji_notif"));
 
-/* akuchat permission + isAdmin */
+const myName=localStorage.getItem("accessUserName_2")||"";
+
+/* ━━━ オンラインプレゼンス ━━━
+   presence_2/{uid} に {name, ts} を書き込み、
+   5分以内のドキュメントを「オンライン」とみなす
+*/
+const presenceId = myName + '_' + Math.random().toString(36).slice(2,7);
+const presenceRef = doc(db, "presence_2", presenceId);
+
+async function heartbeat(){
+  try{
+    await setDoc(presenceRef, {
+      name: myName,
+      ts: serverTimestamp()
+    });
+  }catch(e){}
+}
+
+// 入室時・30秒ごとに更新
+heartbeat();
+const hbInterval = setInterval(heartbeat, 30000);
+
+// ページ離脱時に削除
+function leavePresence(){
+  clearInterval(hbInterval);
+  // beacon APIで非同期削除（ページ離脱後も確実に送信）
+  try{
+    navigator.sendBeacon&&navigator.sendBeacon(
+      `https://firestore.googleapis.com/v1/projects/fir-66339/databases/(default)/documents/presence_2/${presenceId}?delete=true`
+    );
+  }catch(e){}
+  deleteDoc(presenceRef).catch(()=>{});
+}
+window.addEventListener('beforeunload', leavePresence);
+window.addEventListener('pagehide', leavePresence);
+
+// オンライン人数をリアルタイム監視（5分以内をオンラインとみなす）
+onSnapshot(collection(db,"presence_2"), snap=>{
+  const fiveMinAgo = Date.now()/1000 - 300;
+  const online = snap.docs.filter(d=>{
+    const ts = d.data().ts?.seconds;
+    return ts && ts > fiveMinAgo;
+  });
+  document.getElementById('onlineCnt').textContent = online.length;
+});
+
+/* akuchat permission */
 (async()=>{
   try{
-    const s=localStorage.getItem("accessUserName_2")||"";if(!s)return;
-    const q=await getDocs(query(collection(db,"users"),where("name","==",s)));
-    if(q.empty)return;
-    const data=q.docs[0].data();
-    if(data.akuchat===true)
+    if(!myName)return;
+    const q=await getDocs(query(collection(db,"users"),where("name","==",myName)));
+    if(!q.empty&&q.docs[0].data().akuchat===true)
       document.getElementById("akuApp").style.display="";
-    if(data.isAdmin===true)
-      document.getElementById("adminSection").style.display="";
   }catch(e){}
 })();
 
-/* name */
-const sName=localStorage.getItem("chatName")||"名無し";
-document.getElementById("pName").value=sName;
-document.getElementById("pName").addEventListener("change",()=>{
-  const v=document.getElementById("pName").value.trim();
-  if(v)localStorage.setItem("chatName",v);
-});
-function myName(){return document.getElementById("pName").value.trim()||sName;}
+/* 盛り上がり検知 */
+const recentTs=[];
+let hypeShown=false;
+let hypeTimer=null;
+const HYPE_MSGS=["チャットが盛り上がっています！","みんな話してる！","今アツい💬","チャット賑わってるよ！"];
 
-/* ng words */
-let ngW=[];
-onSnapshot(doc(db,"config","ngWords_2"),s=>{ngW=s.exists()?(s.data().words||[]):[];});
-function isNG(t){return ngW.some(w=>t.toLowerCase().includes(w.toLowerCase()));}
-
-async function post(text){
-  if(!text||isNG(text))return false;
-  try{await addDoc(collection(db,"chat_2"),{name:myName(),text,ts:serverTimestamp()});return true;}
-  catch(e){return false;}
+function checkHype(){
+  const now=Date.now()/1000;
+  const recent=recentTs.filter(t=>now-t<60);
+  if(recent.length>=5&&!hypeShown){
+    hypeShown=true;
+    const msg=HYPE_MSGS[Math.floor(Math.random()*HYPE_MSGS.length)];
+    window.receiveNotif(msg, true, '');
+    clearTimeout(hypeTimer);
+    hypeTimer=setTimeout(()=>{hypeShown=false;},10000);
+  }
 }
 
-window.sendHome=async function(){
-  const el=document.getElementById("homeInput");const t=el.value.trim();if(!t)return;
-  el.value='';
-  if(!await post(t)){el.style.borderColor='var(--red)';setTimeout(()=>el.style.borderColor='',2000);}
-};
-window.sendPanel=async function(){
-  const el=document.getElementById("pInput");const t=el.value.trim();if(!t)return;
-  el.value='';
-  if(!await post(t)){el.style.borderColor='var(--red)';setTimeout(()=>el.style.borderColor='',2000);}
-};
+/* 最新メッセージ監視 */
+let lastCnt=0;
+onSnapshot(query(collection(db,"chat_2"),orderBy("ts","desc"),limit(1)),snap=>{
+  if(snap.empty)return;
+  const l=snap.docs[0].data();
 
-document.getElementById("homeInput").addEventListener("keydown",e=>{if(e.key==="Enter")window.sendHome();});
-document.getElementById("pInput").addEventListener("keydown",e=>{if(e.key==="Enter")window.sendPanel();});
-
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function fmt(ts){if(!ts)return'';return new Date(ts.seconds*1000).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});}
-
-/* realtime */
-let lastCnt=0,unread=0;
-onSnapshot(query(collection(db,"chat_2"),orderBy("ts","desc"),limit(60)),snap=>{
-  const msgs=snap.docs.map(d=>({...d.data()})).reverse();
-
-  /* panel */
-  const pm=document.getElementById("panelMsgs");
-  const bot=pm.scrollHeight-pm.scrollTop-pm.clientHeight<60;
-  pm.innerHTML=msgs.map(m=>{
-    const me=m.name===myName();
-    return`<div class="pmsg"><span class="pmsg-n${me?' me':''}">${esc(m.name)}</span><span class="pmsg-t">${esc(m.text)}</span><span class="pmsg-ts">${fmt(m.ts)}</span></div>`;
-  }).join('');
-  if(bot)pm.scrollTop=pm.scrollHeight;
-
-  /* card (last 4) */
-  const cm=document.getElementById("cardMsgs");
-  cm.innerHTML=msgs.slice(-4).map(m=>{
-    const me=m.name===myName();
-    return`<div class="cmsg"><span class="cmsg-name${me?' me':''}">${esc(m.name)}</span><span>${esc(m.text)}</span></div>`;
-  }).join('');
-  cm.scrollTop=cm.scrollHeight;
-
-  /* ticker */
-  if(msgs.length){const l=msgs[msgs.length-1];document.getElementById("tickerTxt").textContent=l.name+'：'+l.text;}
-
-  /* badge */
-  if(msgs.length>lastCnt&&lastCnt!==0){
-    if(!document.getElementById("chatPanel").classList.contains("open")){
-      unread+=msgs.length-lastCnt;
-      const b=document.getElementById("chatBadge");
-      b.textContent=unread>9?'9+':unread;b.classList.add('on');
-    }
+  // タイムスタンプ記録
+  if(l.ts?.seconds){
+    recentTs.push(l.ts.seconds);
+    if(recentTs.length>20)recentTs.shift();
+    checkHype();
   }
-  lastCnt=msgs.length;
+
+  // 新着通知（自分のメッセージは除く）
+  if(lastCnt!==0 && l.name !== myName){
+    const msgText = l.name+'：'+l.text;
+    window.receiveNotif(msgText, false, l.name);
+  }
+  lastCnt++;
 });
 
-/* closed */
-onSnapshot(doc(db,"config","chatSettings_2"),s=>{
-  if(!s.exists())return;
-  const c=s.data().closed;
-  ['homeInput','pInput'].forEach(id=>{
-    const el=document.getElementById(id);
-    el.disabled=c;el.placeholder=c?'（閉鎖中）':'メッセージ...';
-  });
+/* 管理者からの通知テスト */
+let lastTestTs=null;
+onSnapshot(doc(db,"config","testNotif_2"),snap=>{
+  if(!snap.exists())return;
+  const d=snap.data();
+  const ts=d.ts?.toMillis?d.ts.toMillis():(d.ts instanceof Date?d.ts.getTime():null);
+  if(!ts||ts===lastTestTs)return;
+  lastTestTs=ts;
+  window.receiveNotif(d.message||"通知", !!d.hype, '管理者');
 });
 </script>
 </body>
