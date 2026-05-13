@@ -151,11 +151,19 @@ svg.sprite-defs{display:none;}
   -webkit-backdrop-filter:var(--blur);
   border-bottom:1px solid var(--sep);
   display:flex;align-items:center;
-  padding:4px 10px;gap:3px;
-  flex-shrink:0;overflow-x:auto;overflow-y:hidden;
+  padding:4px 10px;gap:3px;flex-shrink:0;overflow-x:auto;overflow-y:hidden;
   scrollbar-width:none;
 }
 #tabBar::-webkit-scrollbar{display:none;}
+
+/* ★ 修正: dynTabs を横並びに */
+#dynTabs{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:3px;
+  flex-shrink:0;
+}
 
 .tab{
   display:flex;align-items:center;gap:5px;
@@ -905,7 +913,6 @@ function applyNotifMode(){
   const btn  = document.getElementById('notifToggleBtn');
   const mail = document.getElementById('mailboxBtn');
   const live = document.getElementById('liveNotifTxt');
-  const mailIcon = mail.querySelector('svg use');
 
   if(notifOn){
     btn.className = 'notif-on';
@@ -920,7 +927,6 @@ function applyNotifMode(){
     mail.style.display = 'flex';
     live.style.display = 'none';
     updateMailboxBadge();
-    // ドロップダウンが開いていれば閉じる
     closeMailbox();
   }
   localStorage.setItem('peji_notif', notifOn ? 'on' : 'off');
@@ -1003,7 +1009,6 @@ function openMailbox(){
   updateMailboxBadge();
   renderMailboxList();
   document.getElementById('mailboxDropdown').classList.add('open');
-  // 外クリックで閉じる
   setTimeout(()=>document.addEventListener('click', outsideMailboxClick), 10);
 }
 
@@ -1050,9 +1055,7 @@ function clearMailbox(){
 /* 通知を受け取ったときの処理 */
 function receiveNotif(msg, isHype, senderName){
   if(notifOn){
-    // ONならバナー
     showBanner(msg, isHype);
-    // ライブテキストも更新
     const lt = document.getElementById('liveNotifTxt');
     if(isHype){
       lt.style.color = 'var(--green)';
@@ -1062,13 +1065,11 @@ function receiveNotif(msg, isHype, senderName){
       lt.textContent = (senderName ? senderName + '：' : '') + msg;
     }
   } else {
-    // OFFならメールボックスへ
     mailboxUnreadCount++;
     addToMailbox(msg, isHype, senderName);
-    if(mailboxOpen) openMailbox(); // 開いてたらリフレッシュ
+    if(mailboxOpen) openMailbox();
   }
 
-  // チャットバッジ（パネルが閉じている時）
   if(!document.getElementById('chatPanel').classList.contains('open')){
     const b = document.getElementById('chatBadge');
     const cur = parseInt(b.textContent||'0')||0;
@@ -1077,7 +1078,6 @@ function receiveNotif(msg, isHype, senderName){
   }
 }
 
-// メールボックスを復元
 renderMailboxList();
 applyNotifMode();
 
@@ -1165,13 +1165,8 @@ document.getElementById('newTabBtn').addEventListener('click',()=>{
 });
 
 /* チャットパネル */
-function openFullChat(){
-  openApp('chat.html','チャット','s-chat');
-}
-
 function openPanel(){
   document.getElementById('chatPanel').classList.add('open');
-  // チャットバッジクリア
   const b=document.getElementById('chatBadge');
   b.classList.remove('on');b.textContent='';
 }
@@ -1216,10 +1211,6 @@ const db=getFirestore(initializeApp({
 
 const myName=localStorage.getItem("accessUserName_2")||"";
 
-/* ━━━ オンラインプレゼンス ━━━
-   presence_2/{uid} に {name, ts} を書き込み、
-   5分以内のドキュメントを「オンライン」とみなす
-*/
 const presenceId = myName + '_' + Math.random().toString(36).slice(2,7);
 const presenceRef = doc(db, "presence_2", presenceId);
 
@@ -1232,14 +1223,11 @@ async function heartbeat(){
   }catch(e){}
 }
 
-// 入室時・30秒ごとに更新
 heartbeat();
 const hbInterval = setInterval(heartbeat, 30000);
 
-// ページ離脱時に削除
 function leavePresence(){
   clearInterval(hbInterval);
-  // beacon APIで非同期削除（ページ離脱後も確実に送信）
   try{
     navigator.sendBeacon&&navigator.sendBeacon(
       `https://firestore.googleapis.com/v1/projects/fir-66339/databases/(default)/documents/presence_2/${presenceId}?delete=true`
@@ -1250,7 +1238,6 @@ function leavePresence(){
 window.addEventListener('beforeunload', leavePresence);
 window.addEventListener('pagehide', leavePresence);
 
-// オンライン人数をリアルタイム監視（5分以内をオンラインとみなす）
 onSnapshot(collection(db,"presence_2"), snap=>{
   const fiveMinAgo = Date.now()/1000 - 300;
   const online = snap.docs.filter(d=>{
@@ -1260,7 +1247,6 @@ onSnapshot(collection(db,"presence_2"), snap=>{
   document.getElementById('onlineCnt').textContent = online.length;
 });
 
-/* akuchat permission */
 (async()=>{
   try{
     if(!myName)return;
@@ -1270,7 +1256,6 @@ onSnapshot(collection(db,"presence_2"), snap=>{
   }catch(e){}
 })();
 
-/* 盛り上がり検知 */
 const recentTs=[];
 let hypeShown=false;
 let hypeTimer=null;
@@ -1288,20 +1273,17 @@ function checkHype(){
   }
 }
 
-/* 最新メッセージ監視 */
 let lastCnt=0;
 onSnapshot(query(collection(db,"chat_2"),orderBy("ts","desc"),limit(1)),snap=>{
   if(snap.empty)return;
   const l=snap.docs[0].data();
 
-  // タイムスタンプ記録
   if(l.ts?.seconds){
     recentTs.push(l.ts.seconds);
     if(recentTs.length>20)recentTs.shift();
     checkHype();
   }
 
-  // 新着通知（自分のメッセージは除く）
   if(lastCnt!==0 && l.name !== myName){
     const msgText = l.name+'：'+l.text;
     window.receiveNotif(msgText, false, l.name);
@@ -1309,7 +1291,6 @@ onSnapshot(query(collection(db,"chat_2"),orderBy("ts","desc"),limit(1)),snap=>{
   lastCnt++;
 });
 
-/* 管理者からの通知テスト */
 let lastTestTs=null;
 onSnapshot(doc(db,"config","testNotif_2"),snap=>{
   if(!snap.exists())return;
