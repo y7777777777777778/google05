@@ -61,8 +61,6 @@ body{
   color:var(--t1);
 }
 
-/* 背景 */
-
 .wall{
   position:fixed;
   inset:0;
@@ -76,8 +74,6 @@ body{
   #02040b;
 }
 
-/* アプリ */
-
 #app{
   position:relative;
   z-index:10;
@@ -86,8 +82,6 @@ body{
   display:flex;
   flex-direction:column;
 }
-
-/* トップ */
 
 #topBar{
   height:44px;
@@ -229,13 +223,15 @@ body{
   color:var(--t2);
 
   cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .xbtn:hover{
   background:var(--fill);
 }
-
-/* ルームバー */
 
 #roomBar{
   height:38px;
@@ -280,8 +276,6 @@ body{
   background:var(--bg3);
   color:#fff;
 }
-
-/* メイン */
 
 #mainArea{
   flex:1;
@@ -392,8 +386,6 @@ body{
   padding-left:6px;
 }
 
-/* 入力 */
-
 #roomFoot{
   flex-shrink:0;
 
@@ -490,8 +482,6 @@ body{
   align-items:center;
   justify-content:center;
 }
-
-/* DM */
 
 #dmPane{
   display:none;
@@ -619,8 +609,6 @@ body{
   display:flex;
 }
 
-/* DM会話 */
-
 #dmConv{
   flex:1;
 
@@ -723,8 +711,6 @@ body{
   color:var(--t4);
 }
 
-/* 空 */
-
 .empty-hint{
   flex:1;
 
@@ -735,8 +721,6 @@ body{
   color:var(--t4);
   font-size:13px;
 }
-
-/* 名前モーダル */
 
 #nameModal{
   position:fixed;
@@ -826,8 +810,6 @@ body{
   color:#fff;
 }
 
-/* スマホ */
-
 @media(max-width:720px){
 
   #dmList{
@@ -854,6 +836,7 @@ body{
   <div id="topBar">
 
     <div id="modePill">
+
       <button class="mpill on" id="pillRoom" onclick="setMode('room')">
         部屋
         <span class="pill-badge" id="pb_room"></span>
@@ -863,6 +846,7 @@ body{
         DM
         <span class="pill-badge" id="pb_dm"></span>
       </button>
+
     </div>
 
     <div id="selfInfo">
@@ -873,6 +857,10 @@ body{
 
       <span id="selfCode">----</span>
 
+      <button class="xbtn" onclick="openFullscreen()" title="全画面">
+        ⛶
+      </button>
+
       <button class="xbtn" onclick="closeChat()">✕</button>
 
     </div>
@@ -882,8 +870,6 @@ body{
   <div id="roomBar"></div>
 
   <div id="mainArea">
-
-    <!-- 部屋 -->
 
     <div id="roomPane">
 
@@ -928,8 +914,6 @@ body{
       </div>
 
     </div>
-
-    <!-- DM -->
 
     <div id="dmPane">
 
@@ -998,10 +982,7 @@ body{
 
       </div>
 
-      <div
-        id="dmEmpty"
-        class="empty-hint"
-      >
+      <div id="dmEmpty" class="empty-hint">
         左からユーザーを選択してください
       </div>
 
@@ -1010,8 +991,6 @@ body{
   </div>
 
 </div>
-
-<!-- 名前変更 -->
 
 <div id="nameModal" onclick="if(event.target===this)closeNameModal()">
 
@@ -1050,6 +1029,20 @@ function closeChat(){
   window.close();
 }
 
+function openFullscreen(){
+
+  if(document.fullscreenElement){
+
+    document.exitFullscreen();
+
+  }else{
+
+    document.documentElement.requestFullscreen();
+
+  }
+
+}
+
 document.addEventListener('keydown',e=>{
 
   if(e.key==='Escape'){
@@ -1073,34 +1066,6 @@ function setMode(m){
 
   document.getElementById('dmPane').classList.toggle('on',m==='dm');
 
-  if(m==='room'){
-    clearBadge('pb_room');
-  }
-
-  if(m==='dm'){
-    clearBadge('pb_dm');
-  }
-
-}
-
-function clearBadge(id){
-  const el=document.getElementById(id);
-  el.classList.remove('on');
-  el.textContent='';
-}
-
-function addBadge(id,n){
-  const el=document.getElementById(id);
-
-  let cur=parseInt(el.textContent||'0')||0;
-
-  cur+=n;
-
-  if(cur>99) cur=99;
-
-  el.textContent=cur;
-
-  el.classList.add('on');
 }
 
 let _reply=null;
@@ -1131,8 +1096,6 @@ function openNameModal(){
 
   document.getElementById('nameModalInput').value=myName;
 
-  document.getElementById('nameModalWarn').style.display='none';
-
 }
 
 function closeNameModal(){
@@ -1140,811 +1103,6 @@ function closeNameModal(){
   document.getElementById('nameModal').classList.remove('on');
 
 }
-</script>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  query,
-  limit,
-  onSnapshot,
-  serverTimestamp,
-  doc,
-  getDocs,
-  where,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-
-const app=initializeApp({
-
-  apiKey:"AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
-  authDomain:"fir-66339.firebaseapp.com",
-  projectId:"fir-66339",
-  storageBucket:"fir-66339.firebasestorage.app",
-  messagingSenderId:"876017617963",
-  appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
-
-},"chat_v3");
-
-const db=getFirestore(app);
-
-let myName=localStorage.getItem("accessUserName_2")||"名無し";
-let myCode="----";
-
-let myDocId=null;
-let myIsAdmin=false;
-
-let adminSet=new Set();
-
-document.getElementById("selfName").textContent=myName;
-
-/* 管理者 */
-
-async function loadAdmins(){
-
-  try{
-
-    const snap=await getDocs(
-      query(
-        collection(db,"users"),
-        where("isAdmin","==",true)
-      )
-    );
-
-    adminSet=new Set(
-      snap.docs.map(d=>d.data().name)
-    );
-
-  }catch(e){}
-
-}
-
-/* コード */
-
-async function initCode(){
-
-  try{
-
-    const q=await getDocs(
-      query(
-        collection(db,"users"),
-        where("name","==",myName)
-      )
-    );
-
-    if(!q.empty){
-
-      const docRef=q.docs[0];
-
-      const data=docRef.data();
-
-      myDocId=docRef.id;
-
-      myIsAdmin=data.isAdmin===true;
-
-      let code=data.userCode;
-
-      if(!code){
-
-        for(let i=0;i<30;i++){
-
-          const c=String(
-            Math.floor(1000+Math.random()*9000)
-          );
-
-          const dup=await getDocs(
-            query(
-              collection(db,"users"),
-              where("userCode","==",c)
-            )
-          );
-
-          if(dup.empty){
-            code=c;
-            break;
-          }
-
-        }
-
-        await updateDoc(
-          doc(db,"users",docRef.id),
-          {
-            userCode:code
-          }
-        );
-
-      }
-
-      myCode=String(code);
-
-      document.getElementById("selfCode").textContent="#"+myCode;
-
-    }
-
-  }catch(e){
-    console.error(e);
-  }
-
-  loadUsers();
-
-}
-
-/* 名前変更 */
-
-window.saveName=async function(){
-
-  const input=document.getElementById('nameModalInput');
-
-  const warn=document.getElementById('nameModalWarn');
-
-  const newName=input.value.trim();
-
-  warn.style.display='none';
-
-  if(!newName || newName.length>20){
-
-    warn.textContent='1〜20文字';
-
-    warn.style.display='block';
-
-    return;
-
-  }
-
-  try{
-
-    const dup=await getDocs(
-      query(
-        collection(db,"users"),
-        where("name","==",newName)
-      )
-    );
-
-    if(!dup.empty){
-
-      warn.textContent='その名前は使われています';
-
-      warn.style.display='block';
-
-      return;
-
-    }
-
-  }catch(e){}
-
-  if(myDocId){
-
-    try{
-
-      await updateDoc(
-        doc(db,"users",myDocId),
-        {
-          name:newName
-        }
-      );
-
-    }catch(e){}
-
-  }
-
-  myName=newName;
-
-  localStorage.setItem("accessUserName_2",newName);
-
-  document.getElementById("selfName").textContent=myName;
-
-  closeNameModal();
-
-};
-
-/* ルーム */
-
-let rooms=[
-  {
-    id:"general",
-    name:"全体"
-  }
-];
-
-let curRoom="general";
-
-let msgUnsub=null;
-
-function renderRooms(){
-
-  document.getElementById("roomBar").innerHTML=
-  rooms.map(r=>`
-    <button
-      class="rbtn${r.id===curRoom?' on':''}"
-      onclick="switchRoom('${esc(r.id)}')"
-    >
-      #${esc(r.name)}
-    </button>
-  `).join('');
-
-}
-
-window.switchRoom=function(id){
-
-  curRoom=id;
-
-  renderRooms();
-
-  if(msgUnsub){
-    msgUnsub();
-  }
-
-  document.getElementById("msgList").innerHTML='';
-
-  subscribeRoomMsgs();
-
-};
-
-onSnapshot(
-  doc(db,"config","chatRooms_2"),
-  snap=>{
-
-    if(
-      snap.exists()
-      &&
-      Array.isArray(snap.data().rooms)
-    ){
-
-      const r=snap.data().rooms;
-
-      rooms=[
-        {
-          id:"general",
-          name:"全体"
-        },
-        ...r.filter(x=>x.id!=="general")
-      ];
-
-    }else{
-
-      rooms=[
-        {
-          id:"general",
-          name:"全体"
-        }
-      ];
-
-    }
-
-    renderRooms();
-
-  }
-);
-
-/* NG */
-
-let ngW=[];
-
-onSnapshot(
-  doc(db,"config","ngWords_2"),
-  s=>{
-
-    ngW=s.exists()
-    ?(s.data().words||[])
-    :[];
-
-  }
-);
-
-function isNG(t){
-
-  return ngW.some(w=>
-    t.toLowerCase().includes(
-      w.toLowerCase()
-    )
-  );
-
-}
-
-/* メッセ */
-
-function subscribeRoomMsgs(){
-
-  msgUnsub=onSnapshot(
-
-    query(
-      collection(db,"chat_2"),
-      where("roomId","==",curRoom),
-      limit(80)
-    ),
-
-    snap=>{
-
-      const msgs=snap.docs
-      .map(d=>({
-        id:d.id,
-        ...d.data()
-      }))
-      .sort((a,b)=>
-        (a.ts?.seconds??0)
-        -
-        (b.ts?.seconds??0)
-      );
-
-      renderRoomMsgs(msgs);
-
-    }
-
-  );
-
-}
-
-function renderRoomMsgs(msgs){
-
-  const el=document.getElementById("msgList");
-
-  const atBot=
-  el.scrollHeight-el.scrollTop-el.clientHeight<80;
-
-  el.innerHTML=msgs.map(m=>{
-
-    const me=m.name===myName;
-
-    const isAdmin=adminSet.has(m.name);
-
-    let cls='mname';
-
-    if(me) cls+=' me';
-
-    if(isAdmin) cls+=' admin-gold';
-
-    return `
-      <div class="mrow${isAdmin?' admin-row':''}">
-
-        <div class="mmeta">
-
-          <span
-            class="${cls}"
-            onclick="setReply('${esc(m.name)}','${esc(m.text)}')"
-          >
-            ${esc(m.name)}
-          </span>
-
-          <span class="mcode">
-            #${esc(m.userCode||'----')}
-          </span>
-
-          <span class="mts">
-            ${fmt(m.ts)}
-          </span>
-
-        </div>
-
-        ${
-          m.replyTo
-          ?
-          `<div class="mreply">
-            ↩ ${esc(m.replyTo.name)}：${esc(m.replyTo.text)}
-          </div>`
-          :''
-        }
-
-        <div class="mbody">
-          ${esc(m.text)}
-        </div>
-
-      </div>
-    `;
-
-  }).join('');
-
-  if(atBot){
-    el.scrollTop=el.scrollHeight;
-  }
-
-}
-
-window.sendMsg=async function(){
-
-  const el=document.getElementById("msgInput");
-
-  const text=el.value.trim();
-
-  if(!text) return;
-
-  if(isNG(text)) return;
-
-  el.value='';
-
-  const data={
-
-    name:myName,
-    userCode:myCode,
-
-    text,
-
-    roomId:curRoom,
-
-    ts:serverTimestamp()
-
-  };
-
-  if(_reply){
-
-    data.replyTo={
-      name:_reply.name,
-      text:_reply.text
-    };
-
-    clearReply();
-
-  }
-
-  try{
-
-    await addDoc(
-      collection(db,"chat_2"),
-      data
-    );
-
-  }catch(e){
-    console.error(e);
-  }
-
-};
-
-document.getElementById("msgInput")
-.addEventListener("keydown",e=>{
-
-  if(e.key==="Enter"){
-    sendMsg();
-  }
-
-});
-
-/* DM */
-
-let allUsers=[];
-
-let dmUnread={};
-
-let dmTarget=null;
-
-let dmUnsub=null;
-
-async function loadUsers(){
-
-  try{
-
-    const snap=await getDocs(
-
-      query(
-        collection(db,"users"),
-        where("group","==","2"),
-        where("status","==","ok")
-      )
-
-    );
-
-    allUsers=snap.docs
-    .map(d=>({
-      id:d.id,
-      ...d.data()
-    }))
-    .filter(u=>
-      u.name!==myName
-      &&
-      u.userCode
-    );
-
-    renderDmUserList();
-
-  }catch(e){
-    console.error(e);
-  }
-
-}
-
-function renderDmUserList(){
-
-  const el=document.getElementById("dmUserList");
-
-  if(!allUsers.length){
-
-    el.innerHTML=
-    `<div class="empty-hint">
-      他のユーザーがいません
-    </div>`;
-
-    return;
-
-  }
-
-  el.innerHTML=allUsers.map(u=>{
-
-    const unr=dmUnread[u.name]||0;
-
-    const active=
-    dmTarget
-    &&
-    dmTarget.name===u.name;
-
-    const isAdminUser=
-    adminSet.has(u.name);
-
-    return `
-
-      <div
-        class="duitem${active?' on':''}"
-        onclick="openDm('${esc(u.name)}','${esc(u.userCode||'')}')"
-      >
-
-        <div class="duav${isAdminUser?' admin-av':''}">
-          ${u.name.charAt(0)}
-        </div>
-
-        <div class="duinfo">
-
-          <div class="duname${isAdminUser?' admin-gold-dm':''}">
-            ${esc(u.name)}
-            ${isAdminUser?' 👑':''}
-          </div>
-
-          <div class="ducode">
-            #${esc(u.userCode||'----')}
-          </div>
-
-        </div>
-
-        <span
-          class="dubadge${unr?' on':''}"
-          id="dub_${safeid(u.name)}"
-        >
-          ${unr||''}
-        </span>
-
-      </div>
-
-    `;
-
-  }).join('');
-
-}
-
-function dmKey(a,b){
-
-  return [a,b].sort().join('__');
-
-}
-
-window.openDm=function(name,code){
-
-  dmTarget={name,code};
-
-  document.getElementById("dmConvName").textContent=name;
-
-  document.getElementById("dmConvCode").textContent="#"+code;
-
-  document.getElementById("dmConv").classList.add("on");
-
-  document.getElementById("dmEmpty").style.display="none";
-
-  dmUnread[name]=0;
-
-  renderDmUserList();
-
-  if(dmUnsub){
-    dmUnsub();
-  }
-
-  const key=dmKey(myName,name);
-
-  dmUnsub=onSnapshot(
-
-    query(
-      collection(db,"dm_2"),
-      where("dmKey","==",key),
-      limit(100)
-    ),
-
-    snap=>{
-
-      const msgs=snap.docs
-      .map(d=>({
-        id:d.id,
-        ...d.data()
-      }))
-      .sort((a,b)=>
-        (a.ts?.seconds??0)
-        -
-        (b.ts?.seconds??0)
-      );
-
-      renderDmMsgs(msgs);
-
-    }
-
-  );
-
-};
-
-function renderDmMsgs(msgs){
-
-  const el=document.getElementById("dmMsgList");
-
-  const atBot=
-  el.scrollHeight-el.scrollTop-el.clientHeight<60;
-
-  el.innerHTML=msgs.map(m=>{
-
-    const mine=m.from===myName;
-
-    return `
-
-      <div class="dmbrow ${mine?'mine':'theirs'}">
-
-        <div class="dmb">
-          ${esc(m.text)}
-        </div>
-
-        <span class="dmts">
-          ${fmt(m.ts)}
-        </span>
-
-      </div>
-
-    `;
-
-  }).join('');
-
-  if(atBot){
-    el.scrollTop=el.scrollHeight;
-  }
-
-}
-
-window.sendDm=async function(){
-
-  if(!dmTarget) return;
-
-  const el=document.getElementById("dmInput");
-
-  const text=el.value.trim();
-
-  if(!text) return;
-
-  if(isNG(text)) return;
-
-  el.value='';
-
-  try{
-
-    await addDoc(
-      collection(db,"dm_2"),
-      {
-        from:myName,
-        to:dmTarget.name,
-        dmKey:dmKey(myName,dmTarget.name),
-        text,
-        ts:serverTimestamp()
-      }
-    );
-
-  }catch(e){
-    console.error(e);
-  }
-
-};
-
-document.getElementById("dmInput")
-.addEventListener("keydown",e=>{
-
-  if(e.key==="Enter"){
-    sendDm();
-  }
-
-});
-
-window.closeDmConv=function(){
-
-  if(dmUnsub){
-    dmUnsub();
-  }
-
-  dmTarget=null;
-
-  document.getElementById("dmConv").classList.remove("on");
-
-  document.getElementById("dmEmpty").style.display='';
-
-  renderDmUserList();
-
-};
-
-onSnapshot(
-
-  query(
-    collection(db,"dm_2"),
-    where("to","==",myName),
-    limit(50)
-  ),
-
-  snap=>{
-
-    snap.docChanges().forEach(ch=>{
-
-      if(ch.type!=="added") return;
-
-      const d=ch.doc.data();
-
-      if(
-        dmTarget
-        &&
-        dmTarget.name===d.from
-      ){
-        return;
-      }
-
-      dmUnread[d.from]=(dmUnread[d.from]||0)+1;
-
-      addBadge('pb_dm',1);
-
-      renderDmUserList();
-
-    });
-
-  }
-
-);
-
-/* utils */
-
-function esc(s){
-
-  return String(s||'')
-
-  .replace(/&/g,'&amp;')
-  .replace(/</g,'&lt;')
-  .replace(/>/g,'&gt;')
-  .replace(/"/g,'&quot;')
-  .replace(/'/g,'&#39;');
-
-}
-
-function fmt(ts){
-
-  if(!ts || !ts.seconds) return '';
-
-  return new Date(ts.seconds*1000)
-  .toLocaleTimeString(
-    'ja-JP',
-    {
-      hour:'2-digit',
-      minute:'2-digit'
-    }
-  );
-
-}
-
-function safeid(s){
-
-  return String(s||'')
-  .replace(/[^a-zA-Z0-9]/g,'_');
-
-}
-
-/* 初期化 */
-
-loadAdmins();
-
-initCode();
-
-renderRooms();
-
-subscribeRoomMsgs();
-
-setMode('room');
-
 </script>
 
 </body>
