@@ -539,6 +539,97 @@ svg.sprite-defs{display:none;}
   #chatPanel{width:calc(100vw - 28px);}
   #mailboxDropdown{width:calc(100vw - 16px);right:8px;}
 }
+
+/* ━━━ 表示名変更モーダル ━━━ */
+#nameChangeOverlay{
+  position:fixed;inset:0;z-index:800;
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+}
+#nameChangeOverlay.open{display:flex;}
+#nameChangeBox{
+  background:rgba(36,36,40,.97);
+  border:.5px solid rgba(255,255,255,.12);
+  border-radius:var(--r4);
+  padding:28px 24px;
+  width:min(340px,calc(100vw - 32px));
+  box-shadow:0 24px 72px rgba(0,0,0,.7);
+  animation:ncIn .25s cubic-bezier(.34,1.28,.64,1) both;
+}
+@keyframes ncIn{
+  from{opacity:0;transform:scale(.88) translateY(16px);}
+  to{opacity:1;transform:scale(1) translateY(0);}
+}
+#nameChangeBox h3{
+  font-size:16px;font-weight:700;color:var(--t1);
+  margin-bottom:6px;letter-spacing:-.01em;
+}
+#nameChangeBox p{
+  font-size:12px;color:var(--t3);margin-bottom:18px;line-height:1.5;
+}
+#nameChangeBox .nc-current{
+  font-size:11px;color:var(--t3);margin-bottom:14px;
+}
+#nameChangeBox .nc-current strong{
+  color:var(--blue-l);font-weight:600;
+}
+#nameChangeInput{
+  width:100%;padding:11px 14px;
+  background:rgba(255,255,255,.07);
+  border:.5px solid rgba(255,255,255,.15);
+  border-radius:var(--r2);
+  color:var(--t1);font-size:15px;font-family:inherit;
+  outline:none;transition:border .15s,box-shadow .15s;
+  margin-bottom:8px;
+}
+#nameChangeInput:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(10,132,255,.2);
+}
+#nameChangeErr{
+  font-size:11px;color:var(--red);min-height:16px;
+  margin-bottom:14px;padding-left:2px;
+}
+#nameChangeBox .nc-btns{
+  display:flex;gap:8px;justify-content:flex-end;
+}
+.nc-btn-cancel{
+  padding:9px 18px;border-radius:var(--r1);
+  border:.5px solid var(--sep);background:none;
+  color:var(--t3);font-size:13px;font-weight:500;
+  cursor:pointer;font-family:inherit;transition:background .12s;
+}
+.nc-btn-cancel:hover{background:var(--fill2);}
+.nc-btn-submit{
+  padding:9px 20px;border-radius:var(--r1);
+  border:none;background:var(--blue);
+  color:#fff;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:background .12s;
+}
+.nc-btn-submit:hover{background:#1a8fff;}
+.nc-btn-submit:disabled{background:rgba(10,132,255,.35);cursor:not-allowed;}
+
+/* ホーム画面の名前表示エリア */
+.name-bar{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:-12px;margin-bottom:8px;
+}
+.name-bar-txt{font-size:13px;color:var(--t2);font-weight:400;}
+.name-change-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border-radius:12px;
+  border:.5px solid rgba(64,156,255,.35);
+  background:rgba(10,132,255,.1);
+  color:var(--blue-l);font-size:11px;font-weight:500;
+  cursor:pointer;font-family:inherit;
+  transition:background .12s;
+}
+.name-change-btn:hover{background:rgba(10,132,255,.2);}
+.name-change-btn.disabled{
+  border-color:var(--sep2);background:none;
+  color:var(--t4);cursor:default;
+}
 </style>
 </head>
 <body>
@@ -758,6 +849,11 @@ svg.sprite-defs{display:none;}
       <div class="clock-hm" id="clockFace">00:00</div>
       <div class="clock-dt"  id="clockDate">読み込み中</div>
     </div>
+    <!-- 名前表示 & 変更ボタン -->
+    <div class="name-bar">
+      <span class="name-bar-txt" id="nameBarTxt"></span>
+      <button class="name-change-btn" id="nameChangeBtn" onclick="openNameChange()">✏️ 表示名を変更</button>
+    </div>
     <div class="apps-section">
       <div class="apps-label">アプリ</div>
       <div class="app-grid">
@@ -881,6 +977,21 @@ svg.sprite-defs{display:none;}
   </div>
 </div>
 
+<!-- ━━━ 表示名変更モーダル ━━━ -->
+<div id="nameChangeOverlay">
+  <div id="nameChangeBox">
+    <h3>✏️ 表示名を変更</h3>
+    <p>1日1回のみ変更できます。<br>重複している名前は使えません。</p>
+    <div class="nc-current">現在の表示名：<strong id="ncCurrentName"></strong></div>
+    <input type="text" id="nameChangeInput" placeholder="新しい表示名（最大20文字）" maxlength="20">
+    <div id="nameChangeErr"></div>
+    <div class="nc-btns">
+      <button class="nc-btn-cancel" onclick="closeNameChange()">キャンセル</button>
+      <button class="nc-btn-submit" id="ncSubmitBtn" onclick="submitNameChange()">変更する</button>
+    </div>
+  </div>
+</div>
+
 <!-- ━━━ CHAT PANEL (floating) ━━━ -->
 <div id="chatPanel">
   <iframe id="chatFrame" src="chat.html"
@@ -890,6 +1001,65 @@ svg.sprite-defs{display:none;}
 
 <!-- ━━━ JS ━━━ -->
 <script>
+/* ━━━ 表示名変更システム ━━━ */
+function openNameChange(){
+  const myName = localStorage.getItem('accessUserName_2')||'';
+  if(!myName){ alert('ログインしていません'); return; }
+
+  // 1日1回制限チェック（localStorage で日付保存）
+  const today = new Date().toISOString().slice(0,10);
+  const lastChange = localStorage.getItem('nameChangedDate_2')||'';
+  const btn = document.getElementById('nameChangeBtn');
+
+  if(lastChange === today){
+    // 制限済み：ボタンをdisabledにして終了
+    btn.classList.add('disabled');
+    btn.textContent = '⏳ 本日変更済み';
+    return;
+  }
+
+  document.getElementById('ncCurrentName').textContent = myName;
+  document.getElementById('nameChangeInput').value = '';
+  document.getElementById('nameChangeErr').textContent = '';
+  document.getElementById('ncSubmitBtn').disabled = false;
+  document.getElementById('nameChangeOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('nameChangeInput').focus(), 80);
+}
+
+function closeNameChange(){
+  document.getElementById('nameChangeOverlay').classList.remove('open');
+}
+
+// 外クリックで閉じる
+document.addEventListener('click', function(e){
+  const overlay = document.getElementById('nameChangeOverlay');
+  if(e.target === overlay) closeNameChange();
+});
+
+// ページロード時にボタン状態を更新
+function updateNameBarUI(){
+  const myName = localStorage.getItem('accessUserName_2')||'';
+  const nameBarTxt = document.getElementById('nameBarTxt');
+  const btn = document.getElementById('nameChangeBtn');
+  if(!nameBarTxt || !btn) return;
+
+  if(myName){
+    nameBarTxt.textContent = 'こんにちは、' + myName + 'さん';
+    const today = new Date().toISOString().slice(0,10);
+    const lastChange = localStorage.getItem('nameChangedDate_2')||'';
+    if(lastChange === today){
+      btn.classList.add('disabled');
+      btn.textContent = '⏳ 本日変更済み';
+    } else {
+      btn.classList.remove('disabled');
+      btn.textContent = '✏️ 表示名を変更';
+    }
+  } else {
+    nameBarTxt.textContent = '';
+    btn.style.display = 'none';
+  }
+}
+
 /* clock */
 const DAYS=['日','月','火','水','木','金','土'];
 function tick(){
@@ -900,6 +1070,7 @@ function tick(){
     (n.getMonth()+1)+'月'+n.getDate()+'日（'+DAYS[n.getDay()]+'）';
 }
 tick();setInterval(tick,1000);
+updateNameBarUI();
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
    通知 ON/OFF システム
@@ -1196,7 +1367,7 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 <!-- Firebase (通知用) -->
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import{getFirestore,collection,query,orderBy,limit,onSnapshot,doc,getDocs,where,
+import{getFirestore,collection,query,orderBy,limit,onSnapshot,doc,getDocs,where,updateDoc,
   setDoc,deleteDoc,serverTimestamp}
   from"https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
@@ -1210,6 +1381,57 @@ const db=getFirestore(initializeApp({
 },"peji_notif"));
 
 const myName=localStorage.getItem("accessUserName_2")||"";
+
+/* ━━━ 表示名変更（Firestore） ━━━ */
+window.submitNameChange = async function(){
+  const btn = document.getElementById('ncSubmitBtn');
+  const errEl = document.getElementById('nameChangeErr');
+  const input = document.getElementById('nameChangeInput');
+  const newName = input.value.trim();
+  const oldName = localStorage.getItem('accessUserName_2')||'';
+
+  errEl.textContent = '';
+  if(!newName){ errEl.textContent = '表示名を入力してください'; return; }
+  if(newName === oldName){ errEl.textContent = '現在と同じ名前です'; return; }
+  if(newName.length > 20){ errEl.textContent = '20文字以内で入力してください'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '確認中...';
+
+  try {
+    // 重複チェック
+    const dupSnap = await getDocs(query(collection(db,'users'),where('name','==',newName)));
+    if(!dupSnap.empty){ errEl.textContent = 'その表示名は既に使われています'; btn.disabled=false; btn.textContent='変更する'; return; }
+
+    // 自分のドキュメントを検索して更新
+    const mySnap = await getDocs(query(collection(db,'users'),where('name','==',oldName)));
+    if(mySnap.empty){ errEl.textContent = 'ユーザーデータが見つかりません'; btn.disabled=false; btn.textContent='変更する'; return; }
+
+    const myDocId = mySnap.docs[0].id;
+    const today = new Date().toISOString().slice(0,10);
+
+    await updateDoc(doc(db,'users',myDocId),{
+      name: newName,
+      nameChangedAt: today,
+      nameChangeHistory: (mySnap.docs[0].data().nameChangeHistory||[]).concat([{from:oldName,to:newName,date:today}]).slice(-10)
+    });
+
+    // localStorage更新
+    localStorage.setItem('accessUserName_2', newName);
+    localStorage.setItem('nameChangedDate_2', today);
+
+    closeNameChange();
+    // UIを更新
+    updateNameBarUI();
+    // ライブテキストも更新
+    document.getElementById('liveNotifTxt').textContent = 'こんにちは、' + newName + 'さん';
+    showBanner('表示名を「' + newName + '」に変更しました', false);
+  } catch(e) {
+    errEl.textContent = 'エラー: ' + e.message;
+  }
+  btn.disabled = false;
+  btn.textContent = '変更する';
+};
 
 const presenceId = myName + '_' + Math.random().toString(36).slice(2,7);
 const presenceRef = doc(db, "presence_2", presenceId);
