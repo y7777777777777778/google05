@@ -26,7 +26,6 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-/* 背景 */
 .wall{
   position:fixed;inset:0;z-index:0;pointer-events:none;
   background:
@@ -36,7 +35,6 @@ body{
     #03060f;
 }
 
-/* アプリ全体 */
 #app{
   position:relative;z-index:10;
   display:flex;flex-direction:column;
@@ -52,7 +50,6 @@ body{
   border-bottom:.5px solid var(--sep);
 }
 
-/* モード切替ピル */
 #modePill{
   display:flex;gap:2px;
   background:var(--fill3);
@@ -75,16 +72,73 @@ body{
 }
 .pill-badge.on{display:flex;}
 
-/* 自分の情報 */
 #selfInfo{
   margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;
 }
-#selfName{font-size:12px;color:var(--t2);}
+
+/* ━━━ 名前ボタン ━━━ */
+#nameBtn{
+  display:flex;align-items:center;gap:4px;
+  background:var(--fill3);border:.5px solid var(--sep2);
+  border-radius:var(--r1);padding:3px 8px;
+  cursor:pointer;transition:background .12s,border-color .12s;
+  flex-shrink:0;max-width:120px;
+}
+#nameBtn:hover{background:var(--fill2);border-color:var(--sep);}
+#selfName{
+  font-size:12px;font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  max-width:80px;
+}
+#namePencil{font-size:10px;color:var(--t4);flex-shrink:0;}
+
 #selfCode{
   font-size:11px;font-weight:700;letter-spacing:.08em;
   color:var(--blue-l);background:rgba(10,132,255,.14);
   padding:2px 7px;border-radius:5px;
 }
+
+/* ━━━ 名前編集モーダル ━━━ */
+#nameModal{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.6);
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+#nameModal.on{display:flex;}
+#nameModalBox{
+  background:var(--bg2);border:.5px solid var(--sep);
+  border-radius:var(--r3);padding:20px;
+  width:280px;display:flex;flex-direction:column;gap:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+#nameModalTitle{
+  font-size:14px;font-weight:600;
+  display:flex;align-items:center;gap:6px;
+}
+#nameModalTitle span{color:var(--t2);}
+#nameModalInput{
+  height:38px;background:var(--fill2);
+  border:.5px solid var(--sep);border-radius:var(--r1);
+  color:var(--t1);font-size:13px;padding:0 12px;
+  outline:none;font-family:inherit;width:100%;
+  transition:border .15s;
+}
+#nameModalInput:focus{border-color:var(--blue);}
+#nameModalWarn{
+  font-size:11px;color:var(--red);display:none;
+}
+.nm-row{display:flex;gap:8px;}
+.nm-btn{
+  flex:1;height:34px;border-radius:var(--r1);border:none;
+  font-size:12px;font-weight:600;font-family:inherit;
+  cursor:pointer;transition:opacity .12s;
+}
+.nm-cancel{background:var(--fill2);color:var(--t3);}
+.nm-cancel:hover{opacity:.8;}
+.nm-save{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(10,132,255,.35);}
+.nm-save:hover{opacity:.9;}
+.nm-hint{font-size:10px;color:var(--t4);line-height:1.5;}
 
 /* 👑 金色切替ボタン */
 #goldToggleBtn{
@@ -138,7 +192,6 @@ body{
   display:flex;flex:1;overflow:hidden;
 }
 
-/* ルームメッセージ */
 #roomPane{
   display:flex;flex-direction:column;flex:1;overflow:hidden;
 }
@@ -159,7 +212,6 @@ body{
 .mname:hover{text-decoration:underline;}
 .mname.me{color:var(--teal);}
 
-/* 管理者名 金色スタイル */
 .mname.admin-gold{
   color:var(--gold) !important;
   text-shadow:0 0 8px rgba(255,214,10,.5);
@@ -167,7 +219,6 @@ body{
 .mname.admin-gold::after{
   content:' 👑';font-size:10px;
 }
-/* 管理者メッセージ行ハイライト */
 .mrow.admin-row{
   background:linear-gradient(90deg,rgba(255,214,10,.06) 0%,transparent 70%);
   border-left:2px solid rgba(255,214,10,.3);
@@ -185,7 +236,6 @@ body{
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px;
 }
 
-/* ルーム入力フッター */
 #roomFoot{
   border-top:.5px solid var(--sep2);
   padding:8px 10px;flex-shrink:0;
@@ -227,7 +277,6 @@ body{
 }
 #dmPane.on{display:flex;}
 
-/* DM: ユーザーリスト */
 #dmList{
   width:200px;border-right:.5px solid var(--sep2);
   display:flex;flex-direction:column;flex-shrink:0;
@@ -256,7 +305,6 @@ body{
   display:flex;align-items:center;justify-content:center;
   font-size:12px;font-weight:600;color:var(--t2);flex-shrink:0;
 }
-/* 管理者アバター */
 .duav.admin-av{
   background:linear-gradient(135deg,#b8860b,#ffd700);
   border-color:rgba(255,214,10,.5);
@@ -278,7 +326,6 @@ body{
 }
 .dubadge.on{display:flex;}
 
-/* DM: 会話エリア */
 #dmConv{
   flex:1;display:none;flex-direction:column;overflow:hidden;
 }
@@ -314,7 +361,6 @@ body{
   background:var(--glass);
 }
 
-/* ━━━ 空メッセージ ━━━ */
 .empty-hint{
   flex:1;display:flex;align-items:center;justify-content:center;
   font-size:13px;color:var(--t4);
@@ -342,7 +388,11 @@ body{
     </button>
 
     <div id="selfInfo">
-      <span id="selfName"></span>
+      <!-- 名前ボタン（クリックで編集） -->
+      <button id="nameBtn" onclick="openNameModal()" title="名前を変更">
+        <span id="selfName"></span>
+        <span id="namePencil">✎</span>
+      </button>
       <span id="selfCode">----</span>
       <button class="xbtn" onclick="openFullscreen()" title="大画面で開く" style="font-size:11px;">⛶</button>
       <button class="xbtn" onclick="closeChat()" title="閉じる">✕</button>
@@ -405,6 +455,20 @@ body{
   </div>
 </div>
 
+<!-- ━━━ 名前編集モーダル ━━━ -->
+<div id="nameModal" onclick="if(event.target===this)closeNameModal()">
+  <div id="nameModalBox">
+    <div id="nameModalTitle">✎ <span>表示名を変更</span></div>
+    <input id="nameModalInput" maxlength="20" placeholder="新しい名前（1〜20文字）" autocomplete="off">
+    <div id="nameModalWarn">その名前は使用できません</div>
+    <div class="nm-hint">※ 変更後のメッセージから新しい名前で送信されます</div>
+    <div class="nm-row">
+      <button class="nm-btn nm-cancel" onclick="closeNameModal()">キャンセル</button>
+      <button class="nm-btn nm-save" onclick="saveName()">変更する</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ━━━ 閉じる ━━━ */
 function closeChat(){
@@ -427,6 +491,7 @@ function openFullscreen(){
 }
 document.addEventListener('keydown',e=>{
   if(e.ctrlKey&&e.key==='u'){e.preventDefault();closeChat();}
+  if(e.key==='Escape') closeNameModal();
 });
 
 /* ━━━ モード切替 ━━━ */
@@ -462,14 +527,12 @@ function clearReply(){
 }
 
 /* ━━━ 👑 金色表示トグル ━━━ */
-// localStorage で個人設定を保存
-let _goldOn = localStorage.getItem('chat_goldDisplay_2') !== 'off'; // デフォルトON
+let _goldOn = localStorage.getItem('chat_goldDisplay_2') !== 'off';
 
 function toggleGold(){
   _goldOn = !_goldOn;
   localStorage.setItem('chat_goldDisplay_2', _goldOn ? 'on' : 'off');
   applyGoldUI();
-  // メッセージ再レンダリング（現在のキャッシュから）
   if(typeof _lastRoomMsgs !== 'undefined') renderRoomMsgs(_lastRoomMsgs);
   if(typeof _lastDmMsgs !== 'undefined' && dmTarget) renderDmMsgs(_lastDmMsgs);
   renderDmUserList();
@@ -485,9 +548,27 @@ function applyGoldUI(){
     btn.textContent = '👑 金色OFF';
   }
 }
-
-// 起動時に反映
 applyGoldUI();
+
+/* ━━━ 名前変更モーダル ━━━ */
+function openNameModal(){
+  const input = document.getElementById('nameModalInput');
+  input.value = myName;
+  document.getElementById('nameModalWarn').style.display = 'none';
+  document.getElementById('nameModal').classList.add('on');
+  setTimeout(()=>input.select(),80);
+}
+function closeNameModal(){
+  document.getElementById('nameModal').classList.remove('on');
+}
+document.getElementById('nameModalInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter') saveName();
+});
+
+// saveName は Firebase モジュール側で上書き定義する
+function saveName(){
+  // Firebase モジュールが定義するまでのスタブ
+}
 </script>
 
 <!-- ━━━ Firebase ━━━ -->
@@ -510,32 +591,80 @@ const db=getFirestore(initializeApp({
 /* ═══════════════════════════
    自分の情報
 ═══════════════════════════ */
-// localStorage に名前がなければ「名無し」
-const myName = localStorage.getItem("accessUserName_2") || "名無し";
+let myName = localStorage.getItem("accessUserName_2") || "名無し";
 let myCode = "----";
-let myIsAdmin = false; // 自分が管理者かどうか
+let myIsAdmin = false;
+let myDocId = null; // Firestoreのドキュメントid
 
 document.getElementById("selfName").textContent = myName;
 
-// 管理者かどうかチェック & 名前表示に反映
+/* ━━━ 名前変更保存 ━━━ */
+window.saveName = async function(){
+  const input = document.getElementById('nameModalInput');
+  const warn  = document.getElementById('nameModalWarn');
+  const newName = input.value.trim();
+
+  warn.style.display = 'none';
+
+  // バリデーション
+  if(!newName || newName.length > 20){
+    warn.textContent = '1〜20文字で入力してください';
+    warn.style.display = 'block';
+    return;
+  }
+  if(newName === myName){
+    closeNameModal();
+    return;
+  }
+
+  // 重複チェック
+  try{
+    const dup = await getDocs(query(collection(db,"users"),where("name","==",newName)));
+    if(!dup.empty){
+      warn.textContent = 'その名前はすでに使われています';
+      warn.style.display = 'block';
+      return;
+    }
+  }catch(e){
+    warn.textContent = 'エラーが発生しました';
+    warn.style.display = 'block';
+    return;
+  }
+
+  // Firestore更新（自分のドキュメントがある場合）
+  if(myDocId){
+    try{
+      await updateDoc(doc(db,"users",myDocId),{name:newName});
+    }catch(e){
+      console.error("name update:",e);
+    }
+  }
+
+  // ローカル更新
+  myName = newName;
+  localStorage.setItem("accessUserName_2", newName);
+  document.getElementById("selfName").textContent = myName;
+  updateSelfNameDisplay();
+
+  closeNameModal();
+};
+
+/* ═══════════════════════════
+   管理者チェック & コード発行
+═══════════════════════════ */
 async function initCode(){
   try{
     const q = await getDocs(query(collection(db,"users"),where("name","==",myName)));
     if(q.empty){
-      // Firestoreにないユーザー（名無し等）はコード生成しない
       loadUsers();
       return;
     }
     const docRef = q.docs[0];
     const data = docRef.data();
-
-    // 管理者フラグ
+    myDocId = docRef.id;
     myIsAdmin = data.isAdmin === true;
-
-    // 自分の名前を金色表示（管理者かつgoldOn）
     updateSelfNameDisplay();
 
-    // userCode
     let code = data.userCode;
     if(!code){
       for(let i=0;i<30;i++){
@@ -555,19 +684,26 @@ async function initCode(){
 }
 
 function updateSelfNameDisplay(){
-  const el = document.getElementById("selfName");
+  const nameEl = document.getElementById("selfName");
+  const nameBtn = document.getElementById("nameBtn");
+  nameEl.textContent = myName;
+
   if(myIsAdmin && _goldOn){
-    el.style.color = 'var(--gold)';
-    el.style.textShadow = '0 0 8px rgba(255,214,10,.5)';
-    el.style.fontWeight = '700';
+    nameEl.style.color = 'var(--gold)';
+    nameEl.style.textShadow = '0 0 8px rgba(255,214,10,.5)';
+    nameEl.style.fontWeight = '700';
+    // ボタン枠も金色に
+    nameBtn.style.borderColor = 'rgba(255,214,10,.4)';
+    nameBtn.style.background = 'rgba(255,214,10,.08)';
   } else {
-    el.style.color = '';
-    el.style.textShadow = '';
-    el.style.fontWeight = '';
+    nameEl.style.color = '';
+    nameEl.style.textShadow = '';
+    nameEl.style.fontWeight = '';
+    nameBtn.style.borderColor = '';
+    nameBtn.style.background = '';
   }
 }
 
-// adminセット一覧（Firestoreから取得してキャッシュ）
 let adminSet = new Set();
 
 async function loadAdmins(){
@@ -665,11 +801,9 @@ function renderRoomMsgs(msgs){
     const code = m.userCode ? `<span class="mcode">#${esc(m.userCode)}</span>` : '';
     const reply = m.replyTo
       ? `<div class="mreply">↩ ${esc(m.replyTo.name)}：${esc(m.replyTo.text)}</div>` : '';
-    // 名前クラス
     let nameClass = 'mname';
     if(me) nameClass += ' me';
     if(isAdmin) nameClass += ' admin-gold';
-    // 行クラス
     const rowClass = isAdmin ? 'mrow admin-row' : 'mrow';
 
     return `<div class="${rowClass}">
@@ -707,7 +841,6 @@ document.getElementById("msgInput").addEventListener("keydown",e=>{
   if(e.key==="Enter") window.sendMsg();
 });
 
-// チャット閉鎖
 onSnapshot(doc(db,"config","chatSettings_2"),s=>{
   if(!s.exists()) return;
   const c = s.data().closed;
@@ -817,7 +950,6 @@ window.closeDmConv = function(){
   renderDmUserList();
 };
 
-/* DM未読監視 */
 let dmInitDone = false;
 onSnapshot(
   query(collection(db,"dm_2"),where("to","==",myName),limit(50)),
@@ -838,15 +970,12 @@ onSnapshot(
 
 /* ═══════════════════════════
    goldToggle との連携
-   （Firebaseモジュール外の toggleGold から呼べるよう window に公開）
 ═══════════════════════════ */
-window._lastRoomMsgs = _lastRoomMsgs; // 参照共有はできないので renderを直接公開
 window.renderRoomMsgs = renderRoomMsgs;
 window.renderDmMsgs   = renderDmMsgs;
 window.renderDmUserList = renderDmUserList;
 window.updateSelfNameDisplay = updateSelfNameDisplay;
 
-// goldToggle が押されたときの追加処理
 const _origToggleGold = window.toggleGold;
 window.toggleGold = function(){
   _origToggleGold();
