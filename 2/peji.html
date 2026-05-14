@@ -156,6 +156,7 @@ svg.sprite-defs{display:none;}
 }
 #tabBar::-webkit-scrollbar{display:none;}
 
+/* ★ 修正: dynTabs を横並びに */
 #dynTabs{
   display:flex;
   flex-direction:row;
@@ -1005,11 +1006,13 @@ function openNameChange(){
   const myName = localStorage.getItem('accessUserName_2')||'';
   if(!myName){ alert('ログインしていません'); return; }
 
+  // 1日1回制限チェック（localStorage で日付保存）
   const today = new Date().toISOString().slice(0,10);
   const lastChange = localStorage.getItem('nameChangedDate_2')||'';
   const btn = document.getElementById('nameChangeBtn');
 
   if(lastChange === today){
+    // 制限済み：ボタンをdisabledにして終了
     btn.classList.add('disabled');
     btn.textContent = '⏳ 本日変更済み';
     return;
@@ -1027,11 +1030,13 @@ function closeNameChange(){
   document.getElementById('nameChangeOverlay').classList.remove('open');
 }
 
+// 外クリックで閉じる
 document.addEventListener('click', function(e){
   const overlay = document.getElementById('nameChangeOverlay');
   if(e.target === overlay) closeNameChange();
 });
 
+// ページロード時にボタン状態を更新
 function updateNameBarUI(){
   const myName = localStorage.getItem('accessUserName_2')||'';
   const nameBarTxt = document.getElementById('nameBarTxt');
@@ -1394,9 +1399,11 @@ window.submitNameChange = async function(){
   btn.textContent = '確認中...';
 
   try {
+    // 重複チェック
     const dupSnap = await getDocs(query(collection(db,'users'),where('name','==',newName)));
     if(!dupSnap.empty){ errEl.textContent = 'その表示名は既に使われています'; btn.disabled=false; btn.textContent='変更する'; return; }
 
+    // 自分のドキュメントを検索して更新
     const mySnap = await getDocs(query(collection(db,'users'),where('name','==',oldName)));
     if(mySnap.empty){ errEl.textContent = 'ユーザーデータが見つかりません'; btn.disabled=false; btn.textContent='変更する'; return; }
 
@@ -1409,11 +1416,14 @@ window.submitNameChange = async function(){
       nameChangeHistory: (mySnap.docs[0].data().nameChangeHistory||[]).concat([{from:oldName,to:newName,date:today}]).slice(-10)
     });
 
+    // localStorage更新
     localStorage.setItem('accessUserName_2', newName);
     localStorage.setItem('nameChangedDate_2', today);
 
     closeNameChange();
+    // UIを更新
     updateNameBarUI();
+    // ライブテキストも更新
     document.getElementById('liveNotifTxt').textContent = 'こんにちは、' + newName + 'さん';
     showBanner('表示名を「' + newName + '」に変更しました', false);
   } catch(e) {
@@ -1485,29 +1495,31 @@ function checkHype(){
   }
 }
 
-/* ━━━ 修正箇所: ページ読み込み時刻を記録し、それ以前のメッセージは無視する ━━━ */
-const pageLoadTs = Date.now() / 1000;
-let lastCnt = 0;
-
+// 修正後
+let lastMsgTs = null;
 onSnapshot(query(collection(db,"chat_2"),orderBy("ts","desc"),limit(1)),snap=>{
   if(snap.empty)return;
   const l=snap.docs[0].data();
+  const msgTs = l.ts?.seconds ?? null;
 
-  if(l.ts?.seconds){
-    recentTs.push(l.ts.seconds);
+  if(msgTs){
+    recentTs.push(msgTs);
     if(recentTs.length>20)recentTs.shift();
     checkHype();
   }
 
-  // ページ読み込み前のメッセージ、または初回フェッチは通知しない
-  if(lastCnt !== 0
-    && l.name !== myName
-    && l.ts?.seconds > pageLoadTs  // ← 修正: 古いメッセージを無視
-  ){
+  // 初回は lastMsgTs を記録するだけ（通知しない）
+  if(lastMsgTs === null){
+    lastMsgTs = msgTs;
+    return;
+  }
+
+  // 新しいメッセージかつ自分以外
+  if(msgTs !== null && msgTs !== lastMsgTs && l.name !== myName){
     const msgText = l.name+'：'+l.text;
     window.receiveNotif(msgText, false, l.name);
   }
-  lastCnt++;
+  lastMsgTs = msgTs;
 });
 
 let lastTestTs=null;
