@@ -908,12 +908,13 @@
         <th style="width:8%">管理者</th>
         <th style="width:9%">芥chat</th>
         <th style="width:12%">表示先</th>
-        <th style="width:28%">操作</th>
+        <th style="width:10%">名前変更</th>
+        <th style="width:20%">操作</th>
       </tr>
     </thead>
     <tbody id="userTableBody">
       <tr class="loading-row">
-        <td colspan="8">
+        <td colspan="9">
           <div class="spinner"></div><br>
           読み込み中...
         </td>
@@ -1134,7 +1135,7 @@
       : users;
 
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="8">ユーザーが見つかりません</td></tr>`;
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="9">ユーザーが見つかりません</td></tr>`;
       return;
     }
 
@@ -1193,6 +1194,20 @@
           </div>
         </td>
         <td>
+          <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;">
+            <span style="font-size:11px;color:var(--text-muted);" id="ncDate_${user.id}">
+              ${user.nameChangedAt ? user.nameChangedAt : '未変更'}
+            </span>
+            <button class="btn" style="font-size:11px;padding:4px 10px;opacity:.8;border-color:rgba(92,107,192,.4);color:var(--accent2);background:rgba(92,107,192,.08);"
+              onclick="resetNameChangeLimit('${user.id}','${escapeHTML(user.name)}')"
+              title="本日の変更制限を解除">🔓 制限解除</button>
+            ${user.nameChangeHistory&&user.nameChangeHistory.length ? 
+              '<details style="font-size:10px;color:var(--text-muted);margin-top:3px;"><summary style="cursor:pointer;">履歴</summary>' +
+              user.nameChangeHistory.slice(-3).reverse().map(h=>'<div>'+escapeHTML(h.from)+'→'+escapeHTML(h.to)+'<br><span style="color:var(--text-muted);">'+h.date+'</span></div>').join('') +
+              '</details>' : ''}
+          </div>
+        </td>
+        <td>
           <div class="action-btns">
             <button class="btn btn-ok"
               onclick="handleAllow('${user.id}', '${escapeHTML(user.name)}')"
@@ -1219,7 +1234,7 @@
   // ユーザー一覧取得
   // ========================================
   async function loadUsers() {
-    tbody.innerHTML = `<tr class="loading-row"><td colspan="8"><div class="spinner"></div><br>読み込み中...</td></tr>`;
+    tbody.innerHTML = `<tr class="loading-row"><td colspan="9"><div class="spinner"></div><br>読み込み中...</td></tr>`;
     try {
       let snapshot;
       try {
@@ -1231,7 +1246,7 @@
       allUsers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       renderTable(allUsers);
     } catch (e) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="8">⚠ データ取得に失敗しました<br><small>${e.message}</small></td></tr>`;
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="9">⚠ データ取得に失敗しました<br><small>${e.message}</small></td></tr>`;
       showToast("エラー: " + e.message, 6000);
     }
   }
@@ -1320,6 +1335,19 @@
     confirmMsg.innerHTML = `<strong style="color: var(--text)">${name}</strong> のデータを完全に削除します。<br>削除すると再度 Name 入力が可能になります。`;
     confirmOkBtn.textContent = "削除する";
     confirmOverlay.classList.add("active");
+  };
+
+  // ========================================
+  // ★ 名前変更制限解除
+  // ========================================
+  window.resetNameChangeLimit = async function(id, name) {
+    try {
+      await updateDoc(doc(db, "users", id), { nameChangedAt: "" });
+      const user = allUsers.find(u => u.id === id);
+      if (user) user.nameChangedAt = "";
+      renderTable(allUsers);
+      showToast('🔓 「' + name + '」の表示名変更制限を解除しました');
+    } catch(e) { showToast('エラー: ' + e.message); }
   };
 
   searchInput.addEventListener("input", () => renderTable(allUsers));
