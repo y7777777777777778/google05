@@ -4,527 +4,1948 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>チャット</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
 :root{
-  --bg:#000;--bg2:#1C1C1E;--bg3:#2C2C2E;--bg4:#3A3A3C;
-  --sep:rgba(84,84,88,.65);--sep2:rgba(84,84,88,.35);
-  --fill:rgba(120,120,128,.2);--fill2:rgba(120,120,128,.16);--fill3:rgba(120,120,128,.1);
-  --t1:#fff;--t2:rgba(235,235,245,.6);--t3:rgba(235,235,245,.3);--t4:rgba(235,235,245,.16);
-  --blue:#0A84FF;--blue-l:#409CFF;--green:#30D158;--red:#FF453A;--teal:#5AC8FA;
+  --bg:#000;
+  --bg2:#1C1C1E;
+  --bg3:#2C2C2E;
+  --bg4:#3A3A3C;
+
+  --sep:rgba(84,84,88,.65);
+  --sep2:rgba(84,84,88,.35);
+
+  --fill:rgba(120,120,128,.2);
+  --fill2:rgba(120,120,128,.16);
+  --fill3:rgba(120,120,128,.1);
+
+  --t1:#fff;
+  --t2:rgba(235,235,245,.6);
+  --t3:rgba(235,235,245,.3);
+  --t4:rgba(235,235,245,.16);
+
+  --blue:#0A84FF;
+  --blue-l:#409CFF;
+  --green:#30D158;
+  --red:#FF453A;
   --gold:#FFD60A;
-  --glass:rgba(26,26,28,.97);--blur:blur(32px) saturate(180%);
-  --r1:8px;--r2:12px;--r3:16px;--r4:20px;
+  --teal:#5AC8FA;
+
+  --glass:rgba(26,26,28,.97);
+  --blur:blur(32px) saturate(180%);
+
+  --r1:8px;
+  --r2:12px;
+  --r3:16px;
+  --r4:20px;
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;}
-body{font-family:'Figtree',-apple-system,sans-serif;background:var(--bg);color:var(--t1);height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;}
-.wall{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 120% 65% at 10% -10%,#0d2550 0%,transparent 55%),radial-gradient(ellipse 70% 70% at 95% 20%,#0a1e42 0%,transparent 50%),radial-gradient(ellipse 55% 45% at 75% 75%,#120828 0%,transparent 50%),#03060f;}
-#app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;}
 
-/* トップバー */
-#topBar{display:flex;align-items:center;gap:8px;padding:0 10px;height:44px;flex-shrink:0;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:.5px solid var(--sep);}
-#modePill{display:flex;gap:2px;background:var(--fill3);border-radius:var(--r2);padding:3px;}
-.mpill{padding:3px 14px;border-radius:7px;border:none;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--t3);background:transparent;transition:background .12s,color .12s;position:relative;white-space:nowrap;}
-.mpill.on{background:var(--bg3);color:var(--t1);box-shadow:0 1px 4px rgba(0,0,0,.45);}
-.pill-badge{position:absolute;top:-4px;right:-3px;min-width:14px;height:14px;padding:0 3px;background:var(--red);border-radius:7px;font-size:9px;font-weight:700;color:#fff;display:none;align-items:center;justify-content:center;}
-.pill-badge.on{display:flex;}
-#selfInfo{margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-/* 名前ボタン */
-#nameBtn{display:flex;align-items:center;gap:4px;background:var(--fill3);border:.5px solid var(--sep2);border-radius:var(--r1);padding:3px 8px;cursor:pointer;transition:background .12s,border-color .12s;flex-shrink:0;max-width:130px;}
-#nameBtn:hover{background:var(--fill2);border-color:var(--sep);}
-#selfName{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px;}
-#namePencil{font-size:10px;color:var(--t4);flex-shrink:0;}
-#selfCode{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--blue-l);background:rgba(10,132,255,.14);padding:2px 7px;border-radius:5px;}
-.xbtn{width:26px;height:26px;border-radius:50%;background:var(--fill2);border:none;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s,color .1s;font-family:inherit;font-size:13px;}
-.xbtn:hover{background:var(--fill);color:var(--t1);}
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
 
-/* 名前モーダル */
-#nameModal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.6);align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
-#nameModal.on{display:flex;}
-#nameModalBox{background:var(--bg2);border:.5px solid var(--sep);border-radius:var(--r3);padding:20px;width:280px;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.6);}
-#nameModalTitle{font-size:14px;font-weight:600;color:var(--t2);}
-#nameModalInput{height:38px;background:var(--fill2);border:.5px solid var(--sep);border-radius:var(--r1);color:var(--t1);font-size:13px;padding:0 12px;outline:none;font-family:inherit;width:100%;transition:border .15s;}
-#nameModalInput:focus{border-color:var(--blue);}
-#nameModalWarn{font-size:11px;color:var(--red);display:none;}
-.nm-hint{font-size:10px;color:var(--t4);line-height:1.5;}
-.nm-row{display:flex;gap:8px;}
-.nm-btn{flex:1;height:34px;border-radius:var(--r1);border:none;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;}
-.nm-cancel{background:var(--fill2);color:var(--t3);}
-.nm-cancel:hover{opacity:.8;}
-.nm-save{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(10,132,255,.35);}
-.nm-save:hover{opacity:.9;}
+body{
+  font-family:'Figtree',sans-serif;
+  background:var(--bg);
+  color:var(--t1);
+}
+
+/* 背景 */
+
+.wall{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+
+  background:
+  radial-gradient(circle at 10% 0%, #153060 0%, transparent 35%),
+  radial-gradient(circle at 90% 20%, #111f48 0%, transparent 40%),
+  radial-gradient(circle at 70% 80%, #21092f 0%, transparent 40%),
+  #02040b;
+}
+
+/* アプリ */
+
+#app{
+  position:relative;
+  z-index:10;
+  width:100%;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* トップ */
+
+#topBar{
+  height:44px;
+  flex-shrink:0;
+
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  padding:0 10px;
+
+  background:var(--glass);
+  backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);
+
+  border-bottom:.5px solid var(--sep);
+}
+
+#modePill{
+  display:flex;
+  gap:2px;
+
+  padding:3px;
+  border-radius:var(--r2);
+
+  background:var(--fill3);
+}
+
+.mpill{
+  position:relative;
+
+  border:none;
+  background:transparent;
+
+  color:var(--t3);
+
+  padding:3px 14px;
+
+  border-radius:7px;
+
+  font-size:12px;
+  font-weight:600;
+
+  cursor:pointer;
+  transition:.15s;
+}
+
+.mpill:hover{
+  color:var(--t1);
+}
+
+.mpill.on{
+  background:var(--bg3);
+  color:#fff;
+}
+
+.pill-badge{
+  position:absolute;
+  top:-4px;
+  right:-3px;
+
+  min-width:14px;
+  height:14px;
+
+  padding:0 3px;
+
+  border-radius:7px;
+
+  background:var(--red);
+
+  color:#fff;
+
+  display:none;
+  align-items:center;
+  justify-content:center;
+
+  font-size:9px;
+  font-weight:700;
+}
+
+.pill-badge.on{
+  display:flex;
+}
+
+#selfInfo{
+  margin-left:auto;
+
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+#nameBtn{
+  display:flex;
+  align-items:center;
+  gap:4px;
+
+  border:none;
+
+  background:var(--fill3);
+
+  border:.5px solid var(--sep2);
+
+  border-radius:var(--r1);
+
+  padding:3px 8px;
+
+  cursor:pointer;
+}
+
+#selfName{
+  font-size:12px;
+  font-weight:600;
+}
+
+#selfCode{
+  font-size:11px;
+  font-weight:700;
+
+  color:var(--blue-l);
+
+  background:rgba(10,132,255,.15);
+
+  padding:2px 7px;
+
+  border-radius:5px;
+}
+
+.xbtn{
+  width:26px;
+  height:26px;
+
+  border:none;
+
+  border-radius:50%;
+
+  background:var(--fill2);
+
+  color:var(--t2);
+
+  cursor:pointer;
+}
+
+.xbtn:hover{
+  background:var(--fill);
+}
 
 /* ルームバー */
-#roomBar{display:flex;align-items:center;gap:4px;padding:5px 10px;flex-shrink:0;background:rgba(26,26,28,.8);border-bottom:.5px solid var(--sep2);overflow-x:auto;scrollbar-width:none;}
-#roomBar::-webkit-scrollbar{display:none;}
-.rbtn{padding:4px 11px;border-radius:var(--r1);border:none;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;color:var(--t3);background:var(--fill3);white-space:nowrap;flex-shrink:0;transition:background .12s,color .12s;}
-.rbtn:hover{background:var(--fill2);color:var(--t2);}
-.rbtn.on{background:var(--bg3);color:var(--t1);box-shadow:0 0 0 .5px var(--sep);}
+
+#roomBar{
+  height:38px;
+  flex-shrink:0;
+
+  display:flex;
+  align-items:center;
+  gap:4px;
+
+  overflow-x:auto;
+
+  padding:5px 10px;
+
+  background:rgba(26,26,28,.8);
+
+  border-bottom:.5px solid var(--sep2);
+}
+
+#roomBar::-webkit-scrollbar{
+  display:none;
+}
+
+.rbtn{
+  border:none;
+
+  background:var(--fill3);
+
+  color:var(--t3);
+
+  padding:4px 11px;
+
+  border-radius:var(--r1);
+
+  font-size:12px;
+
+  cursor:pointer;
+
+  white-space:nowrap;
+}
+
+.rbtn.on{
+  background:var(--bg3);
+  color:#fff;
+}
 
 /* メイン */
-#mainArea{display:flex;flex:1;overflow:hidden;}
-#roomPane{display:flex;flex-direction:column;flex:1;overflow:hidden;}
-#msgList{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
-#msgList::-webkit-scrollbar{width:3px;}
-#msgList::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
-.mrow{display:flex;flex-direction:column;gap:1px;}
-.mmeta{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;}
-.mname{font-size:12px;font-weight:600;color:var(--blue-l);cursor:pointer;flex-shrink:0;}
-.mname:hover{text-decoration:underline;}
-.mname.me{color:var(--teal);}
-.mname.admin-gold{color:var(--gold)!important;text-shadow:0 0 8px rgba(255,214,10,.5);}
-.mname.admin-gold::after{content:' 👑';font-size:10px;}
-.mrow.admin-row{background:linear-gradient(90deg,rgba(255,214,10,.06) 0%,transparent 70%);border-left:2px solid rgba(255,214,10,.3);padding-left:6px;border-radius:0 4px 4px 0;}
-.mcode{font-size:10px;color:var(--t4);letter-spacing:.04em;}
-.mts{font-size:10px;color:var(--t4);}
-.mbody{font-size:13px;color:var(--t2);word-break:break-all;line-height:1.55;padding-left:1px;}
-.mreply{font-size:10px;color:var(--t4);border-left:2px solid var(--sep);padding:1px 6px;border-radius:0 3px 3px 0;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px;}
-#roomFoot{border-top:.5px solid var(--sep2);padding:8px 10px;flex-shrink:0;background:var(--glass);}
-#replyBar{display:none;align-items:center;gap:6px;font-size:11px;color:var(--t4);padding:3px 8px;margin-bottom:5px;background:var(--fill3);border-radius:var(--r1);}
-#replyBar.on{display:flex;}
-#replyTxt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#replyClear{background:none;border:none;color:var(--t4);cursor:pointer;font-size:13px;line-height:1;padding:0;}
-.irow{display:flex;gap:6px;align-items:center;}
-.minput{flex:1;height:34px;background:var(--fill2);border:.5px solid var(--sep2);border-radius:17px;color:var(--t1);font-size:13px;padding:0 13px;outline:none;font-family:inherit;transition:border .15s,background .15s;}
-.minput:focus{border-color:var(--blue);background:rgba(10,132,255,.06);}
-.minput::placeholder{color:var(--t4);}
-.sbtn{width:34px;height:34px;border-radius:50%;background:var(--blue);border:none;color:#fff;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(10,132,255,.4);transition:background .15s,transform .1s;}
-.sbtn:hover{background:var(--blue-l);}
-.sbtn:active{transform:scale(.9);}
+
+#mainArea{
+  flex:1;
+  overflow:hidden;
+
+  display:flex;
+}
+
+#roomPane{
+  flex:1;
+
+  display:flex;
+  flex-direction:column;
+
+  overflow:hidden;
+}
+
+#msgList{
+  flex:1;
+
+  overflow-y:auto;
+
+  padding:10px 12px;
+
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+#msgList::-webkit-scrollbar{
+  width:3px;
+}
+
+#msgList::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.1);
+  border-radius:2px;
+}
+
+.mrow{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.mrow.admin-row{
+  padding-left:6px;
+  border-left:2px solid rgba(255,214,10,.35);
+
+  background:linear-gradient(90deg,rgba(255,214,10,.06),transparent 70%);
+}
+
+.mmeta{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  flex-wrap:wrap;
+}
+
+.mname{
+  color:var(--blue-l);
+
+  font-size:12px;
+  font-weight:600;
+
+  cursor:pointer;
+}
+
+.mname.me{
+  color:var(--teal);
+}
+
+.mname.admin-gold{
+  color:var(--gold)!important;
+  text-shadow:0 0 8px rgba(255,214,10,.5);
+}
+
+.mname.admin-gold::after{
+  content:" 👑";
+  font-size:10px;
+}
+
+.mcode{
+  font-size:10px;
+  color:var(--t4);
+}
+
+.mts{
+  font-size:10px;
+  color:var(--t4);
+}
+
+.mbody{
+  font-size:13px;
+  color:var(--t2);
+
+  line-height:1.55;
+
+  word-break:break-word;
+}
+
+.mreply{
+  font-size:10px;
+
+  color:var(--t4);
+
+  border-left:2px solid var(--sep);
+
+  padding-left:6px;
+}
+
+/* 入力 */
+
+#roomFoot{
+  flex-shrink:0;
+
+  border-top:.5px solid var(--sep2);
+
+  padding:8px 10px;
+
+  background:var(--glass);
+}
+
+#replyBar{
+  display:none;
+
+  align-items:center;
+  gap:6px;
+
+  margin-bottom:5px;
+
+  background:var(--fill3);
+
+  border-radius:var(--r1);
+
+  padding:3px 8px;
+
+  font-size:11px;
+  color:var(--t4);
+}
+
+#replyBar.on{
+  display:flex;
+}
+
+#replyTxt{
+  flex:1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#replyClear{
+  border:none;
+  background:none;
+
+  color:var(--t4);
+
+  cursor:pointer;
+}
+
+.irow{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.minput{
+  flex:1;
+
+  height:34px;
+
+  border-radius:17px;
+
+  border:.5px solid var(--sep2);
+
+  background:var(--fill2);
+
+  color:#fff;
+
+  padding:0 13px;
+
+  outline:none;
+
+  font-size:13px;
+}
+
+.minput:focus{
+  border-color:var(--blue);
+}
+
+.sbtn{
+  width:34px;
+  height:34px;
+
+  border:none;
+
+  border-radius:50%;
+
+  background:var(--blue);
+
+  color:#fff;
+
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 
 /* DM */
-#dmPane{display:none;flex:1;overflow:hidden;}
-#dmPane.on{display:flex;}
-#dmList{width:200px;border-right:.5px solid var(--sep2);display:flex;flex-direction:column;flex-shrink:0;background:rgba(20,20,22,.9);}
-.dl-hd{padding:8px 10px 4px;font-size:10px;font-weight:700;letter-spacing:.07em;color:var(--t4);text-transform:uppercase;border-bottom:.5px solid var(--sep2);flex-shrink:0;}
-#dmUserList{flex:1;overflow-y:auto;scrollbar-width:none;}
-#dmUserList::-webkit-scrollbar{display:none;}
-.duitem{display:flex;align-items:center;gap:7px;padding:8px 10px;cursor:pointer;border-bottom:.5px solid var(--sep2);transition:background .1s;}
-.duitem:hover{background:var(--fill3);}
-.duitem.on{background:rgba(10,132,255,.1);}
-.duav{width:28px;height:28px;border-radius:50%;background:var(--bg3);border:.5px solid var(--sep);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--t2);flex-shrink:0;}
-.duav.admin-av{background:linear-gradient(135deg,#b8860b,#ffd700);border-color:rgba(255,214,10,.5);color:#000;box-shadow:0 0 6px rgba(255,214,10,.35);}
-.duinfo{flex:1;overflow:hidden;}
-.duname{font-size:12px;font-weight:600;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.duname.admin-gold-dm{color:var(--gold);text-shadow:0 0 6px rgba(255,214,10,.4);}
-.ducode{font-size:10px;color:var(--t4);}
-.dubadge{min-width:15px;height:15px;padding:0 3px;background:var(--red);border-radius:7px;font-size:9px;font-weight:700;color:#fff;display:none;align-items:center;justify-content:center;flex-shrink:0;}
-.dubadge.on{display:flex;}
-#dmConv{flex:1;display:none;flex-direction:column;overflow:hidden;}
-#dmConv.on{display:flex;}
-#dmConvHd{padding:8px 12px;border-bottom:.5px solid var(--sep2);display:flex;align-items:center;gap:8px;flex-shrink:0;background:rgba(28,28,30,.6);}
-#dmBackBtn{background:none;border:none;color:var(--blue);cursor:pointer;font-size:13px;font-family:inherit;padding:0;flex-shrink:0;}
-#dmConvName{font-size:13px;font-weight:600;}
-#dmConvCode{font-size:10px;color:var(--t4);margin-top:1px;}
-#dmMsgList{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
-#dmMsgList::-webkit-scrollbar{width:3px;}
-#dmMsgList::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
-.dmbrow{display:flex;flex-direction:column;gap:1px;}
-.dmbrow.mine{align-self:flex-end;align-items:flex-end;max-width:78%;}
-.dmbrow.theirs{align-self:flex-start;max-width:78%;}
-.dmb{padding:7px 12px;border-radius:var(--r2);font-size:13px;line-height:1.5;word-break:break-all;}
-.mine .dmb{background:var(--blue);color:#fff;border-radius:var(--r2) var(--r2) 4px var(--r2);}
-.theirs .dmb{background:var(--bg3);color:var(--t1);border-radius:var(--r2) var(--r2) var(--r2) 4px;}
-.dmts{font-size:9px;color:var(--t4);padding:0 3px;}
-#dmFoot{border-top:.5px solid var(--sep2);padding:8px 10px;flex-shrink:0;background:var(--glass);}
-.empty-hint{flex:1;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--t4);}
+
+#dmPane{
+  display:none;
+  flex:1;
+  overflow:hidden;
+}
+
+#dmPane.on{
+  display:flex;
+}
+
+#dmList{
+  width:200px;
+  flex-shrink:0;
+
+  border-right:.5px solid var(--sep2);
+
+  background:rgba(20,20,22,.9);
+
+  display:flex;
+  flex-direction:column;
+}
+
+.dl-hd{
+  padding:8px 10px 4px;
+
+  font-size:10px;
+  font-weight:700;
+
+  color:var(--t4);
+
+  border-bottom:.5px solid var(--sep2);
+}
+
+#dmUserList{
+  flex:1;
+  overflow-y:auto;
+}
+
+.duitem{
+  display:flex;
+  align-items:center;
+  gap:7px;
+
+  padding:8px 10px;
+
+  cursor:pointer;
+
+  border-bottom:.5px solid var(--sep2);
+}
+
+.duitem:hover{
+  background:var(--fill3);
+}
+
+.duitem.on{
+  background:rgba(10,132,255,.1);
+}
+
+.duav{
+  width:28px;
+  height:28px;
+
+  border-radius:50%;
+
+  background:var(--bg3);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:12px;
+  font-weight:600;
+}
+
+.duav.admin-av{
+  background:linear-gradient(135deg,#b8860b,#ffd700);
+  color:#000;
+}
+
+.duinfo{
+  flex:1;
+  overflow:hidden;
+}
+
+.duname{
+  font-size:12px;
+  font-weight:600;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.duname.admin-gold-dm{
+  color:var(--gold);
+}
+
+.ducode{
+  font-size:10px;
+  color:var(--t4);
+}
+
+.dubadge{
+  min-width:15px;
+  height:15px;
+
+  display:none;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:7px;
+
+  padding:0 3px;
+
+  background:var(--red);
+
+  color:#fff;
+
+  font-size:9px;
+  font-weight:700;
+}
+
+.dubadge.on{
+  display:flex;
+}
+
+/* DM会話 */
+
+#dmConv{
+  flex:1;
+
+  display:none;
+  flex-direction:column;
+
+  overflow:hidden;
+}
+
+#dmConv.on{
+  display:flex;
+}
+
+#dmConvHd{
+  padding:8px 12px;
+
+  border-bottom:.5px solid var(--sep2);
+
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  background:rgba(28,28,30,.6);
+}
+
+#dmBackBtn{
+  border:none;
+  background:none;
+
+  color:var(--blue);
+
+  cursor:pointer;
+}
+
+#dmConvName{
+  font-size:13px;
+  font-weight:600;
+}
+
+#dmConvCode{
+  font-size:10px;
+  color:var(--t4);
+}
+
+#dmMsgList{
+  flex:1;
+
+  overflow-y:auto;
+
+  padding:10px 12px;
+
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.dmbrow{
+  display:flex;
+  flex-direction:column;
+}
+
+.dmbrow.mine{
+  align-self:flex-end;
+  align-items:flex-end;
+  max-width:78%;
+}
+
+.dmbrow.theirs{
+  align-self:flex-start;
+  max-width:78%;
+}
+
+.dmb{
+  padding:7px 12px;
+
+  border-radius:var(--r2);
+
+  font-size:13px;
+
+  line-height:1.5;
+
+  word-break:break-word;
+}
+
+.mine .dmb{
+  background:var(--blue);
+  color:#fff;
+
+  border-radius:var(--r2) var(--r2) 4px var(--r2);
+}
+
+.theirs .dmb{
+  background:var(--bg3);
+
+  border-radius:var(--r2) var(--r2) var(--r2) 4px;
+}
+
+.dmts{
+  font-size:9px;
+  color:var(--t4);
+}
+
+/* 空 */
+
+.empty-hint{
+  flex:1;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--t4);
+  font-size:13px;
+}
+
+/* 名前モーダル */
+
+#nameModal{
+  position:fixed;
+  inset:0;
+
+  display:none;
+  align-items:center;
+  justify-content:center;
+
+  z-index:9999;
+
+  background:rgba(0,0,0,.6);
+
+  backdrop-filter:blur(8px);
+}
+
+#nameModal.on{
+  display:flex;
+}
+
+#nameModalBox{
+  width:280px;
+
+  background:var(--bg2);
+
+  border:.5px solid var(--sep);
+
+  border-radius:var(--r3);
+
+  padding:20px;
+
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+#nameModalInput{
+  height:38px;
+
+  border:.5px solid var(--sep);
+
+  border-radius:var(--r1);
+
+  background:var(--fill2);
+
+  color:#fff;
+
+  padding:0 12px;
+
+  outline:none;
+}
+
+#nameModalWarn{
+  display:none;
+
+  color:var(--red);
+
+  font-size:11px;
+}
+
+.nm-row{
+  display:flex;
+  gap:8px;
+}
+
+.nm-btn{
+  flex:1;
+
+  height:34px;
+
+  border:none;
+
+  border-radius:var(--r1);
+
+  cursor:pointer;
+
+  font-weight:600;
+}
+
+.nm-cancel{
+  background:var(--fill2);
+  color:var(--t2);
+}
+
+.nm-save{
+  background:var(--blue);
+  color:#fff;
+}
+
+/* スマホ */
+
+@media(max-width:720px){
+
+  #dmList{
+    width:100%;
+  }
+
+  #dmConv{
+    position:absolute;
+    inset:0;
+    z-index:50;
+    background:#000;
+  }
+
+}
 </style>
 </head>
+
 <body>
+
 <div class="wall"></div>
+
 <div id="app">
+
   <div id="topBar">
+
     <div id="modePill">
-      <button class="mpill on" id="pillRoom" onclick="setMode('room')">部屋<span class="pill-badge" id="pb_room"></span></button>
-      <button class="mpill" id="pillDm" onclick="setMode('dm')">DM<span class="pill-badge" id="pb_dm"></span></button>
-    </div>
-    <div id="selfInfo">
-      <button id="nameBtn" onclick="openNameModal()" title="名前を変更">
-        <span id="selfName"></span>
-        <span id="namePencil">✎</span>
+      <button class="mpill on" id="pillRoom" onclick="setMode('room')">
+        部屋
+        <span class="pill-badge" id="pb_room"></span>
       </button>
-      <span id="selfCode">----</span>
-      <button class="xbtn" onclick="openFullscreen()" title="大画面で開く" style="font-size:11px;">⛶</button>
-      <button class="xbtn" onclick="closeChat()" title="閉じる">✕</button>
+
+      <button class="mpill" id="pillDm" onclick="setMode('dm')">
+        DM
+        <span class="pill-badge" id="pb_dm"></span>
+      </button>
     </div>
+
+    <div id="selfInfo">
+
+      <button id="nameBtn" onclick="openNameModal()">
+        <span id="selfName"></span>
+      </button>
+
+      <span id="selfCode">----</span>
+
+      <button class="xbtn" onclick="closeChat()">✕</button>
+
+    </div>
+
   </div>
 
   <div id="roomBar"></div>
 
   <div id="mainArea">
+
+    <!-- 部屋 -->
+
     <div id="roomPane">
+
       <div id="msgList"></div>
+
       <div id="roomFoot">
+
         <div id="replyBar">
-          <span style="color:var(--blue-l);flex-shrink:0;">↩</span>
+          <span>↩</span>
           <span id="replyTxt"></span>
           <button id="replyClear" onclick="clearReply()">✕</button>
         </div>
+
         <div class="irow">
-          <input class="minput" id="msgInput" placeholder="メッセージを入力..." maxlength="200">
+
+          <input
+            class="minput"
+            id="msgInput"
+            placeholder="メッセージを入力..."
+            maxlength="200"
+          >
+
           <button class="sbtn" onclick="sendMsg()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.3"
+              stroke-linecap="round"
+            >
+              <line x1="12" y1="19" x2="12" y2="5"/>
+              <polyline points="5 12 12 5 19 12"/>
+            </svg>
+
           </button>
+
         </div>
+
       </div>
+
     </div>
+
+    <!-- DM -->
 
     <div id="dmPane">
+
       <div id="dmList">
-        <div class="dl-hd">メンバー</div>
-        <div id="dmUserList"><div class="empty-hint">読み込み中...</div></div>
-      </div>
-      <div id="dmConv">
-        <div id="dmConvHd">
-          <button id="dmBackBtn" onclick="closeDmConv()">‹ 戻る</button>
-          <div><div id="dmConvName"></div><div id="dmConvCode"></div></div>
+
+        <div class="dl-hd">
+          メンバー
         </div>
-        <div id="dmMsgList"></div>
-        <div id="dmFoot">
-          <div class="irow">
-            <input class="minput" id="dmInput" placeholder="DMを送信..." maxlength="200">
-            <button class="sbtn" onclick="sendDm()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-            </button>
+
+        <div id="dmUserList">
+          <div class="empty-hint">
+            読み込み中...
           </div>
         </div>
+
       </div>
-      <div id="dmEmpty" style="flex:1;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--t4);">左からユーザーを選択してください</div>
+
+      <div id="dmConv">
+
+        <div id="dmConvHd">
+
+          <button id="dmBackBtn" onclick="closeDmConv()">
+            ‹ 戻る
+          </button>
+
+          <div>
+            <div id="dmConvName"></div>
+            <div id="dmConvCode"></div>
+          </div>
+
+        </div>
+
+        <div id="dmMsgList"></div>
+
+        <div id="roomFoot">
+
+          <div class="irow">
+
+            <input
+              class="minput"
+              id="dmInput"
+              placeholder="DMを送信..."
+              maxlength="200"
+            >
+
+            <button class="sbtn" onclick="sendDm()">
+
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.3"
+                stroke-linecap="round"
+              >
+                <line x1="12" y1="19" x2="12" y2="5"/>
+                <polyline points="5 12 12 5 19 12"/>
+              </svg>
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div
+        id="dmEmpty"
+        class="empty-hint"
+      >
+        左からユーザーを選択してください
+      </div>
+
     </div>
+
   </div>
+
 </div>
 
-<!-- 名前編集モーダル -->
+<!-- 名前変更 -->
+
 <div id="nameModal" onclick="if(event.target===this)closeNameModal()">
+
   <div id="nameModalBox">
-    <div id="nameModalTitle">✎ 表示名を変更</div>
-    <input id="nameModalInput" maxlength="20" placeholder="新しい名前（1〜20文字）" autocomplete="off">
-    <div id="nameModalWarn"></div>
-    <div class="nm-hint">※ 変更後のメッセージから新しい名前で送信されます</div>
-    <div class="nm-row">
-      <button class="nm-btn nm-cancel" onclick="closeNameModal()">キャンセル</button>
-      <button class="nm-btn nm-save" onclick="saveName()">変更する</button>
+
+    <div style="font-size:14px;font-weight:600;">
+      ✎ 表示名を変更
     </div>
+
+    <input
+      id="nameModalInput"
+      maxlength="20"
+      placeholder="新しい名前"
+    >
+
+    <div id="nameModalWarn"></div>
+
+    <div class="nm-row">
+
+      <button class="nm-btn nm-cancel" onclick="closeNameModal()">
+        キャンセル
+      </button>
+
+      <button class="nm-btn nm-save" onclick="saveName()">
+        変更する
+      </button>
+
+    </div>
+
   </div>
+
 </div>
 
 <script>
 function closeChat(){
-  try{if(window.parent!==window){if(typeof window.parent.closePanel==='function'){window.parent.closePanel();return;}const f=window.parent.document.getElementById('hiddenFrame');if(f){f.style.display='none';return;}}}catch(e){}
   window.close();
 }
-function openFullscreen(){
-  try{if(window.parent!==window&&typeof window.parent.openFullChat==='function'){window.parent.openFullChat();return;}}catch(e){}
-  window.open('chat.html','_blank');
-}
+
 document.addEventListener('keydown',e=>{
-  if(e.ctrlKey&&e.key==='u'){e.preventDefault();closeChat();}
-  if(e.key==='Escape') closeNameModal();
+
+  if(e.key==='Escape'){
+    closeNameModal();
+  }
+
 });
 
 let _mode='room';
+
 function setMode(m){
+
   _mode=m;
+
   document.getElementById('pillRoom').classList.toggle('on',m==='room');
   document.getElementById('pillDm').classList.toggle('on',m==='dm');
+
   document.getElementById('roomBar').style.display=m==='room'?'flex':'none';
+
   document.getElementById('roomPane').style.display=m==='room'?'flex':'none';
+
   document.getElementById('dmPane').classList.toggle('on',m==='dm');
-  if(m==='dm'){document.getElementById('pb_dm').classList.remove('on');document.getElementById('pb_dm').textContent='';}
-  if(m==='room'){document.getElementById('pb_room').classList.remove('on');document.getElementById('pb_room').textContent='';}
+
+  if(m==='room'){
+    clearBadge('pb_room');
+  }
+
+  if(m==='dm'){
+    clearBadge('pb_dm');
+  }
+
+}
+
+function clearBadge(id){
+  const el=document.getElementById(id);
+  el.classList.remove('on');
+  el.textContent='';
+}
+
+function addBadge(id,n){
+  const el=document.getElementById(id);
+
+  let cur=parseInt(el.textContent||'0')||0;
+
+  cur+=n;
+
+  if(cur>99) cur=99;
+
+  el.textContent=cur;
+
+  el.classList.add('on');
 }
 
 let _reply=null;
+
 function setReply(name,text){
+
   _reply={name,text};
+
   document.getElementById('replyBar').classList.add('on');
+
   document.getElementById('replyTxt').textContent=name+'：'+text;
+
   document.getElementById('msgInput').focus();
+
 }
-function clearReply(){_reply=null;document.getElementById('replyBar').classList.remove('on');}
+
+function clearReply(){
+
+  _reply=null;
+
+  document.getElementById('replyBar').classList.remove('on');
+
+}
 
 function openNameModal(){
-  document.getElementById('nameModalInput').value=myName;
-  document.getElementById('nameModalWarn').style.display='none';
+
   document.getElementById('nameModal').classList.add('on');
-  setTimeout(()=>document.getElementById('nameModalInput').select(),80);
+
+  document.getElementById('nameModalInput').value=myName;
+
+  document.getElementById('nameModalWarn').style.display='none';
+
 }
-function closeNameModal(){document.getElementById('nameModal').classList.remove('on');}
-document.getElementById('nameModalInput').addEventListener('keydown',e=>{if(e.key==='Enter') saveName();});
-function saveName(){/* Firebase側で上書き */}
+
+function closeNameModal(){
+
+  document.getElementById('nameModal').classList.remove('on');
+
+}
 </script>
 
 <script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import{
-  getFirestore,collection,addDoc,query,limit,
-  onSnapshot,serverTimestamp,doc,getDocs,where,updateDoc
-}from"https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-const db=getFirestore(initializeApp({
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  limit,
+  onSnapshot,
+  serverTimestamp,
+  doc,
+  getDocs,
+  where,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const app=initializeApp({
+
   apiKey:"AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
   authDomain:"fir-66339.firebaseapp.com",
   projectId:"fir-66339",
   storageBucket:"fir-66339.firebasestorage.app",
   messagingSenderId:"876017617963",
   appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
-},"chat_v3"));
+
+},"chat_v3");
+
+const db=getFirestore(app);
 
 let myName=localStorage.getItem("accessUserName_2")||"名無し";
 let myCode="----";
-let myIsAdmin=false;
+
 let myDocId=null;
+let myIsAdmin=false;
+
 let adminSet=new Set();
 
 document.getElementById("selfName").textContent=myName;
 
-function updateSelfNameDisplay(){
-  const el=document.getElementById("selfName");
-  const btn=document.getElementById("nameBtn");
-  el.textContent=myName;
-  if(myIsAdmin){
-    el.style.color='var(--gold)';
-    el.style.textShadow='0 0 8px rgba(255,214,10,.5)';
-    el.style.fontWeight='700';
-    btn.style.borderColor='rgba(255,214,10,.4)';
-    btn.style.background='rgba(255,214,10,.08)';
-  } else {
-    el.style.color='';el.style.textShadow='';el.style.fontWeight='';
-    btn.style.borderColor='';btn.style.background='';
+/* 管理者 */
+
+async function loadAdmins(){
+
+  try{
+
+    const snap=await getDocs(
+      query(
+        collection(db,"users"),
+        where("isAdmin","==",true)
+      )
+    );
+
+    adminSet=new Set(
+      snap.docs.map(d=>d.data().name)
+    );
+
+  }catch(e){}
+
+}
+
+/* コード */
+
+async function initCode(){
+
+  try{
+
+    const q=await getDocs(
+      query(
+        collection(db,"users"),
+        where("name","==",myName)
+      )
+    );
+
+    if(!q.empty){
+
+      const docRef=q.docs[0];
+
+      const data=docRef.data();
+
+      myDocId=docRef.id;
+
+      myIsAdmin=data.isAdmin===true;
+
+      let code=data.userCode;
+
+      if(!code){
+
+        for(let i=0;i<30;i++){
+
+          const c=String(
+            Math.floor(1000+Math.random()*9000)
+          );
+
+          const dup=await getDocs(
+            query(
+              collection(db,"users"),
+              where("userCode","==",c)
+            )
+          );
+
+          if(dup.empty){
+            code=c;
+            break;
+          }
+
+        }
+
+        await updateDoc(
+          doc(db,"users",docRef.id),
+          {
+            userCode:code
+          }
+        );
+
+      }
+
+      myCode=String(code);
+
+      document.getElementById("selfCode").textContent="#"+myCode;
+
+    }
+
+  }catch(e){
+    console.error(e);
   }
+
+  loadUsers();
+
 }
 
 /* 名前変更 */
+
 window.saveName=async function(){
+
   const input=document.getElementById('nameModalInput');
+
   const warn=document.getElementById('nameModalWarn');
+
   const newName=input.value.trim();
+
   warn.style.display='none';
-  if(!newName||newName.length>20){warn.textContent='1〜20文字で入力してください';warn.style.display='block';return;}
-  if(newName===myName){closeNameModal();return;}
-  try{
-    const dup=await getDocs(query(collection(db,"users"),where("name","==",newName)));
-    if(!dup.empty){warn.textContent='その名前はすでに使われています';warn.style.display='block';return;}
-  }catch(e){warn.textContent='エラーが発生しました';warn.style.display='block';return;}
-  if(myDocId){
-    try{await updateDoc(doc(db,"users",myDocId),{name:newName});}
-    catch(e){console.error("name update:",e);}
+
+  if(!newName || newName.length>20){
+
+    warn.textContent='1〜20文字';
+
+    warn.style.display='block';
+
+    return;
+
   }
+
+  try{
+
+    const dup=await getDocs(
+      query(
+        collection(db,"users"),
+        where("name","==",newName)
+      )
+    );
+
+    if(!dup.empty){
+
+      warn.textContent='その名前は使われています';
+
+      warn.style.display='block';
+
+      return;
+
+    }
+
+  }catch(e){}
+
+  if(myDocId){
+
+    try{
+
+      await updateDoc(
+        doc(db,"users",myDocId),
+        {
+          name:newName
+        }
+      );
+
+    }catch(e){}
+
+  }
+
   myName=newName;
+
   localStorage.setItem("accessUserName_2",newName);
-  updateSelfNameDisplay();
+
+  document.getElementById("selfName").textContent=myName;
+
   closeNameModal();
+
 };
 
-async function loadAdmins(){
-  try{
-    const snap=await getDocs(query(collection(db,"users"),where("isAdmin","==",true)));
-    adminSet=new Set(snap.docs.map(d=>d.data().name));
-  }catch(e){}
-}
+/* ルーム */
 
-async function initCode(){
-  try{
-    const q=await getDocs(query(collection(db,"users"),where("name","==",myName)));
-    if(!q.empty){
-      const docRef=q.docs[0];const data=docRef.data();
-      myDocId=docRef.id;myIsAdmin=data.isAdmin===true;
-      updateSelfNameDisplay();
-      let code=data.userCode;
-      if(!code){
-        for(let i=0;i<30;i++){
-          const c=String(Math.floor(1000+Math.random()*9000));
-          const dup=await getDocs(query(collection(db,"users"),where("userCode","==",c)));
-          if(dup.empty){code=c;break;}
-        }
-        await updateDoc(doc(db,"users",docRef.id),{userCode:code});
-      }
-      myCode=String(code);
-      document.getElementById("selfCode").textContent="#"+myCode;
-    }
-  }catch(e){console.error("initCode:",e);}
-  await loadAdmins();
-  loadUsers();
-}
+let rooms=[
+  {
+    id:"general",
+    name:"全体"
+  }
+];
 
-let allUsers=[];
-async function loadUsers(){
-  try{
-    const snap=await getDocs(query(collection(db,"users"),where("group","==","2"),where("status","==","ok")));
-    allUsers=snap.docs.map(d=>({id:d.id,...d.data()})).filter(u=>u.name!==myName&&u.userCode);
-    renderDmUserList();
-  }catch(e){console.error("loadUsers:",e);}
-}
-
-/* 部屋 */
-let rooms=[{id:"general",name:"全体"}];
 let curRoom="general";
+
 let msgUnsub=null;
-let lastMsgCount=0;
-let _lastRoomMsgs=[];
 
 function renderRooms(){
-  document.getElementById("roomBar").innerHTML=rooms.map(r=>
-    `<button class="rbtn${r.id===curRoom?' on':''}" onclick="switchRoom('${esc(r.id)}')">#${esc(r.name)}</button>`
-  ).join('');
+
+  document.getElementById("roomBar").innerHTML=
+  rooms.map(r=>`
+    <button
+      class="rbtn${r.id===curRoom?' on':''}"
+      onclick="switchRoom('${esc(r.id)}')"
+    >
+      #${esc(r.name)}
+    </button>
+  `).join('');
+
 }
+
 window.switchRoom=function(id){
-  curRoom=id;renderRooms();msgUnsub&&msgUnsub();
-  document.getElementById("msgList").innerHTML='';
-  lastMsgCount=0;_lastRoomMsgs=[];subscribeRoomMsgs();
-};
-onSnapshot(doc(db,"config","chatRooms_2"),snap=>{
-  if(snap.exists()&&Array.isArray(snap.data().rooms)){
-    const r=snap.data().rooms;
-    rooms=[{id:"general",name:"全体"},...r.filter(x=>x.id!=="general")];
-  }else{rooms=[{id:"general",name:"全体"}];}
+
+  curRoom=id;
+
   renderRooms();
-});
+
+  if(msgUnsub){
+    msgUnsub();
+  }
+
+  document.getElementById("msgList").innerHTML='';
+
+  subscribeRoomMsgs();
+
+};
+
+onSnapshot(
+  doc(db,"config","chatRooms_2"),
+  snap=>{
+
+    if(
+      snap.exists()
+      &&
+      Array.isArray(snap.data().rooms)
+    ){
+
+      const r=snap.data().rooms;
+
+      rooms=[
+        {
+          id:"general",
+          name:"全体"
+        },
+        ...r.filter(x=>x.id!=="general")
+      ];
+
+    }else{
+
+      rooms=[
+        {
+          id:"general",
+          name:"全体"
+        }
+      ];
+
+    }
+
+    renderRooms();
+
+  }
+);
+
+/* NG */
 
 let ngW=[];
-onSnapshot(doc(db,"config","ngWords_2"),s=>{ngW=s.exists()?(s.data().words||[]):[];});
-function isNG(t){return ngW.some(w=>t.toLowerCase().includes(w.toLowerCase()));}
+
+onSnapshot(
+  doc(db,"config","ngWords_2"),
+  s=>{
+
+    ngW=s.exists()
+    ?(s.data().words||[])
+    :[];
+
+  }
+);
+
+function isNG(t){
+
+  return ngW.some(w=>
+    t.toLowerCase().includes(
+      w.toLowerCase()
+    )
+  );
+
+}
+
+/* メッセ */
 
 function subscribeRoomMsgs(){
+
   msgUnsub=onSnapshot(
-    query(collection(db,"chat_2"),where("roomId","==",curRoom),limit(80)),
+
+    query(
+      collection(db,"chat_2"),
+      where("roomId","==",curRoom),
+      limit(80)
+    ),
+
     snap=>{
-      const msgs=snap.docs.map(d=>({id:d.id,...d.data()}))
-        .sort((a,b)=>(a.ts?.seconds??0)-(b.ts?.seconds??0));
-      _lastRoomMsgs=msgs;
+
+      const msgs=snap.docs
+      .map(d=>({
+        id:d.id,
+        ...d.data()
+      }))
+      .sort((a,b)=>
+        (a.ts?.seconds??0)
+        -
+        (b.ts?.seconds??0)
+      );
+
       renderRoomMsgs(msgs);
-      if(lastMsgCount>0&&msgs.length>lastMsgCount&&_mode!=='room') addBadge('pb_room',msgs.length-lastMsgCount);
-      lastMsgCount=msgs.length;
+
     }
+
   );
+
 }
 
 function renderRoomMsgs(msgs){
+
   const el=document.getElementById("msgList");
-  const atBot=el.scrollHeight-el.scrollTop-el.clientHeight<80;
+
+  const atBot=
+  el.scrollHeight-el.scrollTop-el.clientHeight<80;
+
   el.innerHTML=msgs.map(m=>{
+
     const me=m.name===myName;
+
     const isAdmin=adminSet.has(m.name);
-    const code=m.userCode?`<span class="mcode">#${esc(m.userCode)}</span>`:'';
-    const reply=m.replyTo?`<div class="mreply">↩ ${esc(m.replyTo.name)}：${esc(m.replyTo.text)}</div>`:'';
-    let nc='mname';if(me)nc+=' me';if(isAdmin)nc+=' admin-gold';
-    const rc=isAdmin?'mrow admin-row':'mrow';
-    return `<div class="${rc}"><div class="mmeta"><span class="${nc}" onclick="setReply('${esc(m.name)}','${esc(m.text)}')">${esc(m.name)}</span>${code}<span class="mts">${fmt(m.ts)}</span></div>${reply}<div class="mbody">${esc(m.text)}</div></div>`;
+
+    let cls='mname';
+
+    if(me) cls+=' me';
+
+    if(isAdmin) cls+=' admin-gold';
+
+    return `
+      <div class="mrow${isAdmin?' admin-row':''}">
+
+        <div class="mmeta">
+
+          <span
+            class="${cls}"
+            onclick="setReply('${esc(m.name)}','${esc(m.text)}')"
+          >
+            ${esc(m.name)}
+          </span>
+
+          <span class="mcode">
+            #${esc(m.userCode||'----')}
+          </span>
+
+          <span class="mts">
+            ${fmt(m.ts)}
+          </span>
+
+        </div>
+
+        ${
+          m.replyTo
+          ?
+          `<div class="mreply">
+            ↩ ${esc(m.replyTo.name)}：${esc(m.replyTo.text)}
+          </div>`
+          :''
+        }
+
+        <div class="mbody">
+          ${esc(m.text)}
+        </div>
+
+      </div>
+    `;
+
   }).join('');
-  if(atBot) el.scrollTop=el.scrollHeight;
+
+  if(atBot){
+    el.scrollTop=el.scrollHeight;
+  }
+
 }
 
 window.sendMsg=async function(){
-  const el=document.getElementById("msgInput");
-  const text=el.value.trim();
-  if(!text||isNG(text)) return;
-  el.value='';
-  const data={name:myName,userCode:myCode,text,roomId:curRoom,ts:serverTimestamp()};
-  if(_reply){data.replyTo={name:_reply.name,text:_reply.text};clearReply();}
-  try{await addDoc(collection(db,"chat_2"),data);}catch(e){console.error(e);}
-};
-document.getElementById("msgInput").addEventListener("keydown",e=>{if(e.key==="Enter") window.sendMsg();});
 
-onSnapshot(doc(db,"config","chatSettings_2"),s=>{
-  if(!s.exists()) return;
-  const c=s.data().closed;
   const el=document.getElementById("msgInput");
-  el.disabled=c;el.placeholder=c?'（閉鎖中）':'メッセージを入力...';
+
+  const text=el.value.trim();
+
+  if(!text) return;
+
+  if(isNG(text)) return;
+
+  el.value='';
+
+  const data={
+
+    name:myName,
+    userCode:myCode,
+
+    text,
+
+    roomId:curRoom,
+
+    ts:serverTimestamp()
+
+  };
+
+  if(_reply){
+
+    data.replyTo={
+      name:_reply.name,
+      text:_reply.text
+    };
+
+    clearReply();
+
+  }
+
+  try{
+
+    await addDoc(
+      collection(db,"chat_2"),
+      data
+    );
+
+  }catch(e){
+    console.error(e);
+  }
+
+};
+
+document.getElementById("msgInput")
+.addEventListener("keydown",e=>{
+
+  if(e.key==="Enter"){
+    sendMsg();
+  }
+
 });
 
 /* DM */
-let dmUnread={};let dmTarget=null;let dmUnsub=null;let _lastDmMsgs=[];
 
-function renderDmUserList(){
-  const el=document.getElementById("dmUserList");
-  if(!allUsers.length){el.innerHTML='<div class="empty-hint" style="padding:16px;font-size:12px;color:var(--t4);text-align:center;">他のユーザーがいません</div>';return;}
-  el.innerHTML=allUsers.map(u=>{
-    const unr=dmUnread[u.name]||0;
-    const active=dmTarget&&dmTarget.name===u.name;
-    const isAdminUser=adminSet.has(u.name);
-    return `<div class="duitem${active?' on':''}" onclick="openDm('${esc(u.name)}','${esc(u.userCode||'')}')">
-      <div class="duav${isAdminUser?' admin-av':''}">${u.name.charAt(0)}</div>
-      <div class="duinfo"><div class="duname${isAdminUser?' admin-gold-dm':''}">${esc(u.name)}${isAdminUser?' 👑':''}</div><div class="ducode">#${esc(u.userCode||'----')}</div></div>
-      <span class="dubadge${unr?' on':''}" id="dub_${safeid(u.name)}">${unr||''}</span>
-    </div>`;
-  }).join('');
+let allUsers=[];
+
+let dmUnread={};
+
+let dmTarget=null;
+
+let dmUnsub=null;
+
+async function loadUsers(){
+
+  try{
+
+    const snap=await getDocs(
+
+      query(
+        collection(db,"users"),
+        where("group","==","2"),
+        where("status","==","ok")
+      )
+
+    );
+
+    allUsers=snap.docs
+    .map(d=>({
+      id:d.id,
+      ...d.data()
+    }))
+    .filter(u=>
+      u.name!==myName
+      &&
+      u.userCode
+    );
+
+    renderDmUserList();
+
+  }catch(e){
+    console.error(e);
+  }
+
 }
 
-function dmKey(a,b){return[a,b].sort().join('__');}
+function renderDmUserList(){
+
+  const el=document.getElementById("dmUserList");
+
+  if(!allUsers.length){
+
+    el.innerHTML=
+    `<div class="empty-hint">
+      他のユーザーがいません
+    </div>`;
+
+    return;
+
+  }
+
+  el.innerHTML=allUsers.map(u=>{
+
+    const unr=dmUnread[u.name]||0;
+
+    const active=
+    dmTarget
+    &&
+    dmTarget.name===u.name;
+
+    const isAdminUser=
+    adminSet.has(u.name);
+
+    return `
+
+      <div
+        class="duitem${active?' on':''}"
+        onclick="openDm('${esc(u.name)}','${esc(u.userCode||'')}')"
+      >
+
+        <div class="duav${isAdminUser?' admin-av':''}">
+          ${u.name.charAt(0)}
+        </div>
+
+        <div class="duinfo">
+
+          <div class="duname${isAdminUser?' admin-gold-dm':''}">
+            ${esc(u.name)}
+            ${isAdminUser?' 👑':''}
+          </div>
+
+          <div class="ducode">
+            #${esc(u.userCode||'----')}
+          </div>
+
+        </div>
+
+        <span
+          class="dubadge${unr?' on':''}"
+          id="dub_${safeid(u.name)}"
+        >
+          ${unr||''}
+        </span>
+
+      </div>
+
+    `;
+
+  }).join('');
+
+}
+
+function dmKey(a,b){
+
+  return [a,b].sort().join('__');
+
+}
 
 window.openDm=function(name,code){
+
   dmTarget={name,code};
+
   document.getElementById("dmConvName").textContent=name;
+
   document.getElementById("dmConvCode").textContent="#"+code;
+
   document.getElementById("dmConv").classList.add("on");
+
   document.getElementById("dmEmpty").style.display="none";
+
   dmUnread[name]=0;
-  const badge=document.getElementById("dub_"+safeid(name));
-  if(badge){badge.classList.remove("on");badge.textContent='';}
+
   renderDmUserList();
-  dmUnsub&&dmUnsub();
+
+  if(dmUnsub){
+    dmUnsub();
+  }
+
   const key=dmKey(myName,name);
+
   dmUnsub=onSnapshot(
-    query(collection(db,"dm_2"),where("dmKey","==",key),limit(100)),
+
+    query(
+      collection(db,"dm_2"),
+      where("dmKey","==",key),
+      limit(100)
+    ),
+
     snap=>{
-      const msgs=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.ts?.seconds??0)-(b.ts?.seconds??0));
-      _lastDmMsgs=msgs;renderDmMsgs(msgs);
+
+      const msgs=snap.docs
+      .map(d=>({
+        id:d.id,
+        ...d.data()
+      }))
+      .sort((a,b)=>
+        (a.ts?.seconds??0)
+        -
+        (b.ts?.seconds??0)
+      );
+
+      renderDmMsgs(msgs);
+
     }
+
   );
-  document.getElementById("dmInput").focus();
+
 };
 
 function renderDmMsgs(msgs){
+
   const el=document.getElementById("dmMsgList");
-  const atBot=el.scrollHeight-el.scrollTop-el.clientHeight<60;
+
+  const atBot=
+  el.scrollHeight-el.scrollTop-el.clientHeight<60;
+
   el.innerHTML=msgs.map(m=>{
+
     const mine=m.from===myName;
-    return `<div class="dmbrow ${mine?'mine':'theirs'}"><div class="dmb">${esc(m.text)}</div><span class="dmts">${fmt(m.ts)}</span></div>`;
+
+    return `
+
+      <div class="dmbrow ${mine?'mine':'theirs'}">
+
+        <div class="dmb">
+          ${esc(m.text)}
+        </div>
+
+        <span class="dmts">
+          ${fmt(m.ts)}
+        </span>
+
+      </div>
+
+    `;
+
   }).join('');
-  if(atBot) el.scrollTop=el.scrollHeight;
+
+  if(atBot){
+    el.scrollTop=el.scrollHeight;
+  }
+
 }
 
 window.sendDm=async function(){
+
   if(!dmTarget) return;
+
   const el=document.getElementById("dmInput");
+
   const text=el.value.trim();
-  if(!text||isNG(text)) return;
+
+  if(!text) return;
+
+  if(isNG(text)) return;
+
   el.value='';
-  try{await addDoc(collection(db,"dm_2"),{from:myName,to:dmTarget.name,dmKey:dmKey(myName,dmTarget.name),text,ts:serverTimestamp()});}
-  catch(e){console.error(e);}
-};
-document.getElementById("dmInput").addEventListener("keydown",e=>{if(e.key==="Enter") window.sendDm();});
 
-window.closeDmConv=function(){
-  dmUnsub&&dmUnsub();dmUnsub=null;dmTarget=null;
-  document.getElementById("dmConv").classList.remove("on");
-  document.getElementById("dmEmpty").style.display="";
-  _lastDmMsgs=[];renderDmUserList();
+  try{
+
+    await addDoc(
+      collection(db,"dm_2"),
+      {
+        from:myName,
+        to:dmTarget.name,
+        dmKey:dmKey(myName,dmTarget.name),
+        text,
+        ts:serverTimestamp()
+      }
+    );
+
+  }catch(e){
+    console.error(e);
+  }
+
 };
 
-let dmInitDone=false;
-onSnapshot(query(collection(db,"dm_2"),where("to","==",myName),limit(50)),snap=>{
-  if(!dmInitDone){dmInitDone=true;return;}
-  snap.docChanges().forEach(ch=>{
-    if(ch.type!=="added") return;
-    const d=ch.doc.data();
-    if(dmTarget&&dmTarget.name===d.from) return;
-    dmUnread[d.from]=(dmUnread[d.from]||0)+1;
-    const b=document.getElementById("dub_"+safeid(d.from));
-    if(b){b.classList.add("on");b.textContent=dmUnread[d.from];}
-    addBadge('pb_dm',1);renderDmUserList();
-  });
+document.getElementById("dmInput")
+.addEventListener("keydown",e=>{
+
+  if(e.key==="Enter"){
+    sendDm();
+  }
+
 });
 
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-function fmt(ts){if(!ts||!ts.seconds) return '';return new Date(ts.seconds*1000).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});}
-function safeid(s){return String(s||'').replace(/[^a-zA-Z0-9\u3000-\u9fff\u30A0-\u30FF\u3040-\u309F]/g,"_");}
-function addBadge(id,n){const el=document.getElementById(id);const cur=parseInt(el.textContent||"0")||0;el.textContent=Math.min(cur+n,99);el.classList.add("on");}
+window.closeDmConv=function(){
 
-initCode();renderRooms();subscribeRoomMsgs();setMode('room');
+  if(dmUnsub){
+    dmUnsub();
+  }
+
+  dmTarget=null;
+
+  document.getElementById("dmConv").classList.remove("on");
+
+  document.getElementById("dmEmpty").style.display='';
+
+  renderDmUserList();
+
+};
+
+onSnapshot(
+
+  query(
+    collection(db,"dm_2"),
+    where("to","==",myName),
+    limit(50)
+  ),
+
+  snap=>{
+
+    snap.docChanges().forEach(ch=>{
+
+      if(ch.type!=="added") return;
+
+      const d=ch.doc.data();
+
+      if(
+        dmTarget
+        &&
+        dmTarget.name===d.from
+      ){
+        return;
+      }
+
+      dmUnread[d.from]=(dmUnread[d.from]||0)+1;
+
+      addBadge('pb_dm',1);
+
+      renderDmUserList();
+
+    });
+
+  }
+
+);
+
+/* utils */
+
+function esc(s){
+
+  return String(s||'')
+
+  .replace(/&/g,'&amp;')
+  .replace(/</g,'&lt;')
+  .replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;')
+  .replace(/'/g,'&#39;');
+
+}
+
+function fmt(ts){
+
+  if(!ts || !ts.seconds) return '';
+
+  return new Date(ts.seconds*1000)
+  .toLocaleTimeString(
+    'ja-JP',
+    {
+      hour:'2-digit',
+      minute:'2-digit'
+    }
+  );
+
+}
+
+function safeid(s){
+
+  return String(s||'')
+  .replace(/[^a-zA-Z0-9]/g,'_');
+
+}
+
+/* 初期化 */
+
+loadAdmins();
+
+initCode();
+
+renderRooms();
+
+subscribeRoomMsgs();
+
+setMode('room');
+
 </script>
+
 </body>
 </html>
