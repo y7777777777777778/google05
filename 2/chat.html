@@ -873,7 +873,8 @@ body{
 
       <span id="selfCode">----</span>
 
-      <button class="xbtn" onclick="closeChat()">✕</button>
+      <button class="xbtn" onclick="openFullscreen()" title="大画面で開く" style="background:rgba(10,132,255,.15);color:var(--blue-l);font-size:15px;">⤢</button>
+<button class="xbtn" onclick="closeChat()">✕</button>
 
     </div>
 
@@ -1046,8 +1047,21 @@ body{
 </div>
 
 <script>
+// 修正後
 function closeChat(){
   window.close();
+}
+
+function openFullscreen(){
+  try{
+    if(window.parent !== window){
+      window.parent.openApp('chat.html','共通チャット','s-chat');
+    } else {
+      window.open('chat.html','_blank');
+    }
+  }catch(e){
+    window.open('chat.html','_blank');
+  }
 }
 
 document.addEventListener('keydown',e=>{
