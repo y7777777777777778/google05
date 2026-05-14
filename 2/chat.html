@@ -13,340 +13,113 @@
   --fill:rgba(120,120,128,.2);--fill2:rgba(120,120,128,.16);--fill3:rgba(120,120,128,.1);
   --t1:#fff;--t2:rgba(235,235,245,.6);--t3:rgba(235,235,245,.3);--t4:rgba(235,235,245,.16);
   --blue:#0A84FF;--blue-l:#409CFF;--green:#30D158;--red:#FF453A;--teal:#5AC8FA;
-  --gold:#FFD60A;--gold-l:#ffe55a;--gold-dim:#b89a00;
+  --gold:#FFD60A;
   --glass:rgba(26,26,28,.97);--blur:blur(32px) saturate(180%);
   --r1:8px;--r2:12px;--r3:16px;--r4:20px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
-body{
-  font-family:'Figtree',-apple-system,sans-serif;
-  background:var(--bg);color:var(--t1);
-  height:100vh;display:flex;flex-direction:column;
-  -webkit-font-smoothing:antialiased;
-}
+body{font-family:'Figtree',-apple-system,sans-serif;background:var(--bg);color:var(--t1);height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;}
+.wall{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 120% 65% at 10% -10%,#0d2550 0%,transparent 55%),radial-gradient(ellipse 70% 70% at 95% 20%,#0a1e42 0%,transparent 50%),radial-gradient(ellipse 55% 45% at 75% 75%,#120828 0%,transparent 50%),#03060f;}
+#app{position:relative;z-index:10;display:flex;flex-direction:column;height:100vh;}
 
-.wall{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 120% 65% at 10% -10%,#0d2550 0%,transparent 55%),
-    radial-gradient(ellipse 70% 70% at 95% 20%,#0a1e42 0%,transparent 50%),
-    radial-gradient(ellipse 55% 45% at 75% 75%,#120828 0%,transparent 50%),
-    #03060f;
-}
-
-#app{
-  position:relative;z-index:10;
-  display:flex;flex-direction:column;
-  height:100vh;
-}
-
-/* ━━━ トップバー ━━━ */
-#topBar{
-  display:flex;align-items:center;gap:8px;
-  padding:0 10px;height:44px;flex-shrink:0;
-  background:var(--glass);
-  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
-  border-bottom:.5px solid var(--sep);
-}
-
-#modePill{
-  display:flex;gap:2px;
-  background:var(--fill3);
-  border-radius:var(--r2);padding:3px;
-}
-.mpill{
-  padding:3px 14px;border-radius:7px;border:none;
-  font-size:12px;font-weight:600;font-family:inherit;
-  cursor:pointer;color:var(--t3);background:transparent;
-  transition:background .12s,color .12s;position:relative;
-  white-space:nowrap;
-}
+/* トップバー */
+#topBar{display:flex;align-items:center;gap:8px;padding:0 10px;height:44px;flex-shrink:0;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:.5px solid var(--sep);}
+#modePill{display:flex;gap:2px;background:var(--fill3);border-radius:var(--r2);padding:3px;}
+.mpill{padding:3px 14px;border-radius:7px;border:none;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--t3);background:transparent;transition:background .12s,color .12s;position:relative;white-space:nowrap;}
 .mpill.on{background:var(--bg3);color:var(--t1);box-shadow:0 1px 4px rgba(0,0,0,.45);}
-.pill-badge{
-  position:absolute;top:-4px;right:-3px;
-  min-width:14px;height:14px;padding:0 3px;
-  background:var(--red);border-radius:7px;
-  font-size:9px;font-weight:700;color:#fff;
-  display:none;align-items:center;justify-content:center;
-}
+.pill-badge{position:absolute;top:-4px;right:-3px;min-width:14px;height:14px;padding:0 3px;background:var(--red);border-radius:7px;font-size:9px;font-weight:700;color:#fff;display:none;align-items:center;justify-content:center;}
 .pill-badge.on{display:flex;}
+#selfInfo{margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;}
 
-#selfInfo{
-  margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;
-}
-
-/* ━━━ 名前ボタン ━━━ */
-#nameBtn{
-  display:flex;align-items:center;gap:4px;
-  background:var(--fill3);border:.5px solid var(--sep2);
-  border-radius:var(--r1);padding:3px 8px;
-  cursor:pointer;transition:background .12s,border-color .12s;
-  flex-shrink:0;max-width:120px;
-}
+/* 名前ボタン */
+#nameBtn{display:flex;align-items:center;gap:4px;background:var(--fill3);border:.5px solid var(--sep2);border-radius:var(--r1);padding:3px 8px;cursor:pointer;transition:background .12s,border-color .12s;flex-shrink:0;max-width:130px;}
 #nameBtn:hover{background:var(--fill2);border-color:var(--sep);}
-#selfName{
-  font-size:12px;font-weight:600;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  max-width:80px;
-}
+#selfName{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px;}
 #namePencil{font-size:10px;color:var(--t4);flex-shrink:0;}
+#selfCode{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--blue-l);background:rgba(10,132,255,.14);padding:2px 7px;border-radius:5px;}
+.xbtn{width:26px;height:26px;border-radius:50%;background:var(--fill2);border:none;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s,color .1s;font-family:inherit;font-size:13px;}
+.xbtn:hover{background:var(--fill);color:var(--t1);}
 
-#selfCode{
-  font-size:11px;font-weight:700;letter-spacing:.08em;
-  color:var(--blue-l);background:rgba(10,132,255,.14);
-  padding:2px 7px;border-radius:5px;
-}
-
-/* ━━━ 名前編集モーダル ━━━ */
-#nameModal{
-  display:none;position:fixed;inset:0;z-index:1000;
-  background:rgba(0,0,0,.6);
-  align-items:center;justify-content:center;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-}
+/* 名前モーダル */
+#nameModal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.6);align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 #nameModal.on{display:flex;}
-#nameModalBox{
-  background:var(--bg2);border:.5px solid var(--sep);
-  border-radius:var(--r3);padding:20px;
-  width:280px;display:flex;flex-direction:column;gap:12px;
-  box-shadow:0 20px 60px rgba(0,0,0,.6);
-}
-#nameModalTitle{
-  font-size:14px;font-weight:600;
-  display:flex;align-items:center;gap:6px;
-}
-#nameModalTitle span{color:var(--t2);}
-#nameModalInput{
-  height:38px;background:var(--fill2);
-  border:.5px solid var(--sep);border-radius:var(--r1);
-  color:var(--t1);font-size:13px;padding:0 12px;
-  outline:none;font-family:inherit;width:100%;
-  transition:border .15s;
-}
+#nameModalBox{background:var(--bg2);border:.5px solid var(--sep);border-radius:var(--r3);padding:20px;width:280px;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+#nameModalTitle{font-size:14px;font-weight:600;color:var(--t2);}
+#nameModalInput{height:38px;background:var(--fill2);border:.5px solid var(--sep);border-radius:var(--r1);color:var(--t1);font-size:13px;padding:0 12px;outline:none;font-family:inherit;width:100%;transition:border .15s;}
 #nameModalInput:focus{border-color:var(--blue);}
-#nameModalWarn{
-  font-size:11px;color:var(--red);display:none;
-}
+#nameModalWarn{font-size:11px;color:var(--red);display:none;}
+.nm-hint{font-size:10px;color:var(--t4);line-height:1.5;}
 .nm-row{display:flex;gap:8px;}
-.nm-btn{
-  flex:1;height:34px;border-radius:var(--r1);border:none;
-  font-size:12px;font-weight:600;font-family:inherit;
-  cursor:pointer;transition:opacity .12s;
-}
+.nm-btn{flex:1;height:34px;border-radius:var(--r1);border:none;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;}
 .nm-cancel{background:var(--fill2);color:var(--t3);}
 .nm-cancel:hover{opacity:.8;}
 .nm-save{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(10,132,255,.35);}
 .nm-save:hover{opacity:.9;}
-.nm-hint{font-size:10px;color:var(--t4);line-height:1.5;}
 
-/* 👑 金色切替ボタン */
-#goldToggleBtn{
-  height:24px;padding:0 8px;
-  border-radius:12px;border:none;
-  font-size:11px;font-weight:600;font-family:inherit;
-  cursor:pointer;transition:all .15s;
-  display:flex;align-items:center;gap:4px;
-  flex-shrink:0;
-}
-#goldToggleBtn.gold-on{
-  background:rgba(255,214,10,.15);
-  border:.5px solid rgba(255,214,10,.4);
-  color:var(--gold);
-}
-#goldToggleBtn.gold-off{
-  background:var(--fill3);
-  border:.5px solid var(--sep2);
-  color:var(--t4);
-}
-
-.xbtn{
-  width:26px;height:26px;border-radius:50%;
-  background:var(--fill2);border:none;color:var(--t3);
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:background .1s,color .1s;font-family:inherit;font-size:13px;
-}
-.xbtn:hover{background:var(--fill);color:var(--t1);}
-
-/* ━━━ ルームバー ━━━ */
-#roomBar{
-  display:flex;align-items:center;gap:4px;
-  padding:5px 10px;flex-shrink:0;
-  background:rgba(26,26,28,.8);
-  border-bottom:.5px solid var(--sep2);
-  overflow-x:auto;scrollbar-width:none;
-}
+/* ルームバー */
+#roomBar{display:flex;align-items:center;gap:4px;padding:5px 10px;flex-shrink:0;background:rgba(26,26,28,.8);border-bottom:.5px solid var(--sep2);overflow-x:auto;scrollbar-width:none;}
 #roomBar::-webkit-scrollbar{display:none;}
-.rbtn{
-  padding:4px 11px;border-radius:var(--r1);border:none;
-  font-size:12px;font-weight:500;font-family:inherit;
-  cursor:pointer;color:var(--t3);background:var(--fill3);
-  white-space:nowrap;flex-shrink:0;
-  transition:background .12s,color .12s;
-}
+.rbtn{padding:4px 11px;border-radius:var(--r1);border:none;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;color:var(--t3);background:var(--fill3);white-space:nowrap;flex-shrink:0;transition:background .12s,color .12s;}
 .rbtn:hover{background:var(--fill2);color:var(--t2);}
 .rbtn.on{background:var(--bg3);color:var(--t1);box-shadow:0 0 0 .5px var(--sep);}
 
-/* ━━━ メインエリア ━━━ */
-#mainArea{
-  display:flex;flex:1;overflow:hidden;
-}
-
-#roomPane{
-  display:flex;flex-direction:column;flex:1;overflow:hidden;
-}
-#msgList{
-  flex:1;overflow-y:auto;padding:10px 12px;
-  display:flex;flex-direction:column;gap:5px;
-  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;
-}
+/* メイン */
+#mainArea{display:flex;flex:1;overflow:hidden;}
+#roomPane{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+#msgList{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
 #msgList::-webkit-scrollbar{width:3px;}
 #msgList::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
-
 .mrow{display:flex;flex-direction:column;gap:1px;}
 .mmeta{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;}
-.mname{
-  font-size:12px;font-weight:600;color:var(--blue-l);
-  cursor:pointer;flex-shrink:0;
-}
+.mname{font-size:12px;font-weight:600;color:var(--blue-l);cursor:pointer;flex-shrink:0;}
 .mname:hover{text-decoration:underline;}
 .mname.me{color:var(--teal);}
-
-.mname.admin-gold{
-  color:var(--gold) !important;
-  text-shadow:0 0 8px rgba(255,214,10,.5);
-}
-.mname.admin-gold::after{
-  content:' 👑';font-size:10px;
-}
-.mrow.admin-row{
-  background:linear-gradient(90deg,rgba(255,214,10,.06) 0%,transparent 70%);
-  border-left:2px solid rgba(255,214,10,.3);
-  padding-left:6px;border-radius:0 4px 4px 0;
-}
-
+.mname.admin-gold{color:var(--gold)!important;text-shadow:0 0 8px rgba(255,214,10,.5);}
+.mname.admin-gold::after{content:' 👑';font-size:10px;}
+.mrow.admin-row{background:linear-gradient(90deg,rgba(255,214,10,.06) 0%,transparent 70%);border-left:2px solid rgba(255,214,10,.3);padding-left:6px;border-radius:0 4px 4px 0;}
 .mcode{font-size:10px;color:var(--t4);letter-spacing:.04em;}
 .mts{font-size:10px;color:var(--t4);}
 .mbody{font-size:13px;color:var(--t2);word-break:break-all;line-height:1.55;padding-left:1px;}
-.mreply{
-  font-size:10px;color:var(--t4);
-  border-left:2px solid var(--sep);
-  padding:1px 6px;border-radius:0 3px 3px 0;
-  margin-bottom:2px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px;
-}
-
-#roomFoot{
-  border-top:.5px solid var(--sep2);
-  padding:8px 10px;flex-shrink:0;
-  background:var(--glass);
-}
-#replyBar{
-  display:none;align-items:center;gap:6px;
-  font-size:11px;color:var(--t4);
-  padding:3px 8px;margin-bottom:5px;
-  background:var(--fill3);border-radius:var(--r1);
-}
+.mreply{font-size:10px;color:var(--t4);border-left:2px solid var(--sep);padding:1px 6px;border-radius:0 3px 3px 0;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px;}
+#roomFoot{border-top:.5px solid var(--sep2);padding:8px 10px;flex-shrink:0;background:var(--glass);}
+#replyBar{display:none;align-items:center;gap:6px;font-size:11px;color:var(--t4);padding:3px 8px;margin-bottom:5px;background:var(--fill3);border-radius:var(--r1);}
 #replyBar.on{display:flex;}
 #replyTxt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 #replyClear{background:none;border:none;color:var(--t4);cursor:pointer;font-size:13px;line-height:1;padding:0;}
 .irow{display:flex;gap:6px;align-items:center;}
-.minput{
-  flex:1;height:34px;
-  background:var(--fill2);border:.5px solid var(--sep2);
-  border-radius:17px;color:var(--t1);
-  font-size:13px;padding:0 13px;outline:none;font-family:inherit;
-  transition:border .15s,background .15s;
-}
+.minput{flex:1;height:34px;background:var(--fill2);border:.5px solid var(--sep2);border-radius:17px;color:var(--t1);font-size:13px;padding:0 13px;outline:none;font-family:inherit;transition:border .15s,background .15s;}
 .minput:focus{border-color:var(--blue);background:rgba(10,132,255,.06);}
 .minput::placeholder{color:var(--t4);}
-.sbtn{
-  width:34px;height:34px;border-radius:50%;
-  background:var(--blue);border:none;color:#fff;
-  cursor:pointer;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 10px rgba(10,132,255,.4);
-  transition:background .15s,transform .1s;
-}
+.sbtn{width:34px;height:34px;border-radius:50%;background:var(--blue);border:none;color:#fff;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(10,132,255,.4);transition:background .15s,transform .1s;}
 .sbtn:hover{background:var(--blue-l);}
 .sbtn:active{transform:scale(.9);}
 
-/* ━━━ DMペイン ━━━ */
-#dmPane{
-  display:none;flex:1;overflow:hidden;
-}
+/* DM */
+#dmPane{display:none;flex:1;overflow:hidden;}
 #dmPane.on{display:flex;}
-
-#dmList{
-  width:200px;border-right:.5px solid var(--sep2);
-  display:flex;flex-direction:column;flex-shrink:0;
-  background:rgba(20,20,22,.9);
-}
-.dl-hd{
-  padding:8px 10px 4px;
-  font-size:10px;font-weight:700;letter-spacing:.07em;
-  color:var(--t4);text-transform:uppercase;
-  border-bottom:.5px solid var(--sep2);
-  flex-shrink:0;
-}
+#dmList{width:200px;border-right:.5px solid var(--sep2);display:flex;flex-direction:column;flex-shrink:0;background:rgba(20,20,22,.9);}
+.dl-hd{padding:8px 10px 4px;font-size:10px;font-weight:700;letter-spacing:.07em;color:var(--t4);text-transform:uppercase;border-bottom:.5px solid var(--sep2);flex-shrink:0;}
 #dmUserList{flex:1;overflow-y:auto;scrollbar-width:none;}
 #dmUserList::-webkit-scrollbar{display:none;}
-.duitem{
-  display:flex;align-items:center;gap:7px;
-  padding:8px 10px;cursor:pointer;
-  border-bottom:.5px solid var(--sep2);
-  transition:background .1s;
-}
+.duitem{display:flex;align-items:center;gap:7px;padding:8px 10px;cursor:pointer;border-bottom:.5px solid var(--sep2);transition:background .1s;}
 .duitem:hover{background:var(--fill3);}
 .duitem.on{background:rgba(10,132,255,.1);}
-.duav{
-  width:28px;height:28px;border-radius:50%;
-  background:var(--bg3);border:.5px solid var(--sep);
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:600;color:var(--t2);flex-shrink:0;
-}
-.duav.admin-av{
-  background:linear-gradient(135deg,#b8860b,#ffd700);
-  border-color:rgba(255,214,10,.5);
-  color:#000;
-  box-shadow:0 0 6px rgba(255,214,10,.35);
-}
+.duav{width:28px;height:28px;border-radius:50%;background:var(--bg3);border:.5px solid var(--sep);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--t2);flex-shrink:0;}
+.duav.admin-av{background:linear-gradient(135deg,#b8860b,#ffd700);border-color:rgba(255,214,10,.5);color:#000;box-shadow:0 0 6px rgba(255,214,10,.35);}
 .duinfo{flex:1;overflow:hidden;}
 .duname{font-size:12px;font-weight:600;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.duname.admin-gold-dm{
-  color:var(--gold);
-  text-shadow:0 0 6px rgba(255,214,10,.4);
-}
+.duname.admin-gold-dm{color:var(--gold);text-shadow:0 0 6px rgba(255,214,10,.4);}
 .ducode{font-size:10px;color:var(--t4);}
-.dubadge{
-  min-width:15px;height:15px;padding:0 3px;
-  background:var(--red);border-radius:7px;
-  font-size:9px;font-weight:700;color:#fff;
-  display:none;align-items:center;justify-content:center;flex-shrink:0;
-}
+.dubadge{min-width:15px;height:15px;padding:0 3px;background:var(--red);border-radius:7px;font-size:9px;font-weight:700;color:#fff;display:none;align-items:center;justify-content:center;flex-shrink:0;}
 .dubadge.on{display:flex;}
-
-#dmConv{
-  flex:1;display:none;flex-direction:column;overflow:hidden;
-}
+#dmConv{flex:1;display:none;flex-direction:column;overflow:hidden;}
 #dmConv.on{display:flex;}
-#dmConvHd{
-  padding:8px 12px;border-bottom:.5px solid var(--sep2);
-  display:flex;align-items:center;gap:8px;flex-shrink:0;
-  background:rgba(28,28,30,.6);
-}
-#dmBackBtn{
-  background:none;border:none;color:var(--blue);
-  cursor:pointer;font-size:13px;font-family:inherit;
-  padding:0;flex-shrink:0;
-}
+#dmConvHd{padding:8px 12px;border-bottom:.5px solid var(--sep2);display:flex;align-items:center;gap:8px;flex-shrink:0;background:rgba(28,28,30,.6);}
+#dmBackBtn{background:none;border:none;color:var(--blue);cursor:pointer;font-size:13px;font-family:inherit;padding:0;flex-shrink:0;}
 #dmConvName{font-size:13px;font-weight:600;}
 #dmConvCode{font-size:10px;color:var(--t4);margin-top:1px;}
-#dmMsgList{
-  flex:1;overflow-y:auto;padding:10px 12px;
-  display:flex;flex-direction:column;gap:5px;
-  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;
-}
+#dmMsgList{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
 #dmMsgList::-webkit-scrollbar{width:3px;}
 #dmMsgList::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
 .dmbrow{display:flex;flex-direction:column;gap:1px;}
@@ -356,39 +129,19 @@ body{
 .mine .dmb{background:var(--blue);color:#fff;border-radius:var(--r2) var(--r2) 4px var(--r2);}
 .theirs .dmb{background:var(--bg3);color:var(--t1);border-radius:var(--r2) var(--r2) var(--r2) 4px;}
 .dmts{font-size:9px;color:var(--t4);padding:0 3px;}
-#dmFoot{
-  border-top:.5px solid var(--sep2);padding:8px 10px;flex-shrink:0;
-  background:var(--glass);
-}
-
-.empty-hint{
-  flex:1;display:flex;align-items:center;justify-content:center;
-  font-size:13px;color:var(--t4);
-}
+#dmFoot{border-top:.5px solid var(--sep2);padding:8px 10px;flex-shrink:0;background:var(--glass);}
+.empty-hint{flex:1;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--t4);}
 </style>
 </head>
 <body>
 <div class="wall"></div>
 <div id="app">
-
-  <!-- TOP BAR -->
   <div id="topBar">
     <div id="modePill">
-      <button class="mpill on" id="pillRoom" onclick="setMode('room')">
-        部屋<span class="pill-badge" id="pb_room"></span>
-      </button>
-      <button class="mpill" id="pillDm" onclick="setMode('dm')">
-        DM<span class="pill-badge" id="pb_dm"></span>
-      </button>
+      <button class="mpill on" id="pillRoom" onclick="setMode('room')">部屋<span class="pill-badge" id="pb_room"></span></button>
+      <button class="mpill" id="pillDm" onclick="setMode('dm')">DM<span class="pill-badge" id="pb_dm"></span></button>
     </div>
-
-    <!-- 👑 金色表示トグル -->
-    <button id="goldToggleBtn" class="gold-on" onclick="toggleGold()" title="管理者名の金色表示">
-      👑 金色ON
-    </button>
-
     <div id="selfInfo">
-      <!-- 名前ボタン（クリックで編集） -->
       <button id="nameBtn" onclick="openNameModal()" title="名前を変更">
         <span id="selfName"></span>
         <span id="namePencil">✎</span>
@@ -399,13 +152,9 @@ body{
     </div>
   </div>
 
-  <!-- ROOM BAR -->
   <div id="roomBar"></div>
 
-  <!-- MAIN -->
   <div id="mainArea">
-
-    <!-- 部屋モード -->
     <div id="roomPane">
       <div id="msgList"></div>
       <div id="roomFoot">
@@ -423,7 +172,6 @@ body{
       </div>
     </div>
 
-    <!-- DMモード -->
     <div id="dmPane">
       <div id="dmList">
         <div class="dl-hd">メンバー</div>
@@ -432,10 +180,7 @@ body{
       <div id="dmConv">
         <div id="dmConvHd">
           <button id="dmBackBtn" onclick="closeDmConv()">‹ 戻る</button>
-          <div>
-            <div id="dmConvName"></div>
-            <div id="dmConvCode"></div>
-          </div>
+          <div><div id="dmConvName"></div><div id="dmConvCode"></div></div>
         </div>
         <div id="dmMsgList"></div>
         <div id="dmFoot">
@@ -447,20 +192,17 @@ body{
           </div>
         </div>
       </div>
-      <div id="dmEmpty" style="flex:1;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--t4);">
-        左からユーザーを選択してください
-      </div>
+      <div id="dmEmpty" style="flex:1;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--t4);">左からユーザーを選択してください</div>
     </div>
-
   </div>
 </div>
 
-<!-- ━━━ 名前編集モーダル ━━━ -->
+<!-- 名前編集モーダル -->
 <div id="nameModal" onclick="if(event.target===this)closeNameModal()">
   <div id="nameModalBox">
-    <div id="nameModalTitle">✎ <span>表示名を変更</span></div>
+    <div id="nameModalTitle">✎ 表示名を変更</div>
     <input id="nameModalInput" maxlength="20" placeholder="新しい名前（1〜20文字）" autocomplete="off">
-    <div id="nameModalWarn">その名前は使用できません</div>
+    <div id="nameModalWarn"></div>
     <div class="nm-hint">※ 変更後のメッセージから新しい名前で送信されます</div>
     <div class="nm-row">
       <button class="nm-btn nm-cancel" onclick="closeNameModal()">キャンセル</button>
@@ -470,23 +212,12 @@ body{
 </div>
 
 <script>
-/* ━━━ 閉じる ━━━ */
 function closeChat(){
-  try{
-    if(window.parent!==window){
-      if(typeof window.parent.closePanel==='function'){window.parent.closePanel();return;}
-      const f=window.parent.document.getElementById('hiddenFrame');
-      if(f){f.style.display='none';return;}
-    }
-  }catch(e){}
+  try{if(window.parent!==window){if(typeof window.parent.closePanel==='function'){window.parent.closePanel();return;}const f=window.parent.document.getElementById('hiddenFrame');if(f){f.style.display='none';return;}}}catch(e){}
   window.close();
 }
 function openFullscreen(){
-  try{
-    if(window.parent!==window&&typeof window.parent.openFullChat==='function'){
-      window.parent.openFullChat();return;
-    }
-  }catch(e){}
+  try{if(window.parent!==window&&typeof window.parent.openFullChat==='function'){window.parent.openFullChat();return;}}catch(e){}
   window.open('chat.html','_blank');
 }
 document.addEventListener('keydown',e=>{
@@ -494,26 +225,18 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape') closeNameModal();
 });
 
-/* ━━━ モード切替 ━━━ */
 let _mode='room';
 function setMode(m){
   _mode=m;
   document.getElementById('pillRoom').classList.toggle('on',m==='room');
   document.getElementById('pillDm').classList.toggle('on',m==='dm');
-  document.getElementById('roomBar').style.display  = m==='room'?'flex':'none';
-  document.getElementById('roomPane').style.display = m==='room'?'flex':'none';
+  document.getElementById('roomBar').style.display=m==='room'?'flex':'none';
+  document.getElementById('roomPane').style.display=m==='room'?'flex':'none';
   document.getElementById('dmPane').classList.toggle('on',m==='dm');
-  if(m==='dm'){
-    document.getElementById('pb_dm').classList.remove('on');
-    document.getElementById('pb_dm').textContent='';
-  }
-  if(m==='room'){
-    document.getElementById('pb_room').classList.remove('on');
-    document.getElementById('pb_room').textContent='';
-  }
+  if(m==='dm'){document.getElementById('pb_dm').classList.remove('on');document.getElementById('pb_dm').textContent='';}
+  if(m==='room'){document.getElementById('pb_room').classList.remove('on');document.getElementById('pb_room').textContent='';}
 }
 
-/* ━━━ リプライ ━━━ */
 let _reply=null;
 function setReply(name,text){
   _reply={name,text};
@@ -521,61 +244,23 @@ function setReply(name,text){
   document.getElementById('replyTxt').textContent=name+'：'+text;
   document.getElementById('msgInput').focus();
 }
-function clearReply(){
-  _reply=null;
-  document.getElementById('replyBar').classList.remove('on');
-}
+function clearReply(){_reply=null;document.getElementById('replyBar').classList.remove('on');}
 
-/* ━━━ 👑 金色表示トグル ━━━ */
-let _goldOn = localStorage.getItem('chat_goldDisplay_2') !== 'off';
-
-function toggleGold(){
-  _goldOn = !_goldOn;
-  localStorage.setItem('chat_goldDisplay_2', _goldOn ? 'on' : 'off');
-  applyGoldUI();
-  if(typeof _lastRoomMsgs !== 'undefined') renderRoomMsgs(_lastRoomMsgs);
-  if(typeof _lastDmMsgs !== 'undefined' && dmTarget) renderDmMsgs(_lastDmMsgs);
-  renderDmUserList();
-}
-
-function applyGoldUI(){
-  const btn = document.getElementById('goldToggleBtn');
-  if(_goldOn){
-    btn.className = 'gold-on';
-    btn.textContent = '👑 金色ON';
-  } else {
-    btn.className = 'gold-off';
-    btn.textContent = '👑 金色OFF';
-  }
-}
-applyGoldUI();
-
-/* ━━━ 名前変更モーダル ━━━ */
 function openNameModal(){
-  const input = document.getElementById('nameModalInput');
-  input.value = myName;
-  document.getElementById('nameModalWarn').style.display = 'none';
+  document.getElementById('nameModalInput').value=myName;
+  document.getElementById('nameModalWarn').style.display='none';
   document.getElementById('nameModal').classList.add('on');
-  setTimeout(()=>input.select(),80);
+  setTimeout(()=>document.getElementById('nameModalInput').select(),80);
 }
-function closeNameModal(){
-  document.getElementById('nameModal').classList.remove('on');
-}
-document.getElementById('nameModalInput').addEventListener('keydown',e=>{
-  if(e.key==='Enter') saveName();
-});
-
-// saveName は Firebase モジュール側で上書き定義する
-function saveName(){
-  // Firebase モジュールが定義するまでのスタブ
-}
+function closeNameModal(){document.getElementById('nameModal').classList.remove('on');}
+document.getElementById('nameModalInput').addEventListener('keydown',e=>{if(e.key==='Enter') saveName();});
+function saveName(){/* Firebase側で上書き */}
 </script>
 
-<!-- ━━━ Firebase ━━━ -->
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import{
-  getFirestore,collection,addDoc,query,orderBy,limit,
+  getFirestore,collection,addDoc,query,limit,
   onSnapshot,serverTimestamp,doc,getDocs,where,updateDoc
 }from"https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
@@ -588,430 +273,258 @@ const db=getFirestore(initializeApp({
   appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
 },"chat_v3"));
 
-/* ═══════════════════════════
-   自分の情報
-═══════════════════════════ */
-let myName = localStorage.getItem("accessUserName_2") || "名無し";
-let myCode = "----";
-let myIsAdmin = false;
-let myDocId = null; // Firestoreのドキュメントid
+let myName=localStorage.getItem("accessUserName_2")||"名無し";
+let myCode="----";
+let myIsAdmin=false;
+let myDocId=null;
+let adminSet=new Set();
 
-document.getElementById("selfName").textContent = myName;
+document.getElementById("selfName").textContent=myName;
 
-/* ━━━ 名前変更保存 ━━━ */
-window.saveName = async function(){
-  const input = document.getElementById('nameModalInput');
-  const warn  = document.getElementById('nameModalWarn');
-  const newName = input.value.trim();
-
-  warn.style.display = 'none';
-
-  // バリデーション
-  if(!newName || newName.length > 20){
-    warn.textContent = '1〜20文字で入力してください';
-    warn.style.display = 'block';
-    return;
+function updateSelfNameDisplay(){
+  const el=document.getElementById("selfName");
+  const btn=document.getElementById("nameBtn");
+  el.textContent=myName;
+  if(myIsAdmin){
+    el.style.color='var(--gold)';
+    el.style.textShadow='0 0 8px rgba(255,214,10,.5)';
+    el.style.fontWeight='700';
+    btn.style.borderColor='rgba(255,214,10,.4)';
+    btn.style.background='rgba(255,214,10,.08)';
+  } else {
+    el.style.color='';el.style.textShadow='';el.style.fontWeight='';
+    btn.style.borderColor='';btn.style.background='';
   }
-  if(newName === myName){
-    closeNameModal();
-    return;
-  }
+}
 
-  // 重複チェック
+/* 名前変更 */
+window.saveName=async function(){
+  const input=document.getElementById('nameModalInput');
+  const warn=document.getElementById('nameModalWarn');
+  const newName=input.value.trim();
+  warn.style.display='none';
+  if(!newName||newName.length>20){warn.textContent='1〜20文字で入力してください';warn.style.display='block';return;}
+  if(newName===myName){closeNameModal();return;}
   try{
-    const dup = await getDocs(query(collection(db,"users"),where("name","==",newName)));
-    if(!dup.empty){
-      warn.textContent = 'その名前はすでに使われています';
-      warn.style.display = 'block';
-      return;
-    }
-  }catch(e){
-    warn.textContent = 'エラーが発生しました';
-    warn.style.display = 'block';
-    return;
-  }
-
-  // Firestore更新（自分のドキュメントがある場合）
+    const dup=await getDocs(query(collection(db,"users"),where("name","==",newName)));
+    if(!dup.empty){warn.textContent='その名前はすでに使われています';warn.style.display='block';return;}
+  }catch(e){warn.textContent='エラーが発生しました';warn.style.display='block';return;}
   if(myDocId){
-    try{
-      await updateDoc(doc(db,"users",myDocId),{name:newName});
-    }catch(e){
-      console.error("name update:",e);
-    }
+    try{await updateDoc(doc(db,"users",myDocId),{name:newName});}
+    catch(e){console.error("name update:",e);}
   }
-
-  // ローカル更新
-  myName = newName;
-  localStorage.setItem("accessUserName_2", newName);
-  document.getElementById("selfName").textContent = myName;
+  myName=newName;
+  localStorage.setItem("accessUserName_2",newName);
   updateSelfNameDisplay();
-
   closeNameModal();
 };
 
-/* ═══════════════════════════
-   管理者チェック & コード発行
-═══════════════════════════ */
-async function initCode(){
-  try{
-    const q = await getDocs(query(collection(db,"users"),where("name","==",myName)));
-    if(q.empty){
-      loadUsers();
-      return;
-    }
-    const docRef = q.docs[0];
-    const data = docRef.data();
-    myDocId = docRef.id;
-    myIsAdmin = data.isAdmin === true;
-    updateSelfNameDisplay();
-
-    let code = data.userCode;
-    if(!code){
-      for(let i=0;i<30;i++){
-        const c = String(Math.floor(1000+Math.random()*9000));
-        const dup = await getDocs(query(collection(db,"users"),where("userCode","==",c)));
-        if(dup.empty){code=c;break;}
-      }
-      await updateDoc(doc(db,"users",docRef.id),{userCode:code});
-    }
-    myCode = String(code);
-    document.getElementById("selfCode").textContent = "#"+myCode;
-    loadUsers();
-  }catch(e){
-    console.error("initCode:",e);
-    loadUsers();
-  }
-}
-
-function updateSelfNameDisplay(){
-  const nameEl = document.getElementById("selfName");
-  const nameBtn = document.getElementById("nameBtn");
-  nameEl.textContent = myName;
-
-  if(myIsAdmin && _goldOn){
-    nameEl.style.color = 'var(--gold)';
-    nameEl.style.textShadow = '0 0 8px rgba(255,214,10,.5)';
-    nameEl.style.fontWeight = '700';
-    // ボタン枠も金色に
-    nameBtn.style.borderColor = 'rgba(255,214,10,.4)';
-    nameBtn.style.background = 'rgba(255,214,10,.08)';
-  } else {
-    nameEl.style.color = '';
-    nameEl.style.textShadow = '';
-    nameEl.style.fontWeight = '';
-    nameBtn.style.borderColor = '';
-    nameBtn.style.background = '';
-  }
-}
-
-let adminSet = new Set();
-
 async function loadAdmins(){
   try{
-    const snap = await getDocs(query(collection(db,"users"),where("isAdmin","==",true)));
-    adminSet = new Set(snap.docs.map(d=>d.data().name));
+    const snap=await getDocs(query(collection(db,"users"),where("isAdmin","==",true)));
+    adminSet=new Set(snap.docs.map(d=>d.data().name));
   }catch(e){}
 }
 
-/* ═══════════════════════════
-   ユーザー一覧（DM用）
-═══════════════════════════ */
-let allUsers = [];
+async function initCode(){
+  try{
+    const q=await getDocs(query(collection(db,"users"),where("name","==",myName)));
+    if(!q.empty){
+      const docRef=q.docs[0];const data=docRef.data();
+      myDocId=docRef.id;myIsAdmin=data.isAdmin===true;
+      updateSelfNameDisplay();
+      let code=data.userCode;
+      if(!code){
+        for(let i=0;i<30;i++){
+          const c=String(Math.floor(1000+Math.random()*9000));
+          const dup=await getDocs(query(collection(db,"users"),where("userCode","==",c)));
+          if(dup.empty){code=c;break;}
+        }
+        await updateDoc(doc(db,"users",docRef.id),{userCode:code});
+      }
+      myCode=String(code);
+      document.getElementById("selfCode").textContent="#"+myCode;
+    }
+  }catch(e){console.error("initCode:",e);}
+  await loadAdmins();
+  loadUsers();
+}
+
+let allUsers=[];
 async function loadUsers(){
   try{
-    await loadAdmins();
-    const snap = await getDocs(
-      query(collection(db,"users"),where("group","==","2"),where("status","==","ok"))
-    );
-    allUsers = snap.docs
-      .map(d=>({id:d.id,...d.data()}))
-      .filter(u=>u.name!==myName && u.userCode);
+    const snap=await getDocs(query(collection(db,"users"),where("group","==","2"),where("status","==","ok")));
+    allUsers=snap.docs.map(d=>({id:d.id,...d.data()})).filter(u=>u.name!==myName&&u.userCode);
     renderDmUserList();
   }catch(e){console.error("loadUsers:",e);}
 }
 
-/* ═══════════════════════════
-   部屋
-═══════════════════════════ */
-let rooms = [{id:"general",name:"全体"}];
-let curRoom = "general";
-let msgUnsub = null;
-let lastMsgCount = 0;
-let _lastRoomMsgs = [];
+/* 部屋 */
+let rooms=[{id:"general",name:"全体"}];
+let curRoom="general";
+let msgUnsub=null;
+let lastMsgCount=0;
+let _lastRoomMsgs=[];
 
 function renderRooms(){
-  document.getElementById("roomBar").innerHTML = rooms.map(r=>
+  document.getElementById("roomBar").innerHTML=rooms.map(r=>
     `<button class="rbtn${r.id===curRoom?' on':''}" onclick="switchRoom('${esc(r.id)}')">#${esc(r.name)}</button>`
   ).join('');
 }
-window.switchRoom = function(id){
-  curRoom = id;
-  renderRooms();
-  msgUnsub && msgUnsub();
-  document.getElementById("msgList").innerHTML = '';
-  lastMsgCount = 0;
-  _lastRoomMsgs = [];
-  subscribeRoomMsgs();
+window.switchRoom=function(id){
+  curRoom=id;renderRooms();msgUnsub&&msgUnsub();
+  document.getElementById("msgList").innerHTML='';
+  lastMsgCount=0;_lastRoomMsgs=[];subscribeRoomMsgs();
 };
-
 onSnapshot(doc(db,"config","chatRooms_2"),snap=>{
   if(snap.exists()&&Array.isArray(snap.data().rooms)){
-    const r = snap.data().rooms;
-    rooms = [{id:"general",name:"全体"},...r.filter(x=>x.id!=="general")];
-  }else{
-    rooms = [{id:"general",name:"全体"}];
-  }
+    const r=snap.data().rooms;
+    rooms=[{id:"general",name:"全体"},...r.filter(x=>x.id!=="general")];
+  }else{rooms=[{id:"general",name:"全体"}];}
   renderRooms();
 });
 
-/* ═══════════════════════════
-   NGワード
-═══════════════════════════ */
-let ngW = [];
-onSnapshot(doc(db,"config","ngWords_2"),s=>{
-  ngW = s.exists() ? (s.data().words||[]) : [];
-});
+let ngW=[];
+onSnapshot(doc(db,"config","ngWords_2"),s=>{ngW=s.exists()?(s.data().words||[]):[];});
 function isNG(t){return ngW.some(w=>t.toLowerCase().includes(w.toLowerCase()));}
 
-/* ═══════════════════════════
-   部屋メッセージ
-═══════════════════════════ */
 function subscribeRoomMsgs(){
-  msgUnsub = onSnapshot(
+  msgUnsub=onSnapshot(
     query(collection(db,"chat_2"),where("roomId","==",curRoom),limit(80)),
     snap=>{
-      const msgs = snap.docs.map(d=>({id:d.id,...d.data()}))
+      const msgs=snap.docs.map(d=>({id:d.id,...d.data()}))
         .sort((a,b)=>(a.ts?.seconds??0)-(b.ts?.seconds??0));
-      _lastRoomMsgs = msgs;
+      _lastRoomMsgs=msgs;
       renderRoomMsgs(msgs);
-      if(lastMsgCount>0 && msgs.length>lastMsgCount && _mode!=='room'){
-        addBadge('pb_room',msgs.length-lastMsgCount);
-      }
-      lastMsgCount = msgs.length;
+      if(lastMsgCount>0&&msgs.length>lastMsgCount&&_mode!=='room') addBadge('pb_room',msgs.length-lastMsgCount);
+      lastMsgCount=msgs.length;
     }
   );
 }
 
 function renderRoomMsgs(msgs){
-  const el = document.getElementById("msgList");
-  const atBot = el.scrollHeight-el.scrollTop-el.clientHeight < 80;
-  el.innerHTML = msgs.map(m=>{
-    const me = m.name === myName;
-    const isAdmin = _goldOn && adminSet.has(m.name);
-    const code = m.userCode ? `<span class="mcode">#${esc(m.userCode)}</span>` : '';
-    const reply = m.replyTo
-      ? `<div class="mreply">↩ ${esc(m.replyTo.name)}：${esc(m.replyTo.text)}</div>` : '';
-    let nameClass = 'mname';
-    if(me) nameClass += ' me';
-    if(isAdmin) nameClass += ' admin-gold';
-    const rowClass = isAdmin ? 'mrow admin-row' : 'mrow';
-
-    return `<div class="${rowClass}">
-      <div class="mmeta">
-        <span class="${nameClass}" onclick="setReply('${esc(m.name)}','${esc(m.text)}')">${esc(m.name)}</span>
-        ${code}
-        <span class="mts">${fmt(m.ts)}</span>
-      </div>
-      ${reply}
-      <div class="mbody">${esc(m.text)}</div>
-    </div>`;
+  const el=document.getElementById("msgList");
+  const atBot=el.scrollHeight-el.scrollTop-el.clientHeight<80;
+  el.innerHTML=msgs.map(m=>{
+    const me=m.name===myName;
+    const isAdmin=adminSet.has(m.name);
+    const code=m.userCode?`<span class="mcode">#${esc(m.userCode)}</span>`:'';
+    const reply=m.replyTo?`<div class="mreply">↩ ${esc(m.replyTo.name)}：${esc(m.replyTo.text)}</div>`:'';
+    let nc='mname';if(me)nc+=' me';if(isAdmin)nc+=' admin-gold';
+    const rc=isAdmin?'mrow admin-row':'mrow';
+    return `<div class="${rc}"><div class="mmeta"><span class="${nc}" onclick="setReply('${esc(m.name)}','${esc(m.text)}')">${esc(m.name)}</span>${code}<span class="mts">${fmt(m.ts)}</span></div>${reply}<div class="mbody">${esc(m.text)}</div></div>`;
   }).join('');
-  if(atBot) el.scrollTop = el.scrollHeight;
+  if(atBot) el.scrollTop=el.scrollHeight;
 }
 
-window.sendMsg = async function(){
-  const el = document.getElementById("msgInput");
-  const text = el.value.trim();
-  if(!text || isNG(text)) return;
-  el.value = '';
-  const data = {
-    name: myName,
-    userCode: myCode,
-    text,
-    roomId: curRoom,
-    ts: serverTimestamp()
-  };
-  if(_reply){
-    data.replyTo = {name:_reply.name, text:_reply.text};
-    clearReply();
-  }
+window.sendMsg=async function(){
+  const el=document.getElementById("msgInput");
+  const text=el.value.trim();
+  if(!text||isNG(text)) return;
+  el.value='';
+  const data={name:myName,userCode:myCode,text,roomId:curRoom,ts:serverTimestamp()};
+  if(_reply){data.replyTo={name:_reply.name,text:_reply.text};clearReply();}
   try{await addDoc(collection(db,"chat_2"),data);}catch(e){console.error(e);}
 };
-document.getElementById("msgInput").addEventListener("keydown",e=>{
-  if(e.key==="Enter") window.sendMsg();
-});
+document.getElementById("msgInput").addEventListener("keydown",e=>{if(e.key==="Enter") window.sendMsg();});
 
 onSnapshot(doc(db,"config","chatSettings_2"),s=>{
   if(!s.exists()) return;
-  const c = s.data().closed;
-  const el = document.getElementById("msgInput");
-  el.disabled = c;
-  el.placeholder = c ? '（閉鎖中）' : 'メッセージを入力...';
+  const c=s.data().closed;
+  const el=document.getElementById("msgInput");
+  el.disabled=c;el.placeholder=c?'（閉鎖中）':'メッセージを入力...';
 });
 
-/* ═══════════════════════════
-   DM ユーザーリスト
-═══════════════════════════ */
-let dmUnread = {};
-let dmTarget = null;
-let dmUnsub = null;
-let _lastDmMsgs = [];
+/* DM */
+let dmUnread={};let dmTarget=null;let dmUnsub=null;let _lastDmMsgs=[];
 
 function renderDmUserList(){
-  const el = document.getElementById("dmUserList");
-  if(!allUsers.length){
-    el.innerHTML = '<div class="empty-hint" style="padding:16px;font-size:12px;color:var(--t4);text-align:center;">他のユーザーがいません</div>';
-    return;
-  }
-  el.innerHTML = allUsers.map(u=>{
-    const unr = dmUnread[u.name] || 0;
-    const active = dmTarget && dmTarget.name===u.name;
-    const isAdminUser = _goldOn && adminSet.has(u.name);
+  const el=document.getElementById("dmUserList");
+  if(!allUsers.length){el.innerHTML='<div class="empty-hint" style="padding:16px;font-size:12px;color:var(--t4);text-align:center;">他のユーザーがいません</div>';return;}
+  el.innerHTML=allUsers.map(u=>{
+    const unr=dmUnread[u.name]||0;
+    const active=dmTarget&&dmTarget.name===u.name;
+    const isAdminUser=adminSet.has(u.name);
     return `<div class="duitem${active?' on':''}" onclick="openDm('${esc(u.name)}','${esc(u.userCode||'')}')">
       <div class="duav${isAdminUser?' admin-av':''}">${u.name.charAt(0)}</div>
-      <div class="duinfo">
-        <div class="duname${isAdminUser?' admin-gold-dm':''}">${esc(u.name)}${isAdminUser?' 👑':''}</div>
-        <div class="ducode">#${esc(u.userCode||'----')}</div>
-      </div>
+      <div class="duinfo"><div class="duname${isAdminUser?' admin-gold-dm':''}">${esc(u.name)}${isAdminUser?' 👑':''}</div><div class="ducode">#${esc(u.userCode||'----')}</div></div>
       <span class="dubadge${unr?' on':''}" id="dub_${safeid(u.name)}">${unr||''}</span>
     </div>`;
   }).join('');
 }
 
-/* ═══════════════════════════
-   DM 会話
-═══════════════════════════ */
 function dmKey(a,b){return[a,b].sort().join('__');}
 
-window.openDm = function(name,code){
-  dmTarget = {name,code};
-  document.getElementById("dmConvName").textContent = name;
-  document.getElementById("dmConvCode").textContent = "#"+code;
+window.openDm=function(name,code){
+  dmTarget={name,code};
+  document.getElementById("dmConvName").textContent=name;
+  document.getElementById("dmConvCode").textContent="#"+code;
   document.getElementById("dmConv").classList.add("on");
-  document.getElementById("dmEmpty").style.display = "none";
-
-  dmUnread[name] = 0;
-  const badge = document.getElementById("dub_"+safeid(name));
+  document.getElementById("dmEmpty").style.display="none";
+  dmUnread[name]=0;
+  const badge=document.getElementById("dub_"+safeid(name));
   if(badge){badge.classList.remove("on");badge.textContent='';}
   renderDmUserList();
-
-  dmUnsub && dmUnsub();
-  const key = dmKey(myName,name);
-  dmUnsub = onSnapshot(
+  dmUnsub&&dmUnsub();
+  const key=dmKey(myName,name);
+  dmUnsub=onSnapshot(
     query(collection(db,"dm_2"),where("dmKey","==",key),limit(100)),
     snap=>{
-      const msgs = snap.docs.map(d=>({id:d.id,...d.data()}))
-        .sort((a,b)=>(a.ts?.seconds??0)-(b.ts?.seconds??0));
-      _lastDmMsgs = msgs;
-      renderDmMsgs(msgs);
+      const msgs=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.ts?.seconds??0)-(b.ts?.seconds??0));
+      _lastDmMsgs=msgs;renderDmMsgs(msgs);
     }
   );
   document.getElementById("dmInput").focus();
 };
 
 function renderDmMsgs(msgs){
-  const el = document.getElementById("dmMsgList");
-  const atBot = el.scrollHeight-el.scrollTop-el.clientHeight < 60;
-  el.innerHTML = msgs.map(m=>{
-    const mine = m.from===myName;
-    return `<div class="dmbrow ${mine?'mine':'theirs'}">
-      <div class="dmb">${esc(m.text)}</div>
-      <span class="dmts">${fmt(m.ts)}</span>
-    </div>`;
+  const el=document.getElementById("dmMsgList");
+  const atBot=el.scrollHeight-el.scrollTop-el.clientHeight<60;
+  el.innerHTML=msgs.map(m=>{
+    const mine=m.from===myName;
+    return `<div class="dmbrow ${mine?'mine':'theirs'}"><div class="dmb">${esc(m.text)}</div><span class="dmts">${fmt(m.ts)}</span></div>`;
   }).join('');
-  if(atBot) el.scrollTop = el.scrollHeight;
+  if(atBot) el.scrollTop=el.scrollHeight;
 }
 
-window.sendDm = async function(){
+window.sendDm=async function(){
   if(!dmTarget) return;
-  const el = document.getElementById("dmInput");
-  const text = el.value.trim();
-  if(!text || isNG(text)) return;
-  el.value = '';
-  try{
-    await addDoc(collection(db,"dm_2"),{
-      from: myName,
-      to: dmTarget.name,
-      dmKey: dmKey(myName,dmTarget.name),
-      text,
-      ts: serverTimestamp()
-    });
-  }catch(e){console.error(e);}
+  const el=document.getElementById("dmInput");
+  const text=el.value.trim();
+  if(!text||isNG(text)) return;
+  el.value='';
+  try{await addDoc(collection(db,"dm_2"),{from:myName,to:dmTarget.name,dmKey:dmKey(myName,dmTarget.name),text,ts:serverTimestamp()});}
+  catch(e){console.error(e);}
 };
-document.getElementById("dmInput").addEventListener("keydown",e=>{
-  if(e.key==="Enter") window.sendDm();
+document.getElementById("dmInput").addEventListener("keydown",e=>{if(e.key==="Enter") window.sendDm();});
+
+window.closeDmConv=function(){
+  dmUnsub&&dmUnsub();dmUnsub=null;dmTarget=null;
+  document.getElementById("dmConv").classList.remove("on");
+  document.getElementById("dmEmpty").style.display="";
+  _lastDmMsgs=[];renderDmUserList();
+};
+
+let dmInitDone=false;
+onSnapshot(query(collection(db,"dm_2"),where("to","==",myName),limit(50)),snap=>{
+  if(!dmInitDone){dmInitDone=true;return;}
+  snap.docChanges().forEach(ch=>{
+    if(ch.type!=="added") return;
+    const d=ch.doc.data();
+    if(dmTarget&&dmTarget.name===d.from) return;
+    dmUnread[d.from]=(dmUnread[d.from]||0)+1;
+    const b=document.getElementById("dub_"+safeid(d.from));
+    if(b){b.classList.add("on");b.textContent=dmUnread[d.from];}
+    addBadge('pb_dm',1);renderDmUserList();
+  });
 });
 
-window.closeDmConv = function(){
-  dmUnsub && dmUnsub(); dmUnsub=null; dmTarget=null;
-  document.getElementById("dmConv").classList.remove("on");
-  document.getElementById("dmEmpty").style.display = "";
-  _lastDmMsgs = [];
-  renderDmUserList();
-};
-
-let dmInitDone = false;
-onSnapshot(
-  query(collection(db,"dm_2"),where("to","==",myName),limit(50)),
-  snap=>{
-    if(!dmInitDone){dmInitDone=true;return;}
-    snap.docChanges().forEach(ch=>{
-      if(ch.type!=="added") return;
-      const d = ch.doc.data();
-      if(dmTarget && dmTarget.name===d.from) return;
-      dmUnread[d.from] = (dmUnread[d.from]||0)+1;
-      const b = document.getElementById("dub_"+safeid(d.from));
-      if(b){b.classList.add("on");b.textContent=dmUnread[d.from];}
-      addBadge('pb_dm',1);
-      renderDmUserList();
-    });
-  }
-);
-
-/* ═══════════════════════════
-   goldToggle との連携
-═══════════════════════════ */
-window.renderRoomMsgs = renderRoomMsgs;
-window.renderDmMsgs   = renderDmMsgs;
-window.renderDmUserList = renderDmUserList;
-window.updateSelfNameDisplay = updateSelfNameDisplay;
-
-const _origToggleGold = window.toggleGold;
-window.toggleGold = function(){
-  _origToggleGold();
-  updateSelfNameDisplay();
-  renderRoomMsgs(_lastRoomMsgs);
-  if(dmTarget) renderDmMsgs(_lastDmMsgs);
-  renderDmUserList();
-};
-
-/* ═══════════════════════════
-   ユーティリティ
-═══════════════════════════ */
-function esc(s){
-  return String(s||'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-function fmt(ts){
-  if(!ts||!ts.seconds) return '';
-  return new Date(ts.seconds*1000).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
-}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function fmt(ts){if(!ts||!ts.seconds) return '';return new Date(ts.seconds*1000).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});}
 function safeid(s){return String(s||'').replace(/[^a-zA-Z0-9\u3000-\u9fff\u30A0-\u30FF\u3040-\u309F]/g,"_");}
-function addBadge(id,n){
-  const el = document.getElementById(id);
-  const cur = parseInt(el.textContent||"0")||0;
-  el.textContent = Math.min(cur+n,99);
-  el.classList.add("on");
-}
+function addBadge(id,n){const el=document.getElementById(id);const cur=parseInt(el.textContent||"0")||0;el.textContent=Math.min(cur+n,99);el.classList.add("on");}
 
-/* ═══════════════════════════
-   起動
-═══════════════════════════ */
-initCode();
-renderRooms();
-subscribeRoomMsgs();
-setMode('room');
+initCode();renderRooms();subscribeRoomMsgs();setMode('room');
 </script>
 </body>
 </html>
