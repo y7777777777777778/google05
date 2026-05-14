@@ -13,6 +13,7 @@
   --fill:rgba(120,120,128,.2);--fill2:rgba(120,120,128,.16);--fill3:rgba(120,120,128,.1);
   --t1:#fff;--t2:rgba(235,235,245,.6);--t3:rgba(235,235,245,.3);--t4:rgba(235,235,245,.16);
   --blue:#0A84FF;--blue-l:#409CFF;--green:#30D158;--red:#FF453A;--teal:#5AC8FA;
+  --gold:#FFD60A;--gold-l:#ffe55a;--gold-dim:#b89a00;
   --glass:rgba(26,26,28,.97);--blur:blur(32px) saturate(180%);
   --r1:8px;--r2:12px;--r3:16px;--r4:20px;
 }
@@ -84,6 +85,27 @@ body{
   color:var(--blue-l);background:rgba(10,132,255,.14);
   padding:2px 7px;border-radius:5px;
 }
+
+/* 👑 金色切替ボタン */
+#goldToggleBtn{
+  height:24px;padding:0 8px;
+  border-radius:12px;border:none;
+  font-size:11px;font-weight:600;font-family:inherit;
+  cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:4px;
+  flex-shrink:0;
+}
+#goldToggleBtn.gold-on{
+  background:rgba(255,214,10,.15);
+  border:.5px solid rgba(255,214,10,.4);
+  color:var(--gold);
+}
+#goldToggleBtn.gold-off{
+  background:var(--fill3);
+  border:.5px solid var(--sep2);
+  color:var(--t4);
+}
+
 .xbtn{
   width:26px;height:26px;border-radius:50%;
   background:var(--fill2);border:none;color:var(--t3);
@@ -136,6 +158,22 @@ body{
 }
 .mname:hover{text-decoration:underline;}
 .mname.me{color:var(--teal);}
+
+/* 管理者名 金色スタイル */
+.mname.admin-gold{
+  color:var(--gold) !important;
+  text-shadow:0 0 8px rgba(255,214,10,.5);
+}
+.mname.admin-gold::after{
+  content:' 👑';font-size:10px;
+}
+/* 管理者メッセージ行ハイライト */
+.mrow.admin-row{
+  background:linear-gradient(90deg,rgba(255,214,10,.06) 0%,transparent 70%);
+  border-left:2px solid rgba(255,214,10,.3);
+  padding-left:6px;border-radius:0 4px 4px 0;
+}
+
 .mcode{font-size:10px;color:var(--t4);letter-spacing:.04em;}
 .mts{font-size:10px;color:var(--t4);}
 .mbody{font-size:13px;color:var(--t2);word-break:break-all;line-height:1.55;padding-left:1px;}
@@ -218,8 +256,19 @@ body{
   display:flex;align-items:center;justify-content:center;
   font-size:12px;font-weight:600;color:var(--t2);flex-shrink:0;
 }
+/* 管理者アバター */
+.duav.admin-av{
+  background:linear-gradient(135deg,#b8860b,#ffd700);
+  border-color:rgba(255,214,10,.5);
+  color:#000;
+  box-shadow:0 0 6px rgba(255,214,10,.35);
+}
 .duinfo{flex:1;overflow:hidden;}
 .duname{font-size:12px;font-weight:600;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.duname.admin-gold-dm{
+  color:var(--gold);
+  text-shadow:0 0 6px rgba(255,214,10,.4);
+}
 .ducode{font-size:10px;color:var(--t4);}
 .dubadge{
   min-width:15px;height:15px;padding:0 3px;
@@ -286,6 +335,12 @@ body{
         DM<span class="pill-badge" id="pb_dm"></span>
       </button>
     </div>
+
+    <!-- 👑 金色表示トグル -->
+    <button id="goldToggleBtn" class="gold-on" onclick="toggleGold()" title="管理者名の金色表示">
+      👑 金色ON
+    </button>
+
     <div id="selfInfo">
       <span id="selfName"></span>
       <span id="selfCode">----</span>
@@ -294,7 +349,7 @@ body{
     </div>
   </div>
 
-  <!-- ROOM BAR（room modeのみ表示） -->
+  <!-- ROOM BAR -->
   <div id="roomBar"></div>
 
   <!-- MAIN -->
@@ -320,12 +375,10 @@ body{
 
     <!-- DMモード -->
     <div id="dmPane">
-      <!-- ユーザーリスト -->
       <div id="dmList">
         <div class="dl-hd">メンバー</div>
         <div id="dmUserList"><div class="empty-hint">読み込み中...</div></div>
       </div>
-      <!-- 会話 -->
       <div id="dmConv">
         <div id="dmConvHd">
           <button id="dmBackBtn" onclick="closeDmConv()">‹ 戻る</button>
@@ -344,13 +397,12 @@ body{
           </div>
         </div>
       </div>
-      <!-- 会話未選択時 -->
       <div id="dmEmpty" style="flex:1;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--t4);">
         左からユーザーを選択してください
       </div>
     </div>
 
-  </div><!-- /mainArea -->
+  </div>
 </div>
 
 <script>
@@ -358,18 +410,13 @@ body{
 function closeChat(){
   try{
     if(window.parent!==window){
-      // chatPanel内iframeとして開かれている場合
-      if(typeof window.parent.closePanel==='function'){
-        window.parent.closePanel();return;
-      }
-      // hiddenFrame経由で開かれている場合
+      if(typeof window.parent.closePanel==='function'){window.parent.closePanel();return;}
       const f=window.parent.document.getElementById('hiddenFrame');
       if(f){f.style.display='none';return;}
     }
   }catch(e){}
   window.close();
 }
-
 function openFullscreen(){
   try{
     if(window.parent!==window&&typeof window.parent.openFullChat==='function'){
@@ -392,7 +439,6 @@ function setMode(m){
   document.getElementById('roomPane').style.display = m==='room'?'flex':'none';
   document.getElementById('dmPane').classList.toggle('on',m==='dm');
   if(m==='dm'){
-    // DM未読バッジをクリア
     document.getElementById('pb_dm').classList.remove('on');
     document.getElementById('pb_dm').textContent='';
   }
@@ -414,6 +460,34 @@ function clearReply(){
   _reply=null;
   document.getElementById('replyBar').classList.remove('on');
 }
+
+/* ━━━ 👑 金色表示トグル ━━━ */
+// localStorage で個人設定を保存
+let _goldOn = localStorage.getItem('chat_goldDisplay_2') !== 'off'; // デフォルトON
+
+function toggleGold(){
+  _goldOn = !_goldOn;
+  localStorage.setItem('chat_goldDisplay_2', _goldOn ? 'on' : 'off');
+  applyGoldUI();
+  // メッセージ再レンダリング（現在のキャッシュから）
+  if(typeof _lastRoomMsgs !== 'undefined') renderRoomMsgs(_lastRoomMsgs);
+  if(typeof _lastDmMsgs !== 'undefined' && dmTarget) renderDmMsgs(_lastDmMsgs);
+  renderDmUserList();
+}
+
+function applyGoldUI(){
+  const btn = document.getElementById('goldToggleBtn');
+  if(_goldOn){
+    btn.className = 'gold-on';
+    btn.textContent = '👑 金色ON';
+  } else {
+    btn.className = 'gold-off';
+    btn.textContent = '👑 金色OFF';
+  }
+}
+
+// 起動時に反映
+applyGoldUI();
 </script>
 
 <!-- ━━━ Firebase ━━━ -->
@@ -436,44 +510,86 @@ const db=getFirestore(initializeApp({
 /* ═══════════════════════════
    自分の情報
 ═══════════════════════════ */
-const myName=localStorage.getItem("accessUserName_2")||"名無し";
-let myCode="----";
+// localStorage に名前がなければ「名無し」
+const myName = localStorage.getItem("accessUserName_2") || "名無し";
+let myCode = "----";
+let myIsAdmin = false; // 自分が管理者かどうか
 
-document.getElementById("selfName").textContent=myName;
+document.getElementById("selfName").textContent = myName;
 
+// 管理者かどうかチェック & 名前表示に反映
 async function initCode(){
   try{
-    const q=await getDocs(query(collection(db,"users"),where("name","==",myName)));
-    if(q.empty)return;
-    const docRef=q.docs[0];
-    let code=docRef.data().userCode;
+    const q = await getDocs(query(collection(db,"users"),where("name","==",myName)));
+    if(q.empty){
+      // Firestoreにないユーザー（名無し等）はコード生成しない
+      loadUsers();
+      return;
+    }
+    const docRef = q.docs[0];
+    const data = docRef.data();
+
+    // 管理者フラグ
+    myIsAdmin = data.isAdmin === true;
+
+    // 自分の名前を金色表示（管理者かつgoldOn）
+    updateSelfNameDisplay();
+
+    // userCode
+    let code = data.userCode;
     if(!code){
-      // 重複しない4桁生成
       for(let i=0;i<30;i++){
-        const c=String(Math.floor(1000+Math.random()*9000));
-        const dup=await getDocs(query(collection(db,"users"),where("userCode","==",c)));
+        const c = String(Math.floor(1000+Math.random()*9000));
+        const dup = await getDocs(query(collection(db,"users"),where("userCode","==",c)));
         if(dup.empty){code=c;break;}
       }
       await updateDoc(doc(db,"users",docRef.id),{userCode:code});
     }
-    myCode=String(code);
-    document.getElementById("selfCode").textContent="#"+myCode;
+    myCode = String(code);
+    document.getElementById("selfCode").textContent = "#"+myCode;
     loadUsers();
-  }catch(e){console.error("initCode:",e);}
+  }catch(e){
+    console.error("initCode:",e);
+    loadUsers();
+  }
+}
+
+function updateSelfNameDisplay(){
+  const el = document.getElementById("selfName");
+  if(myIsAdmin && _goldOn){
+    el.style.color = 'var(--gold)';
+    el.style.textShadow = '0 0 8px rgba(255,214,10,.5)';
+    el.style.fontWeight = '700';
+  } else {
+    el.style.color = '';
+    el.style.textShadow = '';
+    el.style.fontWeight = '';
+  }
+}
+
+// adminセット一覧（Firestoreから取得してキャッシュ）
+let adminSet = new Set();
+
+async function loadAdmins(){
+  try{
+    const snap = await getDocs(query(collection(db,"users"),where("isAdmin","==",true)));
+    adminSet = new Set(snap.docs.map(d=>d.data().name));
+  }catch(e){}
 }
 
 /* ═══════════════════════════
    ユーザー一覧（DM用）
 ═══════════════════════════ */
-let allUsers=[];
+let allUsers = [];
 async function loadUsers(){
   try{
-    const snap=await getDocs(
+    await loadAdmins();
+    const snap = await getDocs(
       query(collection(db,"users"),where("group","==","2"),where("status","==","ok"))
     );
-    allUsers=snap.docs
+    allUsers = snap.docs
       .map(d=>({id:d.id,...d.data()}))
-      .filter(u=>u.name!==myName&&u.userCode);
+      .filter(u=>u.name!==myName && u.userCode);
     renderDmUserList();
   }catch(e){console.error("loadUsers:",e);}
 }
@@ -481,32 +597,33 @@ async function loadUsers(){
 /* ═══════════════════════════
    部屋
 ═══════════════════════════ */
-let rooms=[{id:"general",name:"全体"}];
-let curRoom="general";
-let msgUnsub=null;
-let lastMsgCount=0;
+let rooms = [{id:"general",name:"全体"}];
+let curRoom = "general";
+let msgUnsub = null;
+let lastMsgCount = 0;
+let _lastRoomMsgs = [];
 
 function renderRooms(){
-  document.getElementById("roomBar").innerHTML=rooms.map(r=>
+  document.getElementById("roomBar").innerHTML = rooms.map(r=>
     `<button class="rbtn${r.id===curRoom?' on':''}" onclick="switchRoom('${esc(r.id)}')">#${esc(r.name)}</button>`
   ).join('');
 }
-window.switchRoom=function(id){
-  curRoom=id;
+window.switchRoom = function(id){
+  curRoom = id;
   renderRooms();
-  msgUnsub&&msgUnsub();
-  document.getElementById("msgList").innerHTML='';
-  lastMsgCount=0;
+  msgUnsub && msgUnsub();
+  document.getElementById("msgList").innerHTML = '';
+  lastMsgCount = 0;
+  _lastRoomMsgs = [];
   subscribeRoomMsgs();
 };
 
-// 部屋リスト監視（kanri.htmlから変更可）
 onSnapshot(doc(db,"config","chatRooms_2"),snap=>{
   if(snap.exists()&&Array.isArray(snap.data().rooms)){
-    const r=snap.data().rooms;
-    rooms=[{id:"general",name:"全体"},...r.filter(x=>x.id!=="general")];
+    const r = snap.data().rooms;
+    rooms = [{id:"general",name:"全体"},...r.filter(x=>x.id!=="general")];
   }else{
-    rooms=[{id:"general",name:"全体"}];
+    rooms = [{id:"general",name:"全体"}];
   }
   renderRooms();
 });
@@ -514,9 +631,9 @@ onSnapshot(doc(db,"config","chatRooms_2"),snap=>{
 /* ═══════════════════════════
    NGワード
 ═══════════════════════════ */
-let ngW=[];
+let ngW = [];
 onSnapshot(doc(db,"config","ngWords_2"),s=>{
-  ngW=s.exists()?(s.data().words||[]):[];
+  ngW = s.exists() ? (s.data().words||[]) : [];
 });
 function isNG(t){return ngW.some(w=>t.toLowerCase().includes(w.toLowerCase()));}
 
@@ -524,31 +641,40 @@ function isNG(t){return ngW.some(w=>t.toLowerCase().includes(w.toLowerCase()));}
    部屋メッセージ
 ═══════════════════════════ */
 function subscribeRoomMsgs(){
-  msgUnsub=onSnapshot(
+  msgUnsub = onSnapshot(
     query(collection(db,"chat_2"),where("roomId","==",curRoom),limit(80)),
     snap=>{
-      const msgs=snap.docs.map(d=>({id:d.id,...d.data()}))
+      const msgs = snap.docs.map(d=>({id:d.id,...d.data()}))
         .sort((a,b)=>(a.ts?.seconds??0)-(b.ts?.seconds??0));
+      _lastRoomMsgs = msgs;
       renderRoomMsgs(msgs);
-      if(lastMsgCount>0&&msgs.length>lastMsgCount&&_mode!=='room'){
+      if(lastMsgCount>0 && msgs.length>lastMsgCount && _mode!=='room'){
         addBadge('pb_room',msgs.length-lastMsgCount);
       }
-      lastMsgCount=msgs.length;
+      lastMsgCount = msgs.length;
     }
   );
 }
 
 function renderRoomMsgs(msgs){
-  const el=document.getElementById("msgList");
-  const atBot=el.scrollHeight-el.scrollTop-el.clientHeight<80;
-  el.innerHTML=msgs.map(m=>{
-    const me=m.name===myName;
-    const code=m.userCode?`<span class="mcode">#${esc(m.userCode)}</span>`:'';
-    const reply=m.replyTo
-      ?`<div class="mreply">↩ ${esc(m.replyTo.name)}：${esc(m.replyTo.text)}</div>`:''
-    return`<div class="mrow">
+  const el = document.getElementById("msgList");
+  const atBot = el.scrollHeight-el.scrollTop-el.clientHeight < 80;
+  el.innerHTML = msgs.map(m=>{
+    const me = m.name === myName;
+    const isAdmin = _goldOn && adminSet.has(m.name);
+    const code = m.userCode ? `<span class="mcode">#${esc(m.userCode)}</span>` : '';
+    const reply = m.replyTo
+      ? `<div class="mreply">↩ ${esc(m.replyTo.name)}：${esc(m.replyTo.text)}</div>` : '';
+    // 名前クラス
+    let nameClass = 'mname';
+    if(me) nameClass += ' me';
+    if(isAdmin) nameClass += ' admin-gold';
+    // 行クラス
+    const rowClass = isAdmin ? 'mrow admin-row' : 'mrow';
+
+    return `<div class="${rowClass}">
       <div class="mmeta">
-        <span class="mname${me?' me':''}" onclick="setReply('${esc(m.name)}','${esc(m.text)}')">${esc(m.name)}</span>
+        <span class="${nameClass}" onclick="setReply('${esc(m.name)}','${esc(m.text)}')">${esc(m.name)}</span>
         ${code}
         <span class="mts">${fmt(m.ts)}</span>
       </div>
@@ -556,58 +682,62 @@ function renderRoomMsgs(msgs){
       <div class="mbody">${esc(m.text)}</div>
     </div>`;
   }).join('');
-  if(atBot)el.scrollTop=el.scrollHeight;
+  if(atBot) el.scrollTop = el.scrollHeight;
 }
 
-window.sendMsg=async function(){
-  const el=document.getElementById("msgInput");
-  const text=el.value.trim();
-  if(!text||isNG(text))return;
-  el.value='';
-  const data={
-    name:myName,userCode:myCode,
-    text,roomId:curRoom,
-    ts:serverTimestamp()
+window.sendMsg = async function(){
+  const el = document.getElementById("msgInput");
+  const text = el.value.trim();
+  if(!text || isNG(text)) return;
+  el.value = '';
+  const data = {
+    name: myName,
+    userCode: myCode,
+    text,
+    roomId: curRoom,
+    ts: serverTimestamp()
   };
   if(_reply){
-    data.replyTo={name:_reply.name,text:_reply.text};
+    data.replyTo = {name:_reply.name, text:_reply.text};
     clearReply();
   }
   try{await addDoc(collection(db,"chat_2"),data);}catch(e){console.error(e);}
 };
 document.getElementById("msgInput").addEventListener("keydown",e=>{
-  if(e.key==="Enter")window.sendMsg();
+  if(e.key==="Enter") window.sendMsg();
 });
 
 // チャット閉鎖
 onSnapshot(doc(db,"config","chatSettings_2"),s=>{
-  if(!s.exists())return;
-  const c=s.data().closed;
-  const el=document.getElementById("msgInput");
-  el.disabled=c;
-  el.placeholder=c?'（閉鎖中）':'メッセージを入力...';
+  if(!s.exists()) return;
+  const c = s.data().closed;
+  const el = document.getElementById("msgInput");
+  el.disabled = c;
+  el.placeholder = c ? '（閉鎖中）' : 'メッセージを入力...';
 });
 
 /* ═══════════════════════════
    DM ユーザーリスト
 ═══════════════════════════ */
-let dmUnread={};
-let dmTarget=null;
-let dmUnsub=null;
+let dmUnread = {};
+let dmTarget = null;
+let dmUnsub = null;
+let _lastDmMsgs = [];
 
 function renderDmUserList(){
-  const el=document.getElementById("dmUserList");
+  const el = document.getElementById("dmUserList");
   if(!allUsers.length){
-    el.innerHTML='<div class="empty-hint" style="padding:16px;font-size:12px;color:var(--t4);text-align:center;">他のユーザーがいません</div>';
+    el.innerHTML = '<div class="empty-hint" style="padding:16px;font-size:12px;color:var(--t4);text-align:center;">他のユーザーがいません</div>';
     return;
   }
-  el.innerHTML=allUsers.map(u=>{
-    const unr=dmUnread[u.name]||0;
-    const active=dmTarget&&dmTarget.name===u.name;
-    return`<div class="duitem${active?' on':''}" onclick="openDm('${esc(u.name)}','${esc(u.userCode||'')}')">
-      <div class="duav">${u.name.charAt(0)}</div>
+  el.innerHTML = allUsers.map(u=>{
+    const unr = dmUnread[u.name] || 0;
+    const active = dmTarget && dmTarget.name===u.name;
+    const isAdminUser = _goldOn && adminSet.has(u.name);
+    return `<div class="duitem${active?' on':''}" onclick="openDm('${esc(u.name)}','${esc(u.userCode||'')}')">
+      <div class="duav${isAdminUser?' admin-av':''}">${u.name.charAt(0)}</div>
       <div class="duinfo">
-        <div class="duname">${esc(u.name)}</div>
+        <div class="duname${isAdminUser?' admin-gold-dm':''}">${esc(u.name)}${isAdminUser?' 👑':''}</div>
         <div class="ducode">#${esc(u.userCode||'----')}</div>
       </div>
       <span class="dubadge${unr?' on':''}" id="dub_${safeid(u.name)}">${unr||''}</span>
@@ -620,87 +750,111 @@ function renderDmUserList(){
 ═══════════════════════════ */
 function dmKey(a,b){return[a,b].sort().join('__');}
 
-window.openDm=function(name,code){
-  dmTarget={name,code};
-
-  // UI
-  document.getElementById("dmConvName").textContent=name;
-  document.getElementById("dmConvCode").textContent="#"+code;
+window.openDm = function(name,code){
+  dmTarget = {name,code};
+  document.getElementById("dmConvName").textContent = name;
+  document.getElementById("dmConvCode").textContent = "#"+code;
   document.getElementById("dmConv").classList.add("on");
-  document.getElementById("dmEmpty").style.display="none";
+  document.getElementById("dmEmpty").style.display = "none";
 
-  // 未読クリア
-  dmUnread[name]=0;
-  const badge=document.getElementById("dub_"+safeid(name));
+  dmUnread[name] = 0;
+  const badge = document.getElementById("dub_"+safeid(name));
   if(badge){badge.classList.remove("on");badge.textContent='';}
   renderDmUserList();
 
-  // 購読
-  dmUnsub&&dmUnsub();
-  const key=dmKey(myName,name);
-  dmUnsub=onSnapshot(
+  dmUnsub && dmUnsub();
+  const key = dmKey(myName,name);
+  dmUnsub = onSnapshot(
     query(collection(db,"dm_2"),where("dmKey","==",key),limit(100)),
-    snap=>renderDmMsgs(snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.ts?.seconds??0)-(b.ts?.seconds??0)))
+    snap=>{
+      const msgs = snap.docs.map(d=>({id:d.id,...d.data()}))
+        .sort((a,b)=>(a.ts?.seconds??0)-(b.ts?.seconds??0));
+      _lastDmMsgs = msgs;
+      renderDmMsgs(msgs);
+    }
   );
   document.getElementById("dmInput").focus();
 };
 
 function renderDmMsgs(msgs){
-  const el=document.getElementById("dmMsgList");
-  const atBot=el.scrollHeight-el.scrollTop-el.clientHeight<60;
-  el.innerHTML=msgs.map(m=>{
-    const mine=m.from===myName;
-    return`<div class="dmbrow ${mine?'mine':'theirs'}">
+  const el = document.getElementById("dmMsgList");
+  const atBot = el.scrollHeight-el.scrollTop-el.clientHeight < 60;
+  el.innerHTML = msgs.map(m=>{
+    const mine = m.from===myName;
+    return `<div class="dmbrow ${mine?'mine':'theirs'}">
       <div class="dmb">${esc(m.text)}</div>
       <span class="dmts">${fmt(m.ts)}</span>
     </div>`;
   }).join('');
-  if(atBot)el.scrollTop=el.scrollHeight;
+  if(atBot) el.scrollTop = el.scrollHeight;
 }
 
-window.sendDm=async function(){
-  if(!dmTarget)return;
-  const el=document.getElementById("dmInput");
-  const text=el.value.trim();
-  if(!text||isNG(text))return;
-  el.value='';
+window.sendDm = async function(){
+  if(!dmTarget) return;
+  const el = document.getElementById("dmInput");
+  const text = el.value.trim();
+  if(!text || isNG(text)) return;
+  el.value = '';
   try{
     await addDoc(collection(db,"dm_2"),{
-      from:myName,to:dmTarget.name,
-      dmKey:dmKey(myName,dmTarget.name),
-      text,ts:serverTimestamp()
+      from: myName,
+      to: dmTarget.name,
+      dmKey: dmKey(myName,dmTarget.name),
+      text,
+      ts: serverTimestamp()
     });
   }catch(e){console.error(e);}
 };
 document.getElementById("dmInput").addEventListener("keydown",e=>{
-  if(e.key==="Enter")window.sendDm();
+  if(e.key==="Enter") window.sendDm();
 });
 
-window.closeDmConv=function(){
-  dmUnsub&&dmUnsub();dmUnsub=null;dmTarget=null;
+window.closeDmConv = function(){
+  dmUnsub && dmUnsub(); dmUnsub=null; dmTarget=null;
   document.getElementById("dmConv").classList.remove("on");
-  document.getElementById("dmEmpty").style.display="";
+  document.getElementById("dmEmpty").style.display = "";
+  _lastDmMsgs = [];
   renderDmUserList();
 };
 
-/* DM未読監視（自分宛の新着） */
-let dmInitDone=false;
+/* DM未読監視 */
+let dmInitDone = false;
 onSnapshot(
   query(collection(db,"dm_2"),where("to","==",myName),limit(50)),
   snap=>{
     if(!dmInitDone){dmInitDone=true;return;}
     snap.docChanges().forEach(ch=>{
-      if(ch.type!=="added")return;
-      const d=ch.doc.data();
-      if(dmTarget&&dmTarget.name===d.from)return; // 今開いている相手は無視
-      dmUnread[d.from]=(dmUnread[d.from]||0)+1;
-      const b=document.getElementById("dub_"+safeid(d.from));
+      if(ch.type!=="added") return;
+      const d = ch.doc.data();
+      if(dmTarget && dmTarget.name===d.from) return;
+      dmUnread[d.from] = (dmUnread[d.from]||0)+1;
+      const b = document.getElementById("dub_"+safeid(d.from));
       if(b){b.classList.add("on");b.textContent=dmUnread[d.from];}
       addBadge('pb_dm',1);
       renderDmUserList();
     });
   }
 );
+
+/* ═══════════════════════════
+   goldToggle との連携
+   （Firebaseモジュール外の toggleGold から呼べるよう window に公開）
+═══════════════════════════ */
+window._lastRoomMsgs = _lastRoomMsgs; // 参照共有はできないので renderを直接公開
+window.renderRoomMsgs = renderRoomMsgs;
+window.renderDmMsgs   = renderDmMsgs;
+window.renderDmUserList = renderDmUserList;
+window.updateSelfNameDisplay = updateSelfNameDisplay;
+
+// goldToggle が押されたときの追加処理
+const _origToggleGold = window.toggleGold;
+window.toggleGold = function(){
+  _origToggleGold();
+  updateSelfNameDisplay();
+  renderRoomMsgs(_lastRoomMsgs);
+  if(dmTarget) renderDmMsgs(_lastDmMsgs);
+  renderDmUserList();
+};
 
 /* ═══════════════════════════
    ユーティリティ
@@ -711,14 +865,14 @@ function esc(s){
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 function fmt(ts){
-  if(!ts||!ts.seconds)return'';
+  if(!ts||!ts.seconds) return '';
   return new Date(ts.seconds*1000).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
 }
 function safeid(s){return String(s||'').replace(/[^a-zA-Z0-9\u3000-\u9fff\u30A0-\u30FF\u3040-\u309F]/g,"_");}
 function addBadge(id,n){
-  const el=document.getElementById(id);
-  const cur=parseInt(el.textContent||"0")||0;
-  el.textContent=Math.min(cur+n,99);
+  const el = document.getElementById(id);
+  const cur = parseInt(el.textContent||"0")||0;
+  el.textContent = Math.min(cur+n,99);
   el.classList.add("on");
 }
 
