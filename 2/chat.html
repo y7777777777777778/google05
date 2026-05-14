@@ -14,843 +14,363 @@
   --bg2:#1C1C1E;
   --bg3:#2C2C2E;
   --bg4:#3A3A3C;
-
   --sep:rgba(84,84,88,.65);
   --sep2:rgba(84,84,88,.35);
-
   --fill:rgba(120,120,128,.2);
   --fill2:rgba(120,120,128,.16);
   --fill3:rgba(120,120,128,.1);
-
   --t1:#fff;
   --t2:rgba(235,235,245,.6);
   --t3:rgba(235,235,245,.3);
   --t4:rgba(235,235,245,.16);
-
   --blue:#0A84FF;
   --blue-l:#409CFF;
   --green:#30D158;
   --red:#FF453A;
   --gold:#FFD60A;
   --teal:#5AC8FA;
-
   --glass:rgba(26,26,28,.97);
   --blur:blur(32px) saturate(180%);
-
   --r1:8px;
   --r2:12px;
   --r3:16px;
   --r4:20px;
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-}
-
-body{
-  font-family:'Figtree',sans-serif;
-  background:var(--bg);
-  color:var(--t1);
-}
-
-/* 背景 */
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ width:100%; height:100%; overflow:hidden; }
+body{ font-family:'Figtree',sans-serif; background:var(--bg); color:var(--t1); }
 
 .wall{
-  position:fixed;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-
+  position:fixed; inset:0; z-index:0; pointer-events:none;
   background:
-  radial-gradient(circle at 10% 0%, #153060 0%, transparent 35%),
-  radial-gradient(circle at 90% 20%, #111f48 0%, transparent 40%),
-  radial-gradient(circle at 70% 80%, #21092f 0%, transparent 40%),
-  #02040b;
+    radial-gradient(circle at 10% 0%, #153060 0%, transparent 35%),
+    radial-gradient(circle at 90% 20%, #111f48 0%, transparent 40%),
+    radial-gradient(circle at 70% 80%, #21092f 0%, transparent 40%),
+    #02040b;
 }
 
-/* アプリ */
-
 #app{
-  position:relative;
-  z-index:10;
-  width:100%;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
+  position:relative; z-index:10; width:100%; height:100vh;
+  display:flex; flex-direction:column;
 }
 
 /* トップ */
-
 #topBar{
-  height:44px;
-  flex-shrink:0;
-
-  display:flex;
-  align-items:center;
-  gap:8px;
-
+  height:44px; flex-shrink:0;
+  display:flex; align-items:center; gap:6px;
   padding:0 10px;
-
   background:var(--glass);
   backdrop-filter:var(--blur);
   -webkit-backdrop-filter:var(--blur);
-
   border-bottom:.5px solid var(--sep);
 }
 
 #modePill{
-  display:flex;
-  gap:2px;
-
-  padding:3px;
-  border-radius:var(--r2);
-
+  display:flex; gap:2px;
+  padding:3px; border-radius:var(--r2);
   background:var(--fill3);
+  flex-shrink:0;
 }
 
 .mpill{
-  position:relative;
-
-  border:none;
-  background:transparent;
-
-  color:var(--t3);
-
-  padding:3px 14px;
-
-  border-radius:7px;
-
-  font-size:12px;
-  font-weight:600;
-
-  cursor:pointer;
-  transition:.15s;
+  position:relative; border:none; background:transparent;
+  color:var(--t3); padding:3px 14px; border-radius:7px;
+  font-size:12px; font-weight:600; cursor:pointer; transition:.15s;
 }
-
-.mpill:hover{
-  color:var(--t1);
-}
-
-.mpill.on{
-  background:var(--bg3);
-  color:#fff;
-}
+.mpill:hover{ color:var(--t1); }
+.mpill.on{ background:var(--bg3); color:#fff; }
 
 .pill-badge{
-  position:absolute;
-  top:-4px;
-  right:-3px;
-
-  min-width:14px;
-  height:14px;
-
-  padding:0 3px;
-
-  border-radius:7px;
-
-  background:var(--red);
-
-  color:#fff;
-
-  display:none;
-  align-items:center;
-  justify-content:center;
-
-  font-size:9px;
-  font-weight:700;
+  position:absolute; top:-4px; right:-3px;
+  min-width:14px; height:14px; padding:0 3px; border-radius:7px;
+  background:var(--red); color:#fff;
+  display:none; align-items:center; justify-content:center;
+  font-size:9px; font-weight:700;
 }
+.pill-badge.on{ display:flex; }
 
-.pill-badge.on{
-  display:flex;
-}
-
-#selfInfo{
+/* 名前インライン入力エリア */
+#nameArea{
   margin-left:auto;
-
-  display:flex;
-  align-items:center;
-  gap:6px;
+  display:flex; align-items:center; gap:5px;
+  flex-shrink:0;
 }
 
-#nameBtn{
-  display:flex;
-  align-items:center;
-  gap:4px;
-
-  border:none;
-
-  background:var(--fill3);
-
+#nameInlineInput{
+  height:28px;
   border:.5px solid var(--sep2);
-
   border-radius:var(--r1);
-
-  padding:3px 8px;
-
-  cursor:pointer;
-}
-
-#selfName{
+  background:var(--fill2);
+  color:#fff;
+  padding:0 9px;
   font-size:12px;
   font-weight:600;
+  font-family:'Figtree',sans-serif;
+  outline:none;
+  width:96px;
+  transition:border .15s, box-shadow .15s;
 }
+#nameInlineInput:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 2px rgba(10,132,255,.2);
+}
+#nameInlineInput::placeholder{ color:var(--t4); font-weight:400; }
+
+#nameApplyBtn{
+  height:28px; padding:0 10px;
+  border:none; border-radius:var(--r1);
+  background:var(--blue); color:#fff;
+  font-size:11px; font-weight:600;
+  font-family:'Figtree',sans-serif;
+  cursor:pointer; transition:background .12s;
+  flex-shrink:0;
+}
+#nameApplyBtn:hover{ background:#1a8fff; }
 
 #selfCode{
-  font-size:11px;
-  font-weight:700;
-
+  font-size:11px; font-weight:700;
   color:var(--blue-l);
-
   background:rgba(10,132,255,.15);
-
-  padding:2px 7px;
-
-  border-radius:5px;
+  padding:2px 7px; border-radius:5px;
+  flex-shrink:0;
 }
 
 .xbtn{
-  width:26px;
-  height:26px;
-
-  border:none;
-
-  border-radius:50%;
-
-  background:var(--fill2);
-
-  color:var(--t2);
-
-  cursor:pointer;
+  width:26px; height:26px; border:none; border-radius:50%;
+  background:var(--fill2); color:var(--t2); cursor:pointer;
+  flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  font-size:14px;
 }
-
-.xbtn:hover{
-  background:var(--fill);
-}
+.xbtn:hover{ background:var(--fill); }
 
 /* ルームバー */
-
 #roomBar{
-  height:38px;
-  flex-shrink:0;
-
-  display:flex;
-  align-items:center;
-  gap:4px;
-
-  overflow-x:auto;
-
-  padding:5px 10px;
-
+  height:38px; flex-shrink:0;
+  display:flex; align-items:center; gap:4px;
+  overflow-x:auto; padding:5px 10px;
   background:rgba(26,26,28,.8);
-
   border-bottom:.5px solid var(--sep2);
 }
-
-#roomBar::-webkit-scrollbar{
-  display:none;
-}
+#roomBar::-webkit-scrollbar{ display:none; }
 
 .rbtn{
-  border:none;
-
-  background:var(--fill3);
-
-  color:var(--t3);
-
-  padding:4px 11px;
-
-  border-radius:var(--r1);
-
-  font-size:12px;
-
-  cursor:pointer;
-
-  white-space:nowrap;
+  border:none; background:var(--fill3); color:var(--t3);
+  padding:4px 11px; border-radius:var(--r1);
+  font-size:12px; cursor:pointer; white-space:nowrap;
 }
-
-.rbtn.on{
-  background:var(--bg3);
-  color:#fff;
-}
+.rbtn.on{ background:var(--bg3); color:#fff; }
 
 /* メイン */
+#mainArea{ flex:1; overflow:hidden; display:flex; }
 
-#mainArea{
-  flex:1;
-  overflow:hidden;
-
-  display:flex;
-}
-
-#roomPane{
-  flex:1;
-
-  display:flex;
-  flex-direction:column;
-
-  overflow:hidden;
-}
+#roomPane{ flex:1; display:flex; flex-direction:column; overflow:hidden; }
 
 #msgList{
-  flex:1;
-
-  overflow-y:auto;
-
+  flex:1; overflow-y:auto;
   padding:10px 12px;
-
-  display:flex;
-  flex-direction:column;
-  gap:5px;
+  display:flex; flex-direction:column; gap:5px;
 }
+#msgList::-webkit-scrollbar{ width:3px; }
+#msgList::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.1); border-radius:2px; }
 
-#msgList::-webkit-scrollbar{
-  width:3px;
-}
-
-#msgList::-webkit-scrollbar-thumb{
-  background:rgba(255,255,255,.1);
-  border-radius:2px;
-}
-
-.mrow{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-
+.mrow{ display:flex; flex-direction:column; gap:2px; }
 .mrow.admin-row{
   padding-left:6px;
   border-left:2px solid rgba(255,214,10,.35);
-
   background:linear-gradient(90deg,rgba(255,214,10,.06),transparent 70%);
 }
 
-.mmeta{
-  display:flex;
-  align-items:center;
-  gap:5px;
-  flex-wrap:wrap;
-}
+.mmeta{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
 
-.mname{
-  color:var(--blue-l);
+.mname{ color:var(--blue-l); font-size:12px; font-weight:600; cursor:pointer; }
+.mname.me{ color:var(--teal); }
+.mname.admin-gold{ color:var(--gold)!important; text-shadow:0 0 8px rgba(255,214,10,.5); }
+.mname.admin-gold::after{ content:" 👑"; font-size:10px; }
 
-  font-size:12px;
-  font-weight:600;
+.mcode{ font-size:10px; color:var(--t4); }
+.mts{ font-size:10px; color:var(--t4); }
+.mbody{ font-size:13px; color:var(--t2); line-height:1.55; word-break:break-word; }
+.mreply{ font-size:10px; color:var(--t4); border-left:2px solid var(--sep); padding-left:6px; }
 
-  cursor:pointer;
-}
-
-.mname.me{
-  color:var(--teal);
-}
-
-.mname.admin-gold{
-  color:var(--gold)!important;
-  text-shadow:0 0 8px rgba(255,214,10,.5);
-}
-
-.mname.admin-gold::after{
-  content:" 👑";
-  font-size:10px;
-}
-
-.mcode{
-  font-size:10px;
-  color:var(--t4);
-}
-
-.mts{
-  font-size:10px;
-  color:var(--t4);
-}
-
-.mbody{
-  font-size:13px;
-  color:var(--t2);
-
-  line-height:1.55;
-
-  word-break:break-word;
-}
-
-.mreply{
-  font-size:10px;
-
-  color:var(--t4);
-
-  border-left:2px solid var(--sep);
-
-  padding-left:6px;
-}
-
-/* 入力 */
-
+/* 入力フッター */
 #roomFoot{
   flex-shrink:0;
-
   border-top:.5px solid var(--sep2);
-
   padding:8px 10px;
-
   background:var(--glass);
 }
 
 #replyBar{
-  display:none;
-
-  align-items:center;
-  gap:6px;
-
+  display:none; align-items:center; gap:6px;
   margin-bottom:5px;
-
-  background:var(--fill3);
-
-  border-radius:var(--r1);
-
-  padding:3px 8px;
-
-  font-size:11px;
-  color:var(--t4);
+  background:var(--fill3); border-radius:var(--r1);
+  padding:3px 8px; font-size:11px; color:var(--t4);
 }
+#replyBar.on{ display:flex; }
+#replyTxt{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#replyClear{ border:none; background:none; color:var(--t4); cursor:pointer; }
 
-#replyBar.on{
-  display:flex;
-}
-
-#replyTxt{
-  flex:1;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-
-#replyClear{
-  border:none;
-  background:none;
-
-  color:var(--t4);
-
-  cursor:pointer;
-}
-
-.irow{
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
+.irow{ display:flex; align-items:center; gap:6px; }
 
 .minput{
-  flex:1;
-
-  height:34px;
-
-  border-radius:17px;
-
+  flex:1; height:34px; border-radius:17px;
   border:.5px solid var(--sep2);
-
-  background:var(--fill2);
-
-  color:#fff;
-
-  padding:0 13px;
-
-  outline:none;
-
-  font-size:13px;
+  background:var(--fill2); color:#fff;
+  padding:0 13px; outline:none; font-size:13px;
+  font-family:'Figtree',sans-serif;
 }
-
-.minput:focus{
-  border-color:var(--blue);
-}
+.minput:focus{ border-color:var(--blue); }
 
 .sbtn{
-  width:34px;
-  height:34px;
-
-  border:none;
-
-  border-radius:50%;
-
-  background:var(--blue);
-
-  color:#fff;
-
-  cursor:pointer;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  width:34px; height:34px; border:none; border-radius:50%;
+  background:var(--blue); color:#fff; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
 }
 
 /* DM */
-
-#dmPane{
-  display:none;
-  flex:1;
-  overflow:hidden;
-}
-
-#dmPane.on{
-  display:flex;
-}
+#dmPane{ display:none; flex:1; overflow:hidden; }
+#dmPane.on{ display:flex; }
 
 #dmList{
-  width:200px;
-  flex-shrink:0;
-
+  width:200px; flex-shrink:0;
   border-right:.5px solid var(--sep2);
-
   background:rgba(20,20,22,.9);
-
-  display:flex;
-  flex-direction:column;
+  display:flex; flex-direction:column;
 }
 
 .dl-hd{
   padding:8px 10px 4px;
-
-  font-size:10px;
-  font-weight:700;
-
+  font-size:10px; font-weight:700;
   color:var(--t4);
-
   border-bottom:.5px solid var(--sep2);
 }
 
-#dmUserList{
-  flex:1;
-  overflow-y:auto;
-}
+#dmUserList{ flex:1; overflow-y:auto; }
 
 .duitem{
-  display:flex;
-  align-items:center;
-  gap:7px;
-
-  padding:8px 10px;
-
-  cursor:pointer;
-
+  display:flex; align-items:center; gap:7px;
+  padding:8px 10px; cursor:pointer;
   border-bottom:.5px solid var(--sep2);
 }
-
-.duitem:hover{
-  background:var(--fill3);
-}
-
-.duitem.on{
-  background:rgba(10,132,255,.1);
-}
+.duitem:hover{ background:var(--fill3); }
+.duitem.on{ background:rgba(10,132,255,.1); }
 
 .duav{
-  width:28px;
-  height:28px;
-
-  border-radius:50%;
-
+  width:28px; height:28px; border-radius:50%;
   background:var(--bg3);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:12px;
-  font-weight:600;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:600; flex-shrink:0;
 }
+.duav.admin-av{ background:linear-gradient(135deg,#b8860b,#ffd700); color:#000; }
 
-.duav.admin-av{
-  background:linear-gradient(135deg,#b8860b,#ffd700);
-  color:#000;
-}
-
-.duinfo{
-  flex:1;
-  overflow:hidden;
-}
-
-.duname{
-  font-size:12px;
-  font-weight:600;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.duname.admin-gold-dm{
-  color:var(--gold);
-}
-
-.ducode{
-  font-size:10px;
-  color:var(--t4);
-}
+.duinfo{ flex:1; overflow:hidden; }
+.duname{ font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.duname.admin-gold-dm{ color:var(--gold); }
+.ducode{ font-size:10px; color:var(--t4); }
 
 .dubadge{
-  min-width:15px;
-  height:15px;
-
-  display:none;
-  align-items:center;
-  justify-content:center;
-
-  border-radius:7px;
-
-  padding:0 3px;
-
-  background:var(--red);
-
-  color:#fff;
-
-  font-size:9px;
-  font-weight:700;
+  min-width:15px; height:15px;
+  display:none; align-items:center; justify-content:center;
+  border-radius:7px; padding:0 3px;
+  background:var(--red); color:#fff;
+  font-size:9px; font-weight:700;
 }
-
-.dubadge.on{
-  display:flex;
-}
+.dubadge.on{ display:flex; }
 
 /* DM会話 */
-
-#dmConv{
-  flex:1;
-
-  display:none;
-  flex-direction:column;
-
-  overflow:hidden;
-}
-
-#dmConv.on{
-  display:flex;
-}
+#dmConv{ flex:1; display:none; flex-direction:column; overflow:hidden; }
+#dmConv.on{ display:flex; }
 
 #dmConvHd{
   padding:8px 12px;
-
   border-bottom:.5px solid var(--sep2);
-
-  display:flex;
-  align-items:center;
-  gap:8px;
-
+  display:flex; align-items:center; gap:8px;
   background:rgba(28,28,30,.6);
 }
 
-#dmBackBtn{
-  border:none;
-  background:none;
-
-  color:var(--blue);
-
-  cursor:pointer;
-}
-
-#dmConvName{
-  font-size:13px;
-  font-weight:600;
-}
-
-#dmConvCode{
-  font-size:10px;
-  color:var(--t4);
-}
+#dmBackBtn{ border:none; background:none; color:var(--blue); cursor:pointer; font-size:14px; }
+#dmConvName{ font-size:13px; font-weight:600; }
+#dmConvCode{ font-size:10px; color:var(--t4); }
 
 #dmMsgList{
-  flex:1;
-
-  overflow-y:auto;
-
+  flex:1; overflow-y:auto;
   padding:10px 12px;
-
-  display:flex;
-  flex-direction:column;
-  gap:5px;
+  display:flex; flex-direction:column; gap:5px;
 }
 
-.dmbrow{
-  display:flex;
-  flex-direction:column;
-}
-
-.dmbrow.mine{
-  align-self:flex-end;
-  align-items:flex-end;
-  max-width:78%;
-}
-
-.dmbrow.theirs{
-  align-self:flex-start;
-  max-width:78%;
-}
+.dmbrow{ display:flex; flex-direction:column; }
+.dmbrow.mine{ align-self:flex-end; align-items:flex-end; max-width:78%; }
+.dmbrow.theirs{ align-self:flex-start; max-width:78%; }
 
 .dmb{
-  padding:7px 12px;
-
-  border-radius:var(--r2);
-
-  font-size:13px;
-
-  line-height:1.5;
-
-  word-break:break-word;
+  padding:7px 12px; border-radius:var(--r2);
+  font-size:13px; line-height:1.5; word-break:break-word;
 }
-
-.mine .dmb{
-  background:var(--blue);
-  color:#fff;
-
-  border-radius:var(--r2) var(--r2) 4px var(--r2);
-}
-
-.theirs .dmb{
-  background:var(--bg3);
-
-  border-radius:var(--r2) var(--r2) var(--r2) 4px;
-}
-
-.dmts{
-  font-size:9px;
-  color:var(--t4);
-}
-
-/* 空 */
+.mine .dmb{ background:var(--blue); color:#fff; border-radius:var(--r2) var(--r2) 4px var(--r2); }
+.theirs .dmb{ background:var(--bg3); border-radius:var(--r2) var(--r2) var(--r2) 4px; }
+.dmts{ font-size:9px; color:var(--t4); }
 
 .empty-hint{
-  flex:1;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:var(--t4);
-  font-size:13px;
+  flex:1; display:flex; align-items:center; justify-content:center;
+  color:var(--t4); font-size:13px;
 }
 
-/* 名前モーダル */
-
-#nameModal{
-  position:fixed;
-  inset:0;
-
-  display:none;
-  align-items:center;
-  justify-content:center;
-
-  z-index:9999;
-
-  background:rgba(0,0,0,.6);
-
-  backdrop-filter:blur(8px);
+/* 名前未設定のオーバーレイ */
+#namePrompt{
+  position:fixed; inset:0; z-index:9999;
+  background:rgba(0,0,0,.75);
+  backdrop-filter:blur(10px);
+  display:flex; align-items:center; justify-content:center;
 }
-
-#nameModal.on{
-  display:flex;
-}
-
-#nameModalBox{
-  width:280px;
-
+#namePromptBox{
   background:var(--bg2);
-
   border:.5px solid var(--sep);
-
   border-radius:var(--r3);
-
-  padding:20px;
-
-  display:flex;
-  flex-direction:column;
-  gap:12px;
+  padding:24px 20px;
+  width:260px;
+  display:flex; flex-direction:column; gap:12px;
+  animation:ncIn .25s cubic-bezier(.34,1.28,.64,1) both;
 }
-
-#nameModalInput{
-  height:38px;
-
+@keyframes ncIn{
+  from{ opacity:0; transform:scale(.88) translateY(16px); }
+  to{ opacity:1; transform:scale(1) translateY(0); }
+}
+#namePromptBox h3{ font-size:14px; font-weight:700; }
+#namePromptBox p{ font-size:12px; color:var(--t3); line-height:1.5; }
+#namePromptInput{
+  height:36px;
   border:.5px solid var(--sep);
-
   border-radius:var(--r1);
-
-  background:var(--fill2);
-
-  color:#fff;
-
-  padding:0 12px;
-
-  outline:none;
+  background:var(--fill2); color:#fff;
+  padding:0 12px; outline:none;
+  font-size:13px; font-family:'Figtree',sans-serif;
 }
-
-#nameModalWarn{
-  display:none;
-
-  color:var(--red);
-
-  font-size:11px;
-}
-
-.nm-row{
-  display:flex;
-  gap:8px;
-}
-
-.nm-btn{
-  flex:1;
-
-  height:34px;
-
-  border:none;
-
-  border-radius:var(--r1);
-
+#namePromptInput:focus{ border-color:var(--blue); }
+#namePromptErr{ font-size:11px; color:var(--red); min-height:14px; }
+#namePromptBtn{
+  height:36px; border:none; border-radius:var(--r1);
+  background:var(--blue); color:#fff;
+  font-size:13px; font-weight:600;
+  font-family:'Figtree',sans-serif;
   cursor:pointer;
-
-  font-weight:600;
 }
-
-.nm-cancel{
-  background:var(--fill2);
-  color:var(--t2);
-}
-
-.nm-save{
-  background:var(--blue);
-  color:#fff;
-}
-
-/* スマホ */
+#namePromptBtn:hover{ background:#1a8fff; }
 
 @media(max-width:720px){
-
-  #dmList{
-    width:100%;
-  }
-
-  #dmConv{
-    position:absolute;
-    inset:0;
-    z-index:50;
-    background:#000;
-  }
-
+  #dmList{ width:100%; }
+  #dmConv{ position:absolute; inset:0; z-index:50; background:#000; }
 }
 </style>
 </head>
 
 <body>
-
 <div class="wall"></div>
 
 <div id="app">
 
+  <!-- トップバー -->
   <div id="topBar">
 
     <div id="modePill">
@@ -858,199 +378,204 @@ body{
         部屋
         <span class="pill-badge" id="pb_room"></span>
       </button>
-
       <button class="mpill" id="pillDm" onclick="setMode('dm')">
         DM
         <span class="pill-badge" id="pb_dm"></span>
       </button>
     </div>
 
-    <div id="selfInfo">
-
-      <button id="nameBtn" onclick="openNameModal()">
-        <span id="selfName"></span>
-      </button>
-
+    <!-- 名前インライン入力 -->
+    <div id="nameArea">
+      <input
+        id="nameInlineInput"
+        maxlength="20"
+        placeholder="名前を入力..."
+        autocomplete="off"
+        spellcheck="false"
+      >
+      <button id="nameApplyBtn" onclick="applyName()">決定</button>
       <span id="selfCode">----</span>
-
-      <button class="xbtn" onclick="openFullscreen()" title="大画面で開く" style="background:rgba(10,132,255,.15);color:var(--blue-l);font-size:15px;">⤢</button>
-<button class="xbtn" onclick="closeChat()">✕</button>
-
+      <button class="xbtn" onclick="openFullscreen()" title="大画面で開く" style="background:rgba(10,132,255,.15);color:var(--blue-l);">⤢</button>
+      <button class="xbtn" onclick="closeChat()">✕</button>
     </div>
 
   </div>
 
+  <!-- ルームバー -->
   <div id="roomBar"></div>
 
+  <!-- メイン -->
   <div id="mainArea">
 
     <!-- 部屋 -->
-
     <div id="roomPane">
-
       <div id="msgList"></div>
-
       <div id="roomFoot">
-
         <div id="replyBar">
           <span>↩</span>
           <span id="replyTxt"></span>
           <button id="replyClear" onclick="clearReply()">✕</button>
         </div>
-
         <div class="irow">
-
-          <input
-            class="minput"
-            id="msgInput"
-            placeholder="メッセージを入力..."
-            maxlength="200"
-          >
-
+          <input class="minput" id="msgInput" placeholder="メッセージを入力..." maxlength="200">
           <button class="sbtn" onclick="sendMsg()">
-
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.3"
-              stroke-linecap="round"
-            >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round">
               <line x1="12" y1="19" x2="12" y2="5"/>
               <polyline points="5 12 12 5 19 12"/>
             </svg>
-
           </button>
-
         </div>
-
       </div>
-
     </div>
 
     <!-- DM -->
-
     <div id="dmPane">
-
       <div id="dmList">
-
-        <div class="dl-hd">
-          メンバー
-        </div>
-
-        <div id="dmUserList">
-          <div class="empty-hint">
-            読み込み中...
-          </div>
-        </div>
-
+        <div class="dl-hd">メンバー</div>
+        <div id="dmUserList"><div class="empty-hint">読み込み中...</div></div>
       </div>
-
       <div id="dmConv">
-
         <div id="dmConvHd">
-
-          <button id="dmBackBtn" onclick="closeDmConv()">
-            ‹ 戻る
-          </button>
-
+          <button id="dmBackBtn" onclick="closeDmConv()">‹ 戻る</button>
           <div>
             <div id="dmConvName"></div>
             <div id="dmConvCode"></div>
           </div>
-
         </div>
-
         <div id="dmMsgList"></div>
-
-        <div id="roomFoot">
-
+        <div id="roomFoot" style="border-top:.5px solid var(--sep2);padding:8px 10px;background:var(--glass);flex-shrink:0;">
           <div class="irow">
-
-            <input
-              class="minput"
-              id="dmInput"
-              placeholder="DMを送信..."
-              maxlength="200"
-            >
-
+            <input class="minput" id="dmInput" placeholder="DMを送信..." maxlength="200">
             <button class="sbtn" onclick="sendDm()">
-
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.3"
-                stroke-linecap="round"
-              >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round">
                 <line x1="12" y1="19" x2="12" y2="5"/>
                 <polyline points="5 12 12 5 19 12"/>
               </svg>
-
             </button>
-
           </div>
-
         </div>
-
       </div>
-
-      <div
-        id="dmEmpty"
-        class="empty-hint"
-      >
-        左からユーザーを選択してください
-      </div>
-
+      <div id="dmEmpty" class="empty-hint">左からユーザーを選択してください</div>
     </div>
 
   </div>
-
 </div>
 
-<!-- 名前変更 -->
-
-<div id="nameModal" onclick="if(event.target===this)closeNameModal()">
-
-  <div id="nameModalBox">
-
-    <div style="font-size:14px;font-weight:600;">
-      ✎ 表示名を変更
-    </div>
-
-    <input
-      id="nameModalInput"
-      maxlength="20"
-      placeholder="新しい名前"
-    >
-
-    <div id="nameModalWarn"></div>
-
-    <div class="nm-row">
-
-      <button class="nm-btn nm-cancel" onclick="closeNameModal()">
-        キャンセル
-      </button>
-
-      <button class="nm-btn nm-save" onclick="saveName()">
-        変更する
-      </button>
-
-    </div>
-
+<!-- 名前未設定プロンプト -->
+<div id="namePrompt" style="display:none;">
+  <div id="namePromptBox">
+    <h3>👋 表示名を入力してください</h3>
+    <p>チャットで使う名前を設定します。あとから変更できます。</p>
+    <input id="namePromptInput" maxlength="20" placeholder="名前（最大20文字）" autocomplete="off">
+    <div id="namePromptErr"></div>
+    <button id="namePromptBtn" onclick="submitPromptName()">はじめる</button>
   </div>
-
 </div>
 
 <script>
-// 修正後
-function closeChat(){
-  window.close();
+/* ━━━ ユーティリティ ━━━ */
+function esc(s){
+  return String(s||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
 }
+function fmt(ts){
+  if(!ts||!ts.seconds)return'';
+  return new Date(ts.seconds*1000).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+}
+function safeid(s){ return String(s||'').replace(/[^a-zA-Z0-9]/g,'_'); }
+
+/* ━━━ 名前管理 ━━━ */
+// chatName_local を使用（peji.htmlとは独立）
+let myName = localStorage.getItem('chatName_local') || '';
+let myCode = '----';
+
+function initNameUI(){
+  const inp = document.getElementById('nameInlineInput');
+  inp.value = myName;
+
+  if(!myName){
+    // 名前未設定 → プロンプト表示
+    document.getElementById('namePrompt').style.display = 'flex';
+    setTimeout(()=> document.getElementById('namePromptInput').focus(), 80);
+  }
+
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') applyName(); });
+}
+
+window.applyName = async function(){
+  const inp = document.getElementById('nameInlineInput');
+  const v = inp.value.trim();
+  if(!v){ inp.focus(); return; }
+  if(v === myName) return;
+
+  // Firestore重複チェックはモジュール側で行うため、ここでは楽観的に適用
+  myName = v;
+  localStorage.setItem('chatName_local', v);
+  inp.blur();
+  // コード再取得
+  await initCode();
+};
+
+window.submitPromptName = async function(){
+  const inp = document.getElementById('namePromptInput');
+  const errEl = document.getElementById('namePromptErr');
+  const v = inp.value.trim();
+  errEl.textContent = '';
+  if(!v){ errEl.textContent = '名前を入力してください'; return; }
+  myName = v;
+  localStorage.setItem('chatName_local', v);
+  document.getElementById('nameInlineInput').value = v;
+  document.getElementById('namePrompt').style.display = 'none';
+  await initCode();
+};
+
+document.getElementById('namePromptInput')?.addEventListener('keydown', e=>{
+  if(e.key==='Enter') submitPromptName();
+});
+
+/* ━━━ モード切替 ━━━ */
+let _mode = 'room';
+function setMode(m){
+  _mode = m;
+  document.getElementById('pillRoom').classList.toggle('on', m==='room');
+  document.getElementById('pillDm').classList.toggle('on', m==='dm');
+  document.getElementById('roomBar').style.display = m==='room' ? 'flex' : 'none';
+  document.getElementById('roomPane').style.display = m==='room' ? 'flex' : 'none';
+  document.getElementById('dmPane').classList.toggle('on', m==='dm');
+  if(m==='room') clearBadge('pb_room');
+  if(m==='dm') clearBadge('pb_dm');
+}
+
+function clearBadge(id){
+  const el=document.getElementById(id);
+  el.classList.remove('on'); el.textContent='';
+}
+function addBadge(id,n){
+  const el=document.getElementById(id);
+  let cur=parseInt(el.textContent||'0')||0;
+  cur+=n; if(cur>99)cur=99;
+  el.textContent=cur; el.classList.add('on');
+}
+
+/* ━━━ リプライ ━━━ */
+let _reply = null;
+function setReply(name,text){
+  _reply={name,text};
+  document.getElementById('replyBar').classList.add('on');
+  document.getElementById('replyTxt').textContent=name+'：'+text;
+  document.getElementById('msgInput').focus();
+}
+function clearReply(){
+  _reply=null;
+  document.getElementById('replyBar').classList.remove('on');
+}
+
+/* ━━━ その他 ━━━ */
+function closeChat(){ window.close(); }
 
 function openFullscreen(){
   try{
@@ -1064,902 +589,304 @@ function openFullscreen(){
   }
 }
 
-document.addEventListener('keydown',e=>{
-
-  if(e.key==='Escape'){
-    closeNameModal();
-  }
-
-});
-
-let _mode='room';
-
-function setMode(m){
-
-  _mode=m;
-
-  document.getElementById('pillRoom').classList.toggle('on',m==='room');
-  document.getElementById('pillDm').classList.toggle('on',m==='dm');
-
-  document.getElementById('roomBar').style.display=m==='room'?'flex':'none';
-
-  document.getElementById('roomPane').style.display=m==='room'?'flex':'none';
-
-  document.getElementById('dmPane').classList.toggle('on',m==='dm');
-
-  if(m==='room'){
-    clearBadge('pb_room');
-  }
-
-  if(m==='dm'){
-    clearBadge('pb_dm');
-  }
-
-}
-
-function clearBadge(id){
-  const el=document.getElementById(id);
-  el.classList.remove('on');
-  el.textContent='';
-}
-
-function addBadge(id,n){
-  const el=document.getElementById(id);
-
-  let cur=parseInt(el.textContent||'0')||0;
-
-  cur+=n;
-
-  if(cur>99) cur=99;
-
-  el.textContent=cur;
-
-  el.classList.add('on');
-}
-
-let _reply=null;
-
-function setReply(name,text){
-
-  _reply={name,text};
-
-  document.getElementById('replyBar').classList.add('on');
-
-  document.getElementById('replyTxt').textContent=name+'：'+text;
-
-  document.getElementById('msgInput').focus();
-
-}
-
-function clearReply(){
-
-  _reply=null;
-
-  document.getElementById('replyBar').classList.remove('on');
-
-}
-
-function openNameModal(){
-
-  document.getElementById('nameModal').classList.add('on');
-
-  document.getElementById('nameModalInput').value=myName;
-
-  document.getElementById('nameModalWarn').style.display='none';
-
-}
-
-function closeNameModal(){
-
-  document.getElementById('nameModal').classList.remove('on');
-
-}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){} });
 </script>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-
 import {
-  getFirestore,
-  collection,
-  addDoc,
-  query,
-  limit,
-  onSnapshot,
-  serverTimestamp,
-  doc,
-  getDocs,
-  where,
-  updateDoc
+  getFirestore, collection, addDoc, query, limit, onSnapshot,
+  serverTimestamp, doc, getDocs, where, updateDoc
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-const app=initializeApp({
-
+const app = initializeApp({
   apiKey:"AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
   authDomain:"fir-66339.firebaseapp.com",
   projectId:"fir-66339",
   storageBucket:"fir-66339.firebasestorage.app",
   messagingSenderId:"876017617963",
   appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
+}, "chat_v3");
 
-},"chat_v3");
+const db = getFirestore(app);
 
-const db=getFirestore(app);
+let myDocId = null;
+let myIsAdmin = false;
+let adminSet = new Set();
 
-let myName=localStorage.getItem("accessUserName_2")||"名無し";
-let myCode="----";
-
-let myDocId=null;
-let myIsAdmin=false;
-
-let adminSet=new Set();
-
-document.getElementById("selfName").textContent=myName;
-
-/* 管理者 */
-
+/* 管理者読み込み */
 async function loadAdmins(){
-
   try{
-
-    const snap=await getDocs(
-      query(
-        collection(db,"users"),
-        where("isAdmin","==",true)
-      )
-    );
-
-    adminSet=new Set(
-      snap.docs.map(d=>d.data().name)
-    );
-
+    const snap = await getDocs(query(collection(db,'users'), where('isAdmin','==',true)));
+    adminSet = new Set(snap.docs.map(d=>d.data().name));
   }catch(e){}
-
 }
 
-/* コード */
-
-async function initCode(){
-
+/* コード初期化 */
+window.initCode = async function(){
+  const name = localStorage.getItem('chatName_local') || '';
+  if(!name) return;
   try{
-
-    const q=await getDocs(
-      query(
-        collection(db,"users"),
-        where("name","==",myName)
-      )
-    );
-
+    const q = await getDocs(query(collection(db,'users'), where('name','==',name)));
     if(!q.empty){
-
-      const docRef=q.docs[0];
-
-      const data=docRef.data();
-
-      myDocId=docRef.id;
-
-      myIsAdmin=data.isAdmin===true;
-
-      let code=data.userCode;
-
+      const docRef = q.docs[0];
+      const data = docRef.data();
+      myDocId = docRef.id;
+      myIsAdmin = data.isAdmin === true;
+      let code = data.userCode;
       if(!code){
-
         for(let i=0;i<30;i++){
-
-          const c=String(
-            Math.floor(1000+Math.random()*9000)
-          );
-
-          const dup=await getDocs(
-            query(
-              collection(db,"users"),
-              where("userCode","==",c)
-            )
-          );
-
-          if(dup.empty){
-            code=c;
-            break;
-          }
-
+          const c = String(Math.floor(1000+Math.random()*9000));
+          const dup = await getDocs(query(collection(db,'users'), where('userCode','==',c)));
+          if(dup.empty){ code=c; break; }
         }
-
-        await updateDoc(
-          doc(db,"users",docRef.id),
-          {
-            userCode:code
-          }
-        );
-
+        await updateDoc(doc(db,'users',docRef.id), {userCode:code});
       }
-
-      myCode=String(code);
-
-      document.getElementById("selfCode").textContent="#"+myCode;
-
+      window.myCode = String(code);
+      document.getElementById('selfCode').textContent = '#' + code;
     }
-
-  }catch(e){
-    console.error(e);
-  }
-
+  }catch(e){ console.error(e); }
   loadUsers();
-
-}
-
-/* 名前変更 */
-
-window.saveName=async function(){
-
-  const input=document.getElementById('nameModalInput');
-
-  const warn=document.getElementById('nameModalWarn');
-
-  const newName=input.value.trim();
-
-  warn.style.display='none';
-
-  if(!newName || newName.length>20){
-
-    warn.textContent='1〜20文字';
-
-    warn.style.display='block';
-
-    return;
-
-  }
-
-  try{
-
-    const dup=await getDocs(
-      query(
-        collection(db,"users"),
-        where("name","==",newName)
-      )
-    );
-
-    if(!dup.empty){
-
-      warn.textContent='その名前は使われています';
-
-      warn.style.display='block';
-
-      return;
-
-    }
-
-  }catch(e){}
-
-  if(myDocId){
-
-    try{
-
-      await updateDoc(
-        doc(db,"users",myDocId),
-        {
-          name:newName
-        }
-      );
-
-    }catch(e){}
-
-  }
-
-  myName=newName;
-
-  localStorage.setItem("accessUserName_2",newName);
-
-  document.getElementById("selfName").textContent=myName;
-
-  closeNameModal();
-
 };
 
 /* ルーム */
-
-let rooms=[
-  {
-    id:"general",
-    name:"全体"
-  }
-];
-
-let curRoom="general";
-
-let msgUnsub=null;
+let rooms = [{id:'general',name:'全体'}];
+let curRoom = 'general';
+let msgUnsub = null;
 
 function renderRooms(){
-
-  document.getElementById("roomBar").innerHTML=
-  rooms.map(r=>`
-    <button
-      class="rbtn${r.id===curRoom?' on':''}"
-      onclick="switchRoom('${esc(r.id)}')"
-    >
-      #${esc(r.name)}
-    </button>
-  `).join('');
-
+  document.getElementById('roomBar').innerHTML =
+    rooms.map(r=>`
+      <button class="rbtn${r.id===curRoom?' on':''}" onclick="switchRoom('${esc(r.id)}')">
+        #${esc(r.name)}
+      </button>
+    `).join('');
 }
 
-window.switchRoom=function(id){
-
-  curRoom=id;
-
+window.switchRoom = function(id){
+  curRoom = id;
   renderRooms();
-
-  if(msgUnsub){
-    msgUnsub();
-  }
-
-  document.getElementById("msgList").innerHTML='';
-
+  if(msgUnsub) msgUnsub();
+  document.getElementById('msgList').innerHTML = '';
   subscribeRoomMsgs();
-
 };
 
-onSnapshot(
-  doc(db,"config","chatRooms_2"),
-  snap=>{
-
-    if(
-      snap.exists()
-      &&
-      Array.isArray(snap.data().rooms)
-    ){
-
-      const r=snap.data().rooms;
-
-      rooms=[
-        {
-          id:"general",
-          name:"全体"
-        },
-        ...r.filter(x=>x.id!=="general")
-      ];
-
-    }else{
-
-      rooms=[
-        {
-          id:"general",
-          name:"全体"
-        }
-      ];
-
-    }
-
-    renderRooms();
-
+onSnapshot(doc(db,'config','chatRooms_2'), snap=>{
+  if(snap.exists() && Array.isArray(snap.data().rooms)){
+    const r = snap.data().rooms;
+    rooms = [{id:'general',name:'全体'}, ...r.filter(x=>x.id!=='general')];
+  } else {
+    rooms = [{id:'general',name:'全体'}];
   }
-);
+  renderRooms();
+});
 
 /* NG */
+let ngW = [];
+onSnapshot(doc(db,'config','ngWords_2'), s=>{
+  ngW = s.exists() ? (s.data().words||[]) : [];
+});
+function isNG(t){ return ngW.some(w=>t.toLowerCase().includes(w.toLowerCase())); }
 
-let ngW=[];
-
-onSnapshot(
-  doc(db,"config","ngWords_2"),
-  s=>{
-
-    ngW=s.exists()
-    ?(s.data().words||[])
-    :[];
-
-  }
-);
-
-function isNG(t){
-
-  return ngW.some(w=>
-    t.toLowerCase().includes(
-      w.toLowerCase()
-    )
-  );
-
-}
-
-/* メッセ */
-
+/* メッセージ購読 */
 function subscribeRoomMsgs(){
-
-  msgUnsub=onSnapshot(
-
-    query(
-      collection(db,"chat_2"),
-      where("roomId","==",curRoom),
-      limit(80)
-    ),
-
+  msgUnsub = onSnapshot(
+    query(collection(db,'chat_2'), where('roomId','==',curRoom), limit(80)),
     snap=>{
-
-      const msgs=snap.docs
-      .map(d=>({
-        id:d.id,
-        ...d.data()
-      }))
-      .sort((a,b)=>
-        (a.ts?.seconds??0)
-        -
-        (b.ts?.seconds??0)
-      );
-
+      const msgs = snap.docs
+        .map(d=>({id:d.id,...d.data()}))
+        .sort((a,b)=>(a.ts?.seconds??0)-(b.ts?.seconds??0));
       renderRoomMsgs(msgs);
-
     }
-
   );
-
 }
 
 function renderRoomMsgs(msgs){
-
-  const el=document.getElementById("msgList");
-
-  const atBot=
-  el.scrollHeight-el.scrollTop-el.clientHeight<80;
-
-  el.innerHTML=msgs.map(m=>{
-
-    const me=m.name===myName;
-
-    const isAdmin=adminSet.has(m.name);
-
-    let cls='mname';
-
-    if(me) cls+=' me';
-
-    if(isAdmin) cls+=' admin-gold';
-
+  const el = document.getElementById('msgList');
+  const atBot = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  el.innerHTML = msgs.map(m=>{
+    const me = m.name === (localStorage.getItem('chatName_local')||'');
+    const isAdmin = adminSet.has(m.name);
+    let cls = 'mname';
+    if(me) cls += ' me';
+    if(isAdmin) cls += ' admin-gold';
     return `
       <div class="mrow${isAdmin?' admin-row':''}">
-
         <div class="mmeta">
-
-          <span
-            class="${cls}"
-            onclick="setReply('${esc(m.name)}','${esc(m.text)}')"
-          >
-            ${esc(m.name)}
-          </span>
-
-          <span class="mcode">
-            #${esc(m.userCode||'----')}
-          </span>
-
-          <span class="mts">
-            ${fmt(m.ts)}
-          </span>
-
+          <span class="${cls}" onclick="setReply('${esc(m.name)}','${esc(m.text)}')">${esc(m.name)}</span>
+          <span class="mcode">#${esc(m.userCode||'----')}</span>
+          <span class="mts">${fmt(m.ts)}</span>
         </div>
-
-        ${
-          m.replyTo
-          ?
-          `<div class="mreply">
-            ↩ ${esc(m.replyTo.name)}：${esc(m.replyTo.text)}
-          </div>`
-          :''
-        }
-
-        <div class="mbody">
-          ${esc(m.text)}
-        </div>
-
+        ${m.replyTo ? `<div class="mreply">↩ ${esc(m.replyTo.name)}：${esc(m.replyTo.text)}</div>` : ''}
+        <div class="mbody">${esc(m.text)}</div>
       </div>
     `;
-
   }).join('');
-
-  if(atBot){
-    el.scrollTop=el.scrollHeight;
-  }
-
+  if(atBot) el.scrollTop = el.scrollHeight;
 }
 
-window.sendMsg=async function(){
-
-  const el=document.getElementById("msgInput");
-
-  const text=el.value.trim();
-
+window.sendMsg = async function(){
+  const name = localStorage.getItem('chatName_local') || '';
+  if(!name){ alert('先に名前を入力してください'); return; }
+  const el = document.getElementById('msgInput');
+  const text = el.value.trim();
   if(!text) return;
-
   if(isNG(text)) return;
-
-  el.value='';
-
-  const data={
-
-    name:myName,
-    userCode:myCode,
-
+  el.value = '';
+  const data = {
+    name,
+    userCode: window.myCode || '----',
     text,
-
-    roomId:curRoom,
-
-    ts:serverTimestamp()
-
+    roomId: curRoom,
+    ts: serverTimestamp()
   };
-
-  if(_reply){
-
-    data.replyTo={
-      name:_reply.name,
-      text:_reply.text
-    };
-
+  if(window._reply){
+    data.replyTo = { name: window._reply.name, text: window._reply.text };
     clearReply();
-
   }
-
-  try{
-
-    await addDoc(
-      collection(db,"chat_2"),
-      data
-    );
-
-  }catch(e){
-    console.error(e);
-  }
-
+  try{ await addDoc(collection(db,'chat_2'), data); }catch(e){ console.error(e); }
 };
 
-document.getElementById("msgInput")
-.addEventListener("keydown",e=>{
-
-  if(e.key==="Enter"){
-    sendMsg();
-  }
-
+document.getElementById('msgInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter') sendMsg();
 });
 
 /* DM */
+let allUsers = [];
+let dmUnread = {};
+let dmTarget = null;
+let dmUnsub = null;
 
-let allUsers=[];
-
-let dmUnread={};
-
-let dmTarget=null;
-
-let dmUnsub=null;
-
-async function loadUsers(){
-
+window.loadUsers = async function(){
   try{
-
-    const snap=await getDocs(
-
-      query(
-        collection(db,"users"),
-        where("group","==","2"),
-        where("status","==","ok")
-      )
-
+    const snap = await getDocs(
+      query(collection(db,'users'), where('group','==','2'), where('status','==','ok'))
     );
-
-    allUsers=snap.docs
-    .map(d=>({
-      id:d.id,
-      ...d.data()
-    }))
-    .filter(u=>
-      u.name!==myName
-      &&
-      u.userCode
-    );
-
+    const name = localStorage.getItem('chatName_local') || '';
+    allUsers = snap.docs
+      .map(d=>({id:d.id,...d.data()}))
+      .filter(u => u.name !== name && u.userCode);
     renderDmUserList();
-
-  }catch(e){
-    console.error(e);
-  }
-
-}
+  }catch(e){ console.error(e); }
+};
 
 function renderDmUserList(){
-
-  const el=document.getElementById("dmUserList");
-
+  const el = document.getElementById('dmUserList');
   if(!allUsers.length){
-
-    el.innerHTML=
-    `<div class="empty-hint">
-      他のユーザーがいません
-    </div>`;
-
+    el.innerHTML = '<div class="empty-hint">他のユーザーがいません</div>';
     return;
-
   }
-
-  el.innerHTML=allUsers.map(u=>{
-
-    const unr=dmUnread[u.name]||0;
-
-    const active=
-    dmTarget
-    &&
-    dmTarget.name===u.name;
-
-    const isAdminUser=
-    adminSet.has(u.name);
-
+  el.innerHTML = allUsers.map(u=>{
+    const unr = dmUnread[u.name] || 0;
+    const active = dmTarget && dmTarget.name === u.name;
+    const isAdminUser = adminSet.has(u.name);
     return `
-
-      <div
-        class="duitem${active?' on':''}"
-        onclick="openDm('${esc(u.name)}','${esc(u.userCode||'')}')"
-      >
-
-        <div class="duav${isAdminUser?' admin-av':''}">
-          ${u.name.charAt(0)}
-        </div>
-
+      <div class="duitem${active?' on':''}" onclick="openDm('${esc(u.name)}','${esc(u.userCode||'')}')">
+        <div class="duav${isAdminUser?' admin-av':''}">${u.name.charAt(0)}</div>
         <div class="duinfo">
-
-          <div class="duname${isAdminUser?' admin-gold-dm':''}">
-            ${esc(u.name)}
-            ${isAdminUser?' 👑':''}
-          </div>
-
-          <div class="ducode">
-            #${esc(u.userCode||'----')}
-          </div>
-
+          <div class="duname${isAdminUser?' admin-gold-dm':''}">${esc(u.name)}${isAdminUser?' 👑':''}</div>
+          <div class="ducode">#${esc(u.userCode||'----')}</div>
         </div>
-
-        <span
-          class="dubadge${unr?' on':''}"
-          id="dub_${safeid(u.name)}"
-        >
-          ${unr||''}
-        </span>
-
+        <span class="dubadge${unr?' on':''}" id="dub_${safeid(u.name)}">${unr||''}</span>
       </div>
-
     `;
-
   }).join('');
-
 }
 
-function dmKey(a,b){
+function dmKey(a,b){ return [a,b].sort().join('__'); }
 
-  return [a,b].sort().join('__');
-
-}
-
-window.openDm=function(name,code){
-
-  dmTarget={name,code};
-
-  document.getElementById("dmConvName").textContent=name;
-
-  document.getElementById("dmConvCode").textContent="#"+code;
-
-  document.getElementById("dmConv").classList.add("on");
-
-  document.getElementById("dmEmpty").style.display="none";
-
-  dmUnread[name]=0;
-
+window.openDm = function(name, code){
+  dmTarget = {name, code};
+  document.getElementById('dmConvName').textContent = name;
+  document.getElementById('dmConvCode').textContent = '#' + code;
+  document.getElementById('dmConv').classList.add('on');
+  document.getElementById('dmEmpty').style.display = 'none';
+  dmUnread[name] = 0;
   renderDmUserList();
-
-  if(dmUnsub){
-    dmUnsub();
-  }
-
-  const key=dmKey(myName,name);
-
-  dmUnsub=onSnapshot(
-
-    query(
-      collection(db,"dm_2"),
-      where("dmKey","==",key),
-      limit(100)
-    ),
-
+  if(dmUnsub) dmUnsub();
+  const key = dmKey(localStorage.getItem('chatName_local')||'', name);
+  dmUnsub = onSnapshot(
+    query(collection(db,'dm_2'), where('dmKey','==',key), limit(100)),
     snap=>{
-
-      const msgs=snap.docs
-      .map(d=>({
-        id:d.id,
-        ...d.data()
-      }))
-      .sort((a,b)=>
-        (a.ts?.seconds??0)
-        -
-        (b.ts?.seconds??0)
-      );
-
+      const msgs = snap.docs
+        .map(d=>({id:d.id,...d.data()}))
+        .sort((a,b)=>(a.ts?.seconds??0)-(b.ts?.seconds??0));
       renderDmMsgs(msgs);
-
     }
-
   );
-
 };
 
 function renderDmMsgs(msgs){
-
-  const el=document.getElementById("dmMsgList");
-
-  const atBot=
-  el.scrollHeight-el.scrollTop-el.clientHeight<60;
-
-  el.innerHTML=msgs.map(m=>{
-
-    const mine=m.from===myName;
-
+  const el = document.getElementById('dmMsgList');
+  const atBot = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+  const name = localStorage.getItem('chatName_local') || '';
+  el.innerHTML = msgs.map(m=>{
+    const mine = m.from === name;
     return `
-
       <div class="dmbrow ${mine?'mine':'theirs'}">
-
-        <div class="dmb">
-          ${esc(m.text)}
-        </div>
-
-        <span class="dmts">
-          ${fmt(m.ts)}
-        </span>
-
+        <div class="dmb">${esc(m.text)}</div>
+        <span class="dmts">${fmt(m.ts)}</span>
       </div>
-
     `;
-
   }).join('');
-
-  if(atBot){
-    el.scrollTop=el.scrollHeight;
-  }
-
+  if(atBot) el.scrollTop = el.scrollHeight;
 }
 
-window.sendDm=async function(){
-
+window.sendDm = async function(){
   if(!dmTarget) return;
-
-  const el=document.getElementById("dmInput");
-
-  const text=el.value.trim();
-
+  const name = localStorage.getItem('chatName_local') || '';
+  if(!name){ alert('先に名前を入力してください'); return; }
+  const el = document.getElementById('dmInput');
+  const text = el.value.trim();
   if(!text) return;
-
   if(isNG(text)) return;
-
-  el.value='';
-
+  el.value = '';
   try{
-
-    await addDoc(
-      collection(db,"dm_2"),
-      {
-        from:myName,
-        to:dmTarget.name,
-        dmKey:dmKey(myName,dmTarget.name),
-        text,
-        ts:serverTimestamp()
-      }
-    );
-
-  }catch(e){
-    console.error(e);
-  }
-
+    await addDoc(collection(db,'dm_2'), {
+      from: name,
+      to: dmTarget.name,
+      dmKey: dmKey(name, dmTarget.name),
+      text,
+      ts: serverTimestamp()
+    });
+  }catch(e){ console.error(e); }
 };
 
-document.getElementById("dmInput")
-.addEventListener("keydown",e=>{
-
-  if(e.key==="Enter"){
-    sendDm();
-  }
-
+document.getElementById('dmInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter') sendDm();
 });
 
-window.closeDmConv=function(){
-
-  if(dmUnsub){
-    dmUnsub();
-  }
-
-  dmTarget=null;
-
-  document.getElementById("dmConv").classList.remove("on");
-
-  document.getElementById("dmEmpty").style.display='';
-
+window.closeDmConv = function(){
+  if(dmUnsub) dmUnsub();
+  dmTarget = null;
+  document.getElementById('dmConv').classList.remove('on');
+  document.getElementById('dmEmpty').style.display = '';
   renderDmUserList();
-
 };
 
 onSnapshot(
-
-  query(
-    collection(db,"dm_2"),
-    where("to","==",myName),
-    limit(50)
-  ),
-
+  query(collection(db,'dm_2'), where('to','==', localStorage.getItem('chatName_local')||'__none__'), limit(50)),
   snap=>{
-
     snap.docChanges().forEach(ch=>{
-
-      if(ch.type!=="added") return;
-
-      const d=ch.doc.data();
-
-      if(
-        dmTarget
-        &&
-        dmTarget.name===d.from
-      ){
-        return;
-      }
-
-      dmUnread[d.from]=(dmUnread[d.from]||0)+1;
-
-      addBadge('pb_dm',1);
-
+      if(ch.type !== 'added') return;
+      const d = ch.doc.data();
+      if(dmTarget && dmTarget.name === d.from) return;
+      dmUnread[d.from] = (dmUnread[d.from]||0) + 1;
+      addBadge('pb_dm', 1);
       renderDmUserList();
-
     });
-
   }
-
 );
 
-/* utils */
-
-function esc(s){
-
-  return String(s||'')
-
-  .replace(/&/g,'&amp;')
-  .replace(/</g,'&lt;')
-  .replace(/>/g,'&gt;')
-  .replace(/"/g,'&quot;')
-  .replace(/'/g,'&#39;');
-
-}
-
-function fmt(ts){
-
-  if(!ts || !ts.seconds) return '';
-
-  return new Date(ts.seconds*1000)
-  .toLocaleTimeString(
-    'ja-JP',
-    {
-      hour:'2-digit',
-      minute:'2-digit'
-    }
-  );
-
-}
-
-function safeid(s){
-
-  return String(s||'')
-  .replace(/[^a-zA-Z0-9]/g,'_');
-
-}
-
 /* 初期化 */
-
 loadAdmins();
-
-initCode();
-
 renderRooms();
-
 subscribeRoomMsgs();
-
 setMode('room');
-
+initNameUI();
+if(localStorage.getItem('chatName_local')){
+  window.initCode();
+}
 </script>
-
 </body>
 </html>
