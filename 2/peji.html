@@ -76,72 +76,6 @@ body{
 /* ━━━ SVG SPRITE ━━━ */
 svg.sprite-defs{display:none;}
 
-/* ━━━ iOS バナー通知 ━━━ */
-#iosBanner{
-  position:fixed;
-  top:8px;
-  left:50%;
-  transform:translateX(-50%) translateY(-120px);
-  width:min(340px, calc(100vw - 24px));
-  z-index:9999;
-  pointer-events:none;
-  transition:transform .45s cubic-bezier(.34,1.28,.64,1), opacity .3s;
-  opacity:0;
-}
-#iosBanner.show{
-  transform:translateX(-50%) translateY(0);
-  opacity:1;
-  pointer-events:auto;
-}
-#iosBanner.hide{
-  transform:translateX(-50%) translateY(-120px);
-  opacity:0;
-  pointer-events:none;
-  transition:transform .3s cubic-bezier(.4,0,1,1), opacity .25s;
-}
-.banner-inner{
-  background:rgba(36,36,40,.92);
-  backdrop-filter:blur(40px) saturate(200%);
-  -webkit-backdrop-filter:blur(40px) saturate(200%);
-  border:.5px solid rgba(255,255,255,.12);
-  border-radius:20px;
-  padding:11px 14px;
-  box-shadow:0 16px 48px rgba(0,0,0,.65), 0 2px 8px rgba(0,0,0,.4);
-  display:flex;align-items:center;gap:11px;
-  cursor:pointer;
-}
-.banner-icon{
-  width:36px;height:36px;
-  border-radius:8px;
-  background:linear-gradient(145deg,#1a6eff,#0a84ff);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-  box-shadow:0 2px 8px rgba(10,132,255,.4);
-}
-.banner-body{flex:1;overflow:hidden;}
-.banner-app{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px;}
-.banner-msg{font-size:13px;font-weight:500;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.banner-ts{font-size:10px;color:var(--t4);margin-top:1px;}
-.banner-close{
-  width:22px;height:22px;border-radius:50%;
-  background:rgba(255,255,255,.08);border:none;
-  color:var(--t3);cursor:pointer;font-size:12px;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:background .12s;font-family:inherit;
-}
-.banner-close:hover{background:rgba(255,255,255,.16);}
-
-/* バナー hype モード */
-#iosBanner.hype .banner-icon{
-  background:linear-gradient(145deg,#ff9f0a,#ff6b00);
-  box-shadow:0 2px 8px rgba(255,159,10,.5);
-  animation:iconPulse 1s ease infinite alternate;
-}
-@keyframes iconPulse{
-  from{box-shadow:0 2px 8px rgba(255,159,10,.4);}
-  to{box-shadow:0 4px 18px rgba(255,159,10,.8);}
-}
-
 /* ━━━ TAB BAR ━━━ */
 #tabBar{
   position:relative;z-index:60;
@@ -156,7 +90,6 @@ svg.sprite-defs{display:none;}
 }
 #tabBar::-webkit-scrollbar{display:none;}
 
-/* ★ 修正: dynTabs を横並びに */
 #dynTabs{
   display:flex;
   flex-direction:row;
@@ -210,7 +143,7 @@ svg.sprite-defs{display:none;}
 }
 #newTabBtn:hover{background:var(--fill2);color:var(--t1);}
 
-/* ━━━ タブバー右端: 通知エリア ━━━ */
+/* ━━━ タブバー右端 ━━━ */
 #tabRight{
   margin-left:auto;
   display:flex;align-items:center;gap:6px;
@@ -220,49 +153,7 @@ svg.sprite-defs{display:none;}
   flex-shrink:0;
 }
 
-/* 通知トグルボタン */
-#notifToggleBtn{
-  width:28px;height:28px;border-radius:var(--r1);
-  border:none;background:none;
-  color:var(--t3);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;font-family:inherit;
-  transition:background .12s,color .12s;
-  position:relative;
-}
-#notifToggleBtn:hover{background:var(--fill2);}
-#notifToggleBtn.notif-on{color:var(--green);}
-#notifToggleBtn.notif-off{color:var(--t4);}
-.notif-on-dot{
-  position:absolute;bottom:3px;right:3px;
-  width:5px;height:5px;border-radius:50%;
-  background:var(--green);
-  border:1px solid var(--bg);
-  display:none;
-}
-#notifToggleBtn.notif-on .notif-on-dot{display:block;}
-
-/* メールボックスボタン（通知OFFのとき） */
-#mailboxBtn{
-  display:flex;align-items:center;gap:5px;
-  height:26px;padding:0 8px;
-  border-radius:var(--r1);border:none;
-  background:none;color:var(--t3);
-  font-size:11px;font-weight:500;font-family:inherit;
-  cursor:pointer;white-space:nowrap;flex-shrink:0;
-  transition:background .12s,color .12s;
-  position:relative;
-}
-#mailboxBtn:hover{background:var(--fill2);color:var(--t1);}
-#mailboxUnread{
-  min-width:14px;height:14px;padding:0 3px;
-  background:var(--red);border-radius:7px;
-  font-size:9px;font-weight:700;color:#fff;
-  display:none;align-items:center;justify-content:center;
-}
-#mailboxUnread.on{display:flex;}
-
-/* チャット開くボタン（常時表示） */
+/* チャット開くボタン */
 #chatOpenBtn{
   width:26px;height:26px;border-radius:var(--r1);
   border:none;background:rgba(10,132,255,.12);
@@ -270,79 +161,8 @@ svg.sprite-defs{display:none;}
   display:flex;align-items:center;justify-content:center;
   flex-shrink:0;font-family:inherit;font-size:14px;
   transition:background .12s;
-  position:relative;
 }
 #chatOpenBtn:hover{background:rgba(10,132,255,.25);}
-#chatBadge{
-  position:absolute;top:-4px;right:-4px;
-  min-width:14px;height:14px;padding:0 3px;
-  background:var(--red);border-radius:7px;
-  font-size:9px;font-weight:700;color:#fff;
-  display:none;align-items:center;justify-content:center;
-}
-#chatBadge.on{display:flex;}
-
-/* ━━━ メールボックス ドロップダウン ━━━ */
-#mailboxDropdown{
-  position:fixed;
-  top:calc(var(--tabH) + 4px);
-  right:8px;
-  width:300px;
-  max-height:320px;
-  z-index:500;
-  background:rgba(36,36,40,.96);
-  backdrop-filter:blur(40px) saturate(200%);
-  -webkit-backdrop-filter:blur(40px) saturate(200%);
-  border:.5px solid rgba(255,255,255,.1);
-  border-radius:var(--r3);
-  box-shadow:0 24px 64px rgba(0,0,0,.7);
-  overflow:hidden;
-  display:none;
-  flex-direction:column;
-  animation:dropIn .2s cubic-bezier(.34,1.4,.64,1);
-}
-#mailboxDropdown.open{display:flex;}
-@keyframes dropIn{
-  from{opacity:0;transform:translateY(-12px) scale(.95);}
-  to{opacity:1;transform:translateY(0) scale(1);}
-}
-.mail-hd{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px 8px;
-  border-bottom:.5px solid var(--sep2);
-  flex-shrink:0;
-}
-.mail-hd-title{font-size:12px;font-weight:700;color:var(--t2);letter-spacing:.04em;}
-.mail-clear{
-  font-size:11px;color:var(--blue-l);
-  background:none;border:none;cursor:pointer;font-family:inherit;
-}
-.mail-list{overflow-y:auto;flex:1;scrollbar-width:none;}
-.mail-list::-webkit-scrollbar{display:none;}
-.mail-item{
-  display:flex;align-items:flex-start;gap:9px;
-  padding:9px 14px;
-  border-bottom:.5px solid var(--sep2);
-  cursor:default;
-  transition:background .1s;
-}
-.mail-item:hover{background:var(--fill3);}
-.mail-item:last-child{border-bottom:none;}
-.mail-item-icon{
-  width:28px;height:28px;border-radius:6px;
-  background:linear-gradient(145deg,#1a6eff,#0a84ff);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;font-size:13px;
-}
-.mail-item-icon.hype{background:linear-gradient(145deg,#ff9f0a,#ff6b00);}
-.mail-item-body{flex:1;overflow:hidden;}
-.mail-item-name{font-size:11px;font-weight:600;color:var(--t2);}
-.mail-item-txt{font-size:12px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.mail-item-ts{font-size:10px;color:var(--t4);margin-top:1px;}
-.mail-empty{
-  padding:28px;text-align:center;
-  font-size:12px;color:var(--t4);
-}
 
 /* ━━━ URL BAR ━━━ */
 #uBar{
@@ -475,16 +295,6 @@ svg.sprite-defs{display:none;}
   text-shadow:0 1px 5px rgba(0,0,0,.65);
   max-width:66px;
 }
-.badge{
-  position:absolute;top:-4px;right:-4px;
-  min-width:17px;height:17px;
-  background:var(--red);border-radius:9px;
-  border:2px solid var(--bg);
-  font-size:10px;font-weight:700;color:#fff;
-  display:none;align-items:center;justify-content:center;
-  padding:0 3px;z-index:10;
-}
-.badge.on{display:flex;}
 
 /* colour skins */
 .sk-blue    {background:linear-gradient(155deg,#2090ff 0%,#0055d4 100%);}
@@ -537,7 +347,6 @@ svg.sprite-defs{display:none;}
   .app-shell{width:54px;height:54px;border-radius:13px;}
   .app-grid{gap:18px 4px;}
   #chatPanel{width:calc(100vw - 28px);}
-  #mailboxDropdown{width:calc(100vw - 16px);right:8px;}
 }
 
 /* ━━━ 表示名変更モーダル ━━━ */
@@ -712,41 +521,8 @@ svg.sprite-defs{display:none;}
 <symbol id="s-chevron-r" viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
   <path d="M2 2l6 7-6 7"/>
 </symbol>
-<!-- ベル -->
-<symbol id="s-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-</symbol>
-<!-- ベルオフ -->
-<symbol id="s-bell-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-  <path d="M18.63 13A17.9 17.9 0 0 1 18 8"/>
-  <path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"/>
-  <path d="M18 8a6 6 0 0 0-9.33-5"/>
-  <line x1="1" y1="1" x2="23" y2="23"/>
-</symbol>
-<!-- メール -->
-<symbol id="s-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-  <polyline points="22,6 12,13 2,6"/>
-</symbol>
 </defs>
 </svg>
-
-<!-- ━━━ iOS バナー通知 ━━━ -->
-<div id="iosBanner">
-  <div class="banner-inner" onclick="onBannerClick()">
-    <div class="banner-icon" id="bannerIcon">
-      <svg width="18" height="18" color="#fff"><use href="#s-chat"/></svg>
-    </div>
-    <div class="banner-body">
-      <div class="banner-app">チャット通知</div>
-      <div class="banner-msg" id="bannerMsg">メッセージ</div>
-      <div class="banner-ts"  id="bannerTs"></div>
-    </div>
-    <button class="banner-close" onclick="event.stopPropagation();dismissBanner()">✕</button>
-  </div>
-</div>
 
 <!-- ━━━ TAB BAR ━━━ -->
 <div id="tabBar">
@@ -763,9 +539,8 @@ svg.sprite-defs{display:none;}
     </svg>
   </button>
 
-  <!-- 右端エリア: 通知トグル + メールボックス/ライブテキスト + チャット -->
+  <!-- 右端エリア -->
   <div id="tabRight">
-
     <!-- オンライン人数 -->
     <div id="onlineCount" style="
       display:flex;align-items:center;gap:4px;
@@ -782,43 +557,10 @@ svg.sprite-defs{display:none;}
       <span style="font-size:10px;color:rgba(48,209,88,.6);letter-spacing:.02em;">人</span>
     </div>
 
-    <!-- 通知ONOFFトグル -->
-    <button id="notifToggleBtn" class="notif-on" title="通知をON/OFFする" onclick="toggleNotif()">
-      <svg width="15" height="15"><use href="#s-bell"/></svg>
-      <div class="notif-on-dot"></div>
-    </button>
-
-    <!-- メールボックス (通知OFFのとき) -->
-    <button id="mailboxBtn" onclick="toggleMailbox()" title="通知ボックス" style="display:none;">
-      <svg width="15" height="13"><use href="#s-mail"/></svg>
-      <span id="mailboxUnread"></span>
-    </button>
-
-    <!-- 通知ライブテキスト (通知ONのとき) -->
-    <span id="liveNotifTxt" style="
-      font-size:11px;color:var(--t3);
-      max-width:150px;overflow:hidden;
-      text-overflow:ellipsis;white-space:nowrap;
-      letter-spacing:-.01em;cursor:default;
-    ">接続中...</span>
-
-    <!-- チャットを開く（常時） -->
+    <!-- チャットを開く -->
     <button id="chatOpenBtn" onclick="togglePanel()" title="チャットを開く">
       <svg width="14" height="14"><use href="#s-chat"/></svg>
-      <span id="chatBadge"></span>
     </button>
-
-  </div>
-</div>
-
-<!-- ━━━ メールボックス ドロップダウン ━━━ -->
-<div id="mailboxDropdown">
-  <div class="mail-hd">
-    <span class="mail-hd-title">📬 通知ボックス</span>
-    <button class="mail-clear" onclick="clearMailbox()">全消去</button>
-  </div>
-  <div class="mail-list" id="mailList">
-    <div class="mail-empty">通知なし</div>
   </div>
 </div>
 
@@ -1006,13 +748,11 @@ function openNameChange(){
   const myName = localStorage.getItem('accessUserName_2')||'';
   if(!myName){ alert('ログインしていません'); return; }
 
-  // 1日1回制限チェック（localStorage で日付保存）
   const today = new Date().toISOString().slice(0,10);
   const lastChange = localStorage.getItem('nameChangedDate_2')||'';
   const btn = document.getElementById('nameChangeBtn');
 
   if(lastChange === today){
-    // 制限済み：ボタンをdisabledにして終了
     btn.classList.add('disabled');
     btn.textContent = '⏳ 本日変更済み';
     return;
@@ -1030,13 +770,11 @@ function closeNameChange(){
   document.getElementById('nameChangeOverlay').classList.remove('open');
 }
 
-// 外クリックで閉じる
 document.addEventListener('click', function(e){
   const overlay = document.getElementById('nameChangeOverlay');
   if(e.target === overlay) closeNameChange();
 });
 
-// ページロード時にボタン状態を更新
 function updateNameBarUI(){
   const myName = localStorage.getItem('accessUserName_2')||'';
   const nameBarTxt = document.getElementById('nameBarTxt');
@@ -1071,186 +809,6 @@ function tick(){
 }
 tick();setInterval(tick,1000);
 updateNameBarUI();
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
-   通知 ON/OFF システム
-━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-let notifOn = (localStorage.getItem('peji_notif') !== 'off');
-let mailboxItems = JSON.parse(localStorage.getItem('peji_mailbox')||'[]');
-let mailboxOpen = false;
-let bannerTimer = null;
-
-function applyNotifMode(){
-  const btn  = document.getElementById('notifToggleBtn');
-  const mail = document.getElementById('mailboxBtn');
-  const live = document.getElementById('liveNotifTxt');
-
-  if(notifOn){
-    btn.className = 'notif-on';
-    btn.innerHTML = '<svg width="15" height="15"><use href="#s-bell"/></svg><div class="notif-on-dot"></div>';
-    btn.title = '通知ON（クリックでOFF）';
-    mail.style.display = 'none';
-    live.style.display = '';
-  } else {
-    btn.className = 'notif-off';
-    btn.innerHTML = '<svg width="15" height="15"><use href="#s-bell-off"/></svg><div class="notif-on-dot"></div>';
-    btn.title = '通知OFF（クリックでON）';
-    mail.style.display = 'flex';
-    live.style.display = 'none';
-    updateMailboxBadge();
-    closeMailbox();
-  }
-  localStorage.setItem('peji_notif', notifOn ? 'on' : 'off');
-}
-
-function toggleNotif(){
-  notifOn = !notifOn;
-  applyNotifMode();
-}
-
-/* バナー表示 */
-function showBanner(msg, isHype){
-  const el = document.getElementById('iosBanner');
-  const msgEl = document.getElementById('bannerMsg');
-  const tsEl  = document.getElementById('bannerTs');
-  const icon  = document.getElementById('bannerIcon');
-
-  msgEl.textContent = msg;
-  tsEl.textContent  = new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
-
-  if(isHype){
-    el.classList.add('hype');
-    icon.innerHTML = '🔥';
-  } else {
-    el.classList.remove('hype');
-    icon.innerHTML = '<svg width="18" height="18" color="#fff"><use href="#s-chat"/></svg>';
-  }
-
-  el.classList.remove('hide');
-  el.classList.add('show');
-
-  clearTimeout(bannerTimer);
-  bannerTimer = setTimeout(()=>dismissBanner(), 4500);
-}
-
-function dismissBanner(){
-  const el = document.getElementById('iosBanner');
-  el.classList.remove('show');
-  el.classList.add('hide');
-}
-
-function onBannerClick(){
-  dismissBanner();
-  togglePanel();
-}
-
-/* メールボックス */
-function addToMailbox(msg, isHype, senderName){
-  const item = {
-    msg, isHype, name: senderName||'',
-    ts: new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})
-  };
-  mailboxItems.unshift(item);
-  if(mailboxItems.length > 50) mailboxItems.length = 50;
-  localStorage.setItem('peji_mailbox', JSON.stringify(mailboxItems));
-  updateMailboxBadge();
-  renderMailboxList();
-}
-
-let mailboxUnreadCount = 0;
-function updateMailboxBadge(){
-  const el = document.getElementById('mailboxUnread');
-  if(mailboxUnreadCount > 0){
-    el.textContent = mailboxUnreadCount > 9 ? '9+' : String(mailboxUnreadCount);
-    el.classList.add('on');
-  } else {
-    el.textContent = '';
-    el.classList.remove('on');
-  }
-}
-
-function toggleMailbox(){
-  if(mailboxOpen) closeMailbox();
-  else openMailbox();
-}
-
-function openMailbox(){
-  mailboxOpen = true;
-  mailboxUnreadCount = 0;
-  updateMailboxBadge();
-  renderMailboxList();
-  document.getElementById('mailboxDropdown').classList.add('open');
-  setTimeout(()=>document.addEventListener('click', outsideMailboxClick), 10);
-}
-
-function closeMailbox(){
-  mailboxOpen = false;
-  document.getElementById('mailboxDropdown').classList.remove('open');
-  document.removeEventListener('click', outsideMailboxClick);
-}
-
-function outsideMailboxClick(e){
-  const dd = document.getElementById('mailboxDropdown');
-  const btn = document.getElementById('mailboxBtn');
-  if(!dd.contains(e.target) && !btn.contains(e.target)) closeMailbox();
-}
-
-function renderMailboxList(){
-  const el = document.getElementById('mailList');
-  if(!mailboxItems.length){
-    el.innerHTML = '<div class="mail-empty">通知なし</div>';
-    return;
-  }
-  el.innerHTML = mailboxItems.map(item=>`
-    <div class="mail-item">
-      <div class="mail-item-icon ${item.isHype?'hype':''}">
-        ${item.isHype ? '🔥' : '<svg width="14" height="14" color="#fff"><use href="#s-chat"/></svg>'}
-      </div>
-      <div class="mail-item-body">
-        <div class="mail-item-name">${item.name ? esc(item.name) : 'チャット'}</div>
-        <div class="mail-item-txt">${esc(item.msg)}</div>
-        <div class="mail-item-ts">${item.ts}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function clearMailbox(){
-  mailboxItems = [];
-  mailboxUnreadCount = 0;
-  localStorage.removeItem('peji_mailbox');
-  updateMailboxBadge();
-  renderMailboxList();
-}
-
-/* 通知を受け取ったときの処理 */
-function receiveNotif(msg, isHype, senderName){
-  if(notifOn){
-    showBanner(msg, isHype);
-    const lt = document.getElementById('liveNotifTxt');
-    if(isHype){
-      lt.style.color = 'var(--green)';
-      lt.textContent = msg;
-      setTimeout(()=>{ lt.style.color = ''; }, 8000);
-    } else {
-      lt.textContent = (senderName ? senderName + '：' : '') + msg;
-    }
-  } else {
-    mailboxUnreadCount++;
-    addToMailbox(msg, isHype, senderName);
-    if(mailboxOpen) openMailbox();
-  }
-
-  if(!document.getElementById('chatPanel').classList.contains('open')){
-    const b = document.getElementById('chatBadge');
-    const cur = parseInt(b.textContent||'0')||0;
-    b.textContent = Math.min(cur+1, 99);
-    b.classList.add('on');
-  }
-}
-
-renderMailboxList();
-applyNotifMode();
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
    タブシステム
@@ -1338,8 +896,6 @@ document.getElementById('newTabBtn').addEventListener('click',()=>{
 /* チャットパネル */
 function openPanel(){
   document.getElementById('chatPanel').classList.add('open');
-  const b=document.getElementById('chatBadge');
-  b.classList.remove('on');b.textContent='';
 }
 function closePanel(){document.getElementById('chatPanel').classList.remove('open');}
 function togglePanel(){
@@ -1364,7 +920,7 @@ function hidePanel(){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 
-<!-- Firebase (通知用) -->
+<!-- Firebase (オンライン人数 + 表示名変更のみ) -->
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import{getFirestore,collection,query,orderBy,limit,onSnapshot,doc,getDocs,where,updateDoc,
@@ -1399,11 +955,9 @@ window.submitNameChange = async function(){
   btn.textContent = '確認中...';
 
   try {
-    // 重複チェック
     const dupSnap = await getDocs(query(collection(db,'users'),where('name','==',newName)));
     if(!dupSnap.empty){ errEl.textContent = 'その表示名は既に使われています'; btn.disabled=false; btn.textContent='変更する'; return; }
 
-    // 自分のドキュメントを検索して更新
     const mySnap = await getDocs(query(collection(db,'users'),where('name','==',oldName)));
     if(mySnap.empty){ errEl.textContent = 'ユーザーデータが見つかりません'; btn.disabled=false; btn.textContent='変更する'; return; }
 
@@ -1416,16 +970,11 @@ window.submitNameChange = async function(){
       nameChangeHistory: (mySnap.docs[0].data().nameChangeHistory||[]).concat([{from:oldName,to:newName,date:today}]).slice(-10)
     });
 
-    // localStorage更新
     localStorage.setItem('accessUserName_2', newName);
     localStorage.setItem('nameChangedDate_2', today);
 
     closeNameChange();
-    // UIを更新
     updateNameBarUI();
-    // ライブテキストも更新
-    document.getElementById('liveNotifTxt').textContent = 'こんにちは、' + newName + 'さん';
-    showBanner('表示名を「' + newName + '」に変更しました', false);
   } catch(e) {
     errEl.textContent = 'エラー: ' + e.message;
   }
@@ -1433,15 +982,13 @@ window.submitNameChange = async function(){
   btn.textContent = '変更する';
 };
 
+/* ━━━ プレゼンス（オンライン人数）のみ ━━━ */
 const presenceId = myName + '_' + Math.random().toString(36).slice(2,7);
 const presenceRef = doc(db, "presence_2", presenceId);
 
 async function heartbeat(){
   try{
-    await setDoc(presenceRef, {
-      name: myName,
-      ts: serverTimestamp()
-    });
+    await setDoc(presenceRef, { name: myName, ts: serverTimestamp() });
   }catch(e){}
 }
 
@@ -1450,11 +997,6 @@ const hbInterval = setInterval(heartbeat, 30000);
 
 function leavePresence(){
   clearInterval(hbInterval);
-  try{
-    navigator.sendBeacon&&navigator.sendBeacon(
-      `https://firestore.googleapis.com/v1/projects/fir-66339/databases/(default)/documents/presence_2/${presenceId}?delete=true`
-    );
-  }catch(e){}
   deleteDoc(presenceRef).catch(()=>{});
 }
 window.addEventListener('beforeunload', leavePresence);
@@ -1469,6 +1011,7 @@ onSnapshot(collection(db,"presence_2"), snap=>{
   document.getElementById('onlineCnt').textContent = online.length;
 });
 
+/* ━━━ akuchat 権限チェック ━━━ */
 (async()=>{
   try{
     if(!myName)return;
@@ -1477,60 +1020,6 @@ onSnapshot(collection(db,"presence_2"), snap=>{
       document.getElementById("akuApp").style.display="";
   }catch(e){}
 })();
-
-const recentTs=[];
-let hypeShown=false;
-let hypeTimer=null;
-const HYPE_MSGS=["チャットが盛り上がっています！","みんな話してる！","今アツい💬","チャット賑わってるよ！"];
-
-function checkHype(){
-  const now=Date.now()/1000;
-  const recent=recentTs.filter(t=>now-t<60);
-  if(recent.length>=5&&!hypeShown){
-    hypeShown=true;
-    const msg=HYPE_MSGS[Math.floor(Math.random()*HYPE_MSGS.length)];
-    window.receiveNotif(msg, true, '');
-    clearTimeout(hypeTimer);
-    hypeTimer=setTimeout(()=>{hypeShown=false;},10000);
-  }
-}
-
-// 修正後
-let lastMsgTs = null;
-onSnapshot(query(collection(db,"chat_2"),orderBy("ts","desc"),limit(1)),snap=>{
-  if(snap.empty)return;
-  const l=snap.docs[0].data();
-  const msgTs = l.ts?.seconds ?? null;
-
-  if(msgTs){
-    recentTs.push(msgTs);
-    if(recentTs.length>20)recentTs.shift();
-    checkHype();
-  }
-
-  // 初回は lastMsgTs を記録するだけ（通知しない）
-  if(lastMsgTs === null){
-    lastMsgTs = msgTs;
-    return;
-  }
-
-  // 新しいメッセージかつ自分以外
-  if(msgTs !== null && msgTs !== lastMsgTs && l.name !== myName){
-    const msgText = l.name+'：'+l.text;
-    window.receiveNotif(msgText, false, l.name);
-  }
-  lastMsgTs = msgTs;
-});
-
-let lastTestTs=null;
-onSnapshot(doc(db,"config","testNotif_2"),snap=>{
-  if(!snap.exists())return;
-  const d=snap.data();
-  const ts=d.ts?.toMillis?d.ts.toMillis():(d.ts instanceof Date?d.ts.getTime():null);
-  if(!ts||ts===lastTestTs)return;
-  lastTestTs=ts;
-  window.receiveNotif(d.message||"通知", !!d.hype, '管理者');
-});
 </script>
 </body>
 </html>
