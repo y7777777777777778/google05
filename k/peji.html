@@ -87,8 +87,59 @@ svg.sprite-defs{display:none;}
   display:flex;align-items:center;
   padding:4px 10px;gap:3px;flex-shrink:0;overflow-x:auto;overflow-y:hidden;
   scrollbar-width:none;
+  transition:height .25s cubic-bezier(.4,0,.2,1), opacity .25s;
 }
 #tabBar::-webkit-scrollbar{display:none;}
+
+/* ━━━ 全画面モード ━━━ */
+body.fullscreen #tabBar,
+body.fullscreen #uBar {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  border: none;
+  padding: 0;
+}
+body.fullscreen #uBar {
+  transition: height .25s cubic-bezier(.4,0,.2,1), opacity .25s;
+}
+
+/* 全画面ボタン */
+#fullscreenBtn {
+  position: fixed;
+  bottom: 14px;
+  left: 14px;
+  z-index: 300;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: .5px solid rgba(255,255,255,.18);
+  background: rgba(28,28,30,.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--t2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s, transform .15s, opacity .2s;
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  opacity: .55;
+}
+#fullscreenBtn:hover {
+  background: rgba(44,44,46,.95);
+  color: var(--t1);
+  opacity: 1;
+  transform: scale(1.08);
+}
+body.fullscreen #fullscreenBtn {
+  opacity: .35;
+  bottom: 10px;
+  left: 10px;
+}
+body.fullscreen #fullscreenBtn:hover {
+  opacity: 1;
+}
 
 #dynTabs{
   display:flex;
@@ -220,6 +271,7 @@ svg.sprite-defs{display:none;}
   border-bottom:1px solid var(--sep);
   display:flex;align-items:center;
   padding:0 10px;gap:5px;flex-shrink:0;
+  transition:height .25s cubic-bezier(.4,0,.2,1), opacity .25s;
 }
 .ubtn{
   width:30px;height:30px;border-radius:var(--r1);
@@ -629,6 +681,19 @@ svg.sprite-defs{display:none;}
 <symbol id="s-chevron-r" viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
   <path d="M2 2l6 7-6 7"/>
 </symbol>
+<!-- 全画面アイコン -->
+<symbol id="s-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="15 3 21 3 21 9"/>
+  <polyline points="9 21 3 21 3 15"/>
+  <line x1="21" y1="3" x2="14" y2="10"/>
+  <line x1="3" y1="21" x2="10" y2="14"/>
+</symbol>
+<symbol id="s-compress" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="4 14 10 14 10 20"/>
+  <polyline points="20 10 14 10 14 4"/>
+  <line x1="10" y1="14" x2="3" y2="21"/>
+  <line x1="21" y1="3" x2="14" y2="10"/>
+</symbol>
 </defs>
 </svg>
 
@@ -749,7 +814,8 @@ svg.sprite-defs{display:none;}
           <div class="app-lbl">YouTube</div>
         </div>
 
-        <div class="app-item" onclick="openApp('https://x.gd/rirekiume','履歴埋め','s-history')">
+        <!-- 履歴埋め：別タブで開く -->
+        <div class="app-item" onclick="openNewTab('https://x.gd/rirekiume','履歴埋め')">
           <div class="app-shell sk-graphite">
             <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-history"/></svg>
           </div>
@@ -763,12 +829,15 @@ svg.sprite-defs{display:none;}
           <div class="app-lbl">共通チャット</div>
         </div>
 
-
-
       </div>
     </div>
   </div>
 </div>
+
+<!-- ━━━ 全画面ボタン ━━━ -->
+<button id="fullscreenBtn" onclick="toggleFullscreen()" title="全画面切り替え">
+  <svg width="16" height="16" id="fsIcon"><use href="#s-expand"/></svg>
+</button>
 
 <!-- ━━━ 表示名変更モーダル ━━━ -->
 <div id="nameChangeOverlay">
@@ -810,6 +879,22 @@ svg.sprite-defs{display:none;}
 
 <!-- ━━━ JS ━━━ -->
 <script>
+/* ━━━ 全画面トグル ━━━ */
+let isFullscreen = false;
+function toggleFullscreen(){
+  isFullscreen = !isFullscreen;
+  document.body.classList.toggle('fullscreen', isFullscreen);
+  const icon = document.getElementById('fsIcon');
+  icon.innerHTML = isFullscreen
+    ? '<use href="#s-compress"/>'
+    : '<use href="#s-expand"/>';
+}
+
+/* ━━━ 履歴埋め：本当の別タブで開く ━━━ */
+function openNewTab(url, title){
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 /* ━━━ 表示名変更システム ━━━ */
 function openNameChange(){
   const myName = localStorage.getItem('accessUserName_2')||'';
@@ -973,6 +1058,7 @@ document.getElementById('newTabBtn').addEventListener('click',()=>{
 document.addEventListener('keydown',e=>{
   if(e.ctrlKey&&e.key==='u'){e.preventDefault();hidePanel();}
   if(e.ctrlKey&&e.key==='w'){e.preventDefault();if(activeId!=='home'&&tabs.length)closeTab({stopPropagation:()=>{}},activeId);}
+  if(e.key==='F11'){e.preventDefault();toggleFullscreen();}
 });
 
 function hidePanel(){
