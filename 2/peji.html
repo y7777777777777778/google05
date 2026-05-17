@@ -87,8 +87,59 @@ svg.sprite-defs{display:none;}
   display:flex;align-items:center;
   padding:4px 10px;gap:3px;flex-shrink:0;overflow-x:auto;overflow-y:hidden;
   scrollbar-width:none;
+  transition:height .25s cubic-bezier(.4,0,.2,1), opacity .25s;
 }
 #tabBar::-webkit-scrollbar{display:none;}
+
+/* ━━━ 全画面モード ━━━ */
+body.fullscreen #tabBar,
+body.fullscreen #uBar {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  border: none;
+  padding: 0;
+}
+body.fullscreen #uBar {
+  transition: height .25s cubic-bezier(.4,0,.2,1), opacity .25s;
+}
+
+/* 全画面ボタン */
+#fullscreenBtn {
+  position: fixed;
+  bottom: 14px;
+  left: 14px;
+  z-index: 300;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: .5px solid rgba(255,255,255,.18);
+  background: rgba(28,28,30,.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--t2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s, transform .15s, opacity .2s;
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  opacity: .55;
+}
+#fullscreenBtn:hover {
+  background: rgba(44,44,46,.95);
+  color: var(--t1);
+  opacity: 1;
+  transform: scale(1.08);
+}
+body.fullscreen #fullscreenBtn {
+  opacity: .35;
+  bottom: 10px;
+  left: 10px;
+}
+body.fullscreen #fullscreenBtn:hover {
+  opacity: 1;
+}
 
 #dynTabs{
   display:flex;
@@ -153,16 +204,62 @@ svg.sprite-defs{display:none;}
   flex-shrink:0;
 }
 
+/* テロップエリア */
+#tickerWrap{
+  width:160px;height:26px;
+  border:.5px solid rgba(10,132,255,.25);
+  border-radius:var(--r1);
+  background:rgba(10,132,255,.06);
+  overflow:hidden;position:relative;
+  cursor:pointer;flex-shrink:0;
+}
+#tickerDot{
+  position:absolute;left:7px;top:50%;
+  transform:translateY(-50%);
+  width:5px;height:5px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 5px var(--green);
+  animation:onlinePulse 2s ease infinite;z-index:1;
+}
+#tickerInner{
+  position:absolute;left:18px;right:0;top:0;bottom:0;
+  display:flex;align-items:center;
+  overflow:hidden;
+}
+
 /* チャット開くボタン */
 #chatOpenBtn{
-  width:26px;height:26px;border-radius:var(--r1);
-  border:none;background:rgba(10,132,255,.12);
+  height:26px;padding:0 10px;border-radius:var(--r1);
+  border:.5px solid rgba(10,132,255,.3);
+  background:rgba(10,132,255,.12);
   color:var(--blue-l);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;font-family:inherit;font-size:14px;
+  display:flex;align-items:center;gap:5px;
+  flex-shrink:0;font-family:inherit;font-size:11px;font-weight:600;
+  letter-spacing:.03em;
   transition:background .12s;
+  position:relative;
 }
 #chatOpenBtn:hover{background:rgba(10,132,255,.25);}
+
+/* 未読バッジ */
+#chatUnread{
+  position:absolute;top:-5px;right:-5px;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--red);color:#fff;
+  font-size:9px;display:none;
+  align-items:center;justify-content:center;
+  font-family:inherit;font-weight:700;
+}
+#chatUnread.show{display:flex;}
+
+/* オンライン人数 */
+#onlineCount{
+  display:flex;align-items:center;gap:4px;
+  padding:0 8px;height:26px;
+  background:rgba(48,209,88,.08);
+  border:.5px solid rgba(48,209,88,.22);
+  border-radius:13px;
+  flex-shrink:0;
+}
 
 /* ━━━ URL BAR ━━━ */
 #uBar{
@@ -174,6 +271,7 @@ svg.sprite-defs{display:none;}
   border-bottom:1px solid var(--sep);
   display:flex;align-items:center;
   padding:0 10px;gap:5px;flex-shrink:0;
+  transition:height .25s cubic-bezier(.4,0,.2,1), opacity .25s;
 }
 .ubtn{
   width:30px;height:30px;border-radius:var(--r1);
@@ -314,24 +412,109 @@ svg.sprite-defs{display:none;}
 .iframe-v{flex:1;}
 .iframe-v iframe{width:100%;height:100%;border:none;display:block;background:#fff;}
 
-/* ━━━ chat panel ━━━ */
-#chatPanel{
-  position:fixed;bottom:14px;right:14px;
-  width:288px;height:368px;
+/* ━━━ チャットポップアップ ━━━ */
+#chatPopup{
+  position:fixed;
+  bottom:14px;right:14px;
+  width:300px;height:400px;
+  background:rgba(8,12,24,.97);
+  border:.5px solid rgba(10,132,255,.25);
   border-radius:var(--r4);
   z-index:200;
-  display:none;
+  display:none;flex-direction:column;
   box-shadow:0 28px 72px rgba(0,0,0,.75),0 0 0 .5px rgba(255,255,255,.04);
   overflow:hidden;transform-origin:bottom right;
 }
-#chatPanel.open{
-  display:block;
+#chatPopup.open{
+  display:flex;
   animation:panelIn .28s cubic-bezier(.34,1.56,.64,1) both;
 }
 @keyframes panelIn{
   from{opacity:0;transform:scale(.78) translateY(24px);}
   to{opacity:1;transform:scale(1) translateY(0);}
 }
+
+.popup-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;height:38px;flex-shrink:0;
+  border-bottom:.5px solid rgba(10,132,255,.2);
+}
+.popup-title{
+  font-size:11px;font-weight:700;
+  letter-spacing:.08em;color:var(--blue-l);
+  display:flex;align-items:center;gap:7px;
+}
+.popup-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 6px var(--green);
+  animation:onlinePulse 2s ease infinite;
+}
+.popup-close{
+  background:none;border:none;cursor:pointer;
+  color:var(--t3);font-size:14px;
+  padding:4px 6px;transition:color .15s;
+}
+.popup-close:hover{color:var(--red);}
+
+#chatMsgs{
+  flex:1;overflow-y:auto;
+  padding:8px 12px;display:flex;flex-direction:column;gap:4px;
+}
+#chatMsgs::-webkit-scrollbar{width:3px;}
+#chatMsgs::-webkit-scrollbar-thumb{background:rgba(10,132,255,.3);border-radius:3px;}
+
+.chat-msg{
+  display:flex;align-items:baseline;gap:6px;
+  font-size:11px;line-height:1.5;
+}
+.chat-msg-name{
+  font-size:10px;font-weight:700;
+  color:var(--blue-l);flex-shrink:0;letter-spacing:.02em;
+}
+.chat-msg-name.me{color:var(--teal);}
+.chat-msg-text{color:rgba(235,235,245,.8);word-break:break-all;flex:1;}
+.chat-msg-time{font-size:9px;color:var(--t3);flex-shrink:0;}
+
+.popup-input-row{
+  display:flex;flex-direction:column;gap:5px;
+  padding:8px 10px;
+  border-top:.5px solid rgba(10,132,255,.15);
+  flex-shrink:0;
+}
+.popup-name-row{
+  display:flex;align-items:center;gap:6px;
+}
+.popup-name-label{
+  font-size:9px;letter-spacing:.1em;color:var(--t3);
+  white-space:nowrap;text-transform:uppercase;
+}
+#chatName{
+  flex:1;
+  background:rgba(255,255,255,.05);
+  border:.5px solid var(--sep2);border-radius:var(--r1);
+  color:var(--blue-l);font-family:inherit;
+  font-size:11px;padding:4px 8px;outline:none;
+  transition:border .15s;
+}
+#chatName:focus{border-color:var(--blue);}
+.popup-msg-row{display:flex;gap:6px;}
+#chatInput{
+  flex:1;background:rgba(255,255,255,.05);
+  border:.5px solid var(--sep2);border-radius:var(--r1);
+  color:var(--t2);font-family:inherit;
+  font-size:11px;padding:6px 10px;outline:none;
+  transition:border .15s;
+}
+#chatInput:focus{border-color:var(--blue);}
+#chatInput::placeholder{color:var(--t3);}
+#chatSend{
+  font-family:inherit;font-size:10px;font-weight:700;
+  letter-spacing:.05em;padding:6px 12px;
+  border:.5px solid rgba(10,132,255,.4);border-radius:var(--r1);
+  background:rgba(10,132,255,.15);color:var(--blue-l);
+  cursor:pointer;transition:all .15s;text-transform:uppercase;
+}
+#chatSend:hover{background:rgba(10,132,255,.3);border-color:var(--blue);}
 
 @keyframes slideUp{
   from{opacity:0;transform:translateY(20px);}
@@ -346,7 +529,7 @@ svg.sprite-defs{display:none;}
 @media(max-width:390px){
   .app-shell{width:54px;height:54px;border-radius:13px;}
   .app-grid{gap:18px 4px;}
-  #chatPanel{width:calc(100vw - 28px);}
+  #chatPopup{width:calc(100vw - 28px);}
 }
 
 /* ━━━ 表示名変更モーダル ━━━ */
@@ -370,19 +553,10 @@ svg.sprite-defs{display:none;}
   from{opacity:0;transform:scale(.88) translateY(16px);}
   to{opacity:1;transform:scale(1) translateY(0);}
 }
-#nameChangeBox h3{
-  font-size:16px;font-weight:700;color:var(--t1);
-  margin-bottom:6px;letter-spacing:-.01em;
-}
-#nameChangeBox p{
-  font-size:12px;color:var(--t3);margin-bottom:18px;line-height:1.5;
-}
-#nameChangeBox .nc-current{
-  font-size:11px;color:var(--t3);margin-bottom:14px;
-}
-#nameChangeBox .nc-current strong{
-  color:var(--blue-l);font-weight:600;
-}
+#nameChangeBox h3{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px;letter-spacing:-.01em;}
+#nameChangeBox p{font-size:12px;color:var(--t3);margin-bottom:18px;line-height:1.5;}
+#nameChangeBox .nc-current{font-size:11px;color:var(--t3);margin-bottom:14px;}
+#nameChangeBox .nc-current strong{color:var(--blue-l);font-weight:600;}
 #nameChangeInput{
   width:100%;padding:11px 14px;
   background:rgba(255,255,255,.07);
@@ -392,17 +566,9 @@ svg.sprite-defs{display:none;}
   outline:none;transition:border .15s,box-shadow .15s;
   margin-bottom:8px;
 }
-#nameChangeInput:focus{
-  border-color:var(--blue);
-  box-shadow:0 0 0 3px rgba(10,132,255,.2);
-}
-#nameChangeErr{
-  font-size:11px;color:var(--red);min-height:16px;
-  margin-bottom:14px;padding-left:2px;
-}
-#nameChangeBox .nc-btns{
-  display:flex;gap:8px;justify-content:flex-end;
-}
+#nameChangeInput:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(10,132,255,.2);}
+#nameChangeErr{font-size:11px;color:var(--red);min-height:16px;margin-bottom:14px;padding-left:2px;}
+#nameChangeBox .nc-btns{display:flex;gap:8px;justify-content:flex-end;}
 .nc-btn-cancel{
   padding:9px 18px;border-radius:var(--r1);
   border:.5px solid var(--sep);background:none;
@@ -420,10 +586,7 @@ svg.sprite-defs{display:none;}
 .nc-btn-submit:disabled{background:rgba(10,132,255,.35);cursor:not-allowed;}
 
 /* ホーム画面の名前表示エリア */
-.name-bar{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  margin-top:-12px;margin-bottom:8px;
-}
+.name-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:-12px;margin-bottom:8px;}
 .name-bar-txt{font-size:13px;color:var(--t2);font-weight:400;}
 .name-change-btn{
   display:inline-flex;align-items:center;gap:4px;
@@ -431,13 +594,17 @@ svg.sprite-defs{display:none;}
   border:.5px solid rgba(64,156,255,.35);
   background:rgba(10,132,255,.1);
   color:var(--blue-l);font-size:11px;font-weight:500;
-  cursor:pointer;font-family:inherit;
-  transition:background .12s;
+  cursor:pointer;font-family:inherit;transition:background .12s;
 }
 .name-change-btn:hover{background:rgba(10,132,255,.2);}
-.name-change-btn.disabled{
-  border-color:var(--sep2);background:none;
-  color:var(--t4);cursor:default;
+.name-change-btn.disabled{border-color:var(--sep2);background:none;color:var(--t4);cursor:default;}
+
+/* ticker text style */
+.ticker-text{
+  font-size:11px;color:var(--blue-l);white-space:nowrap;
+  position:absolute;left:0;top:50%;
+  transform:translateY(-50%);
+  will-change:transform;font-weight:500;
 }
 </style>
 </head>
@@ -496,13 +663,6 @@ svg.sprite-defs{display:none;}
   <path d="M3.51 15a9 9 0 1 0 .49-4.93"/>
   <polyline points="12 7 12 12 15 15"/>
 </symbol>
-<symbol id="s-board" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="2" y="3" width="20" height="14" rx="2"/>
-  <line x1="8" y1="21" x2="16" y2="21"/>
-  <line x1="12" y1="17" x2="12" y2="21"/>
-  <line x1="7" y1="9" x2="17" y2="9"/>
-  <line x1="7" y1="13" x2="13" y2="13"/>
-</symbol>
 <symbol id="s-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
   <line x1="18" y1="6" x2="6" y2="18"/>
   <line x1="6" y1="6" x2="18" y2="18"/>
@@ -520,6 +680,19 @@ svg.sprite-defs{display:none;}
 </symbol>
 <symbol id="s-chevron-r" viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
   <path d="M2 2l6 7-6 7"/>
+</symbol>
+<!-- 全画面アイコン -->
+<symbol id="s-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="15 3 21 3 21 9"/>
+  <polyline points="9 21 3 21 3 15"/>
+  <line x1="21" y1="3" x2="14" y2="10"/>
+  <line x1="3" y1="21" x2="10" y2="14"/>
+</symbol>
+<symbol id="s-compress" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="4 14 10 14 10 20"/>
+  <polyline points="20 10 14 10 14 4"/>
+  <line x1="10" y1="14" x2="3" y2="21"/>
+  <line x1="21" y1="3" x2="14" y2="10"/>
 </symbol>
 </defs>
 </svg>
@@ -541,25 +714,24 @@ svg.sprite-defs{display:none;}
 
   <!-- 右端エリア -->
   <div id="tabRight">
+    <!-- テロップ -->
+    <div id="tickerWrap" onclick="openChatPopup()" title="チャットを開く">
+      <div id="tickerDot"></div>
+      <div id="tickerInner"></div>
+    </div>
+
     <!-- オンライン人数 -->
-    <div id="onlineCount" style="
-      display:flex;align-items:center;gap:4px;
-      padding:0 8px;height:26px;
-      background:rgba(48,209,88,.08);
-      border:.5px solid rgba(48,209,88,.22);
-      border-radius:13px;
-      flex-shrink:0;
-    ">
-      <span style="width:6px;height:6px;border-radius:50%;background:var(--green);
-        display:inline-block;flex-shrink:0;
-        animation:onlinePulse 2s ease infinite;"></span>
+    <div id="onlineCount">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0;animation:onlinePulse 2s ease infinite;"></span>
       <span id="onlineCnt" style="font-size:11px;font-weight:700;color:var(--green);letter-spacing:.02em;">…</span>
       <span style="font-size:10px;color:rgba(48,209,88,.6);letter-spacing:.02em;">人</span>
     </div>
 
     <!-- チャットを開く -->
-    <button id="chatOpenBtn" onclick="togglePanel()" title="チャットを開く">
-      <svg width="14" height="14"><use href="#s-chat"/></svg>
+    <button id="chatOpenBtn" onclick="openChatPopup()" title="チャットを開く">
+      <svg width="13" height="13"><use href="#s-chat"/></svg>
+      CHAT
+      <span id="chatUnread">0</span>
     </button>
   </div>
 </div>
@@ -614,7 +786,7 @@ svg.sprite-defs{display:none;}
           <div class="app-lbl">ゲーム</div>
         </div>
 
-        <div class="app-item" onclick="openApp('https://google-one-red.vercel.app/purokisi.html','プロキシ','s-shuffle')">
+        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/proxy/','プロキシ','s-shuffle')">
           <div class="app-shell sk-orange">
             <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
           </div>
@@ -635,13 +807,6 @@ svg.sprite-defs{display:none;}
           <div class="app-lbl">YTダウンロード</div>
         </div>
 
-        <div class="app-item" onclick="openApp('https://script.google.com/macros/s/AKfycbzZr6_OlbryeiykIF5KDlPXlT8M5UEdRyietdS9jMsHfqCeeGOcG1H-VO3RZd5CW7bn/exec','6ch','s-board')">
-          <div class="app-shell sk-teal">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-board"/></svg>
-          </div>
-          <div class="app-lbl">6ch</div>
-        </div>
-
         <div class="app-item" onclick="openApp('https://script.google.com/macros/s/AKfycbyvrK__4OqTvTCXmX8u3Q4qtNKw7iEPunnli6xxFbU9GN8381Yas2f0vPd6PLxHlHLX/exec','YouTube','s-play')">
           <div class="app-shell sk-wine">
             <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-play"/></svg>
@@ -649,7 +814,8 @@ svg.sprite-defs{display:none;}
           <div class="app-lbl">YouTube</div>
         </div>
 
-        <div class="app-item" onclick="openApp('https://x.gd/rirekiume','履歴埋め','s-history')">
+        <!-- 履歴埋め：別タブで開く -->
+        <div class="app-item" onclick="openNewTab('https://x.gd/rirekiume','履歴埋め')">
           <div class="app-shell sk-graphite">
             <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-history"/></svg>
           </div>
@@ -663,61 +829,15 @@ svg.sprite-defs{display:none;}
           <div class="app-lbl">共通チャット</div>
         </div>
 
-        <div class="app-item" onclick="openApp('https://kiuytgfcvbnkiuy.vercel.app/','プロキシ1','s-shuffle')">
-          <div class="app-shell sk-purple">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
-          </div>
-          <div class="app-lbl">プロキシ1</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://min-tube-ver-1-4-2.vercel.app/','プロキシ2','s-shuffle')">
-          <div class="app-shell sk-purple">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
-          </div>
-          <div class="app-lbl">プロキシ2</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/proxy/','プロキシ3','s-shuffle')">
-          <div class="app-shell sk-purple">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
-          </div>
-          <div class="app-lbl">プロキシ3</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/nautilus-os','Nautilus OS','s-shuffle')">
-          <div class="app-shell sk-teal">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
-          </div>
-          <div class="app-lbl">Nautilus OS</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/helios','Helios','s-shuffle')">
-          <div class="app-shell sk-gold">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
-          </div>
-          <div class="app-lbl">Helios</div>
-        </div>
-
-        <div class="app-item" onclick="openApp('https://proxy-gamma-one-61.vercel.app/gust','Gust','s-shuffle')">
-          <div class="app-shell sk-slate">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-shuffle"/></svg>
-          </div>
-          <div class="app-lbl">Gust</div>
-        </div>
-
-        <!-- akuchat（権限制） -->
-        <div class="app-item" id="akuApp" style="display:none"
-             onclick="openApp('../akuchat.html','共通チャット','s-chat')">
-          <div class="app-shell sk-indigo">
-            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-chat"/></svg>
-          </div>
-          <div class="app-lbl">共通チャット</div>
-        </div>
-
       </div>
     </div>
   </div>
 </div>
+
+<!-- ━━━ 全画面ボタン ━━━ -->
+<button id="fullscreenBtn" onclick="toggleFullscreen()" title="全画面切り替え">
+  <svg width="16" height="16" id="fsIcon"><use href="#s-expand"/></svg>
+</button>
 
 <!-- ━━━ 表示名変更モーダル ━━━ -->
 <div id="nameChangeOverlay">
@@ -734,30 +854,59 @@ svg.sprite-defs{display:none;}
   </div>
 </div>
 
-<!-- ━━━ CHAT PANEL (floating) ━━━ -->
-<div id="chatPanel">
-  <iframe id="chatFrame" src="chat.html"
-    style="width:100%;height:100%;border:none;border-radius:var(--r4);display:block;"
-    allow="same-origin scripts"></iframe>
+<!-- ━━━ チャットポップアップ ━━━ -->
+<div id="chatPopup">
+  <div class="popup-header">
+    <div class="popup-title">
+      <div class="popup-dot"></div>
+      LIVE CHAT
+    </div>
+    <button class="popup-close" onclick="closeChatPopup()">✕</button>
+  </div>
+  <div id="chatMsgs"></div>
+  <div class="popup-input-row">
+    <div class="popup-name-row">
+      <span class="popup-name-label">NAME:</span>
+      <input id="chatName" placeholder="名無し" maxlength="20">
+    </div>
+    <div style="font-size:9px;color:var(--t3);letter-spacing:.05em;padding:0 2px;">⚠ 本名は使用しないでください</div>
+    <div class="popup-msg-row">
+      <input id="chatInput" placeholder="メッセージ..." maxlength="100">
+      <button id="chatSend">SEND</button>
+    </div>
+  </div>
 </div>
 
 <!-- ━━━ JS ━━━ -->
 <script>
+/* ━━━ 全画面トグル ━━━ */
+let isFullscreen = false;
+function toggleFullscreen(){
+  isFullscreen = !isFullscreen;
+  document.body.classList.toggle('fullscreen', isFullscreen);
+  const icon = document.getElementById('fsIcon');
+  icon.innerHTML = isFullscreen
+    ? '<use href="#s-compress"/>'
+    : '<use href="#s-expand"/>';
+}
+
+/* ━━━ 履歴埋め：本当の別タブで開く ━━━ */
+function openNewTab(url, title){
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 /* ━━━ 表示名変更システム ━━━ */
 function openNameChange(){
   const myName = localStorage.getItem('accessUserName_2')||'';
   if(!myName){ alert('ログインしていません'); return; }
-
   const today = new Date().toISOString().slice(0,10);
   const lastChange = localStorage.getItem('nameChangedDate_2')||'';
   const btn = document.getElementById('nameChangeBtn');
-
   if(lastChange === today){
     btn.classList.add('disabled');
     btn.textContent = '⏳ 本日変更済み';
     return;
   }
-
   document.getElementById('ncCurrentName').textContent = myName;
   document.getElementById('nameChangeInput').value = '';
   document.getElementById('nameChangeErr').textContent = '';
@@ -780,7 +929,6 @@ function updateNameBarUI(){
   const nameBarTxt = document.getElementById('nameBarTxt');
   const btn = document.getElementById('nameChangeBtn');
   if(!nameBarTxt || !btn) return;
-
   if(myName){
     nameBarTxt.textContent = 'こんにちは、' + myName + 'さん';
     const today = new Date().toISOString().slice(0,10);
@@ -810,9 +958,22 @@ function tick(){
 tick();setInterval(tick,1000);
 updateNameBarUI();
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━
-   タブシステム
-━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━ チャットポップアップ開閉 ━━━ */
+function openChatPopup(){
+  document.getElementById('chatPopup').classList.add('open');
+  const badge = document.getElementById('chatUnread');
+  badge.classList.remove('show');
+  badge.textContent = '0';
+  setTimeout(()=>{
+    const n = document.getElementById('chatName');
+    if(!n.value.trim()){ n.focus(); } else { document.getElementById('chatInput').focus(); }
+  }, 100);
+}
+function closeChatPopup(){
+  document.getElementById('chatPopup').classList.remove('open');
+}
+
+/* ━━━ タブシステム ━━━ */
 let tabs=[],activeId='home',cnt=0;
 
 function switchTab(id){
@@ -893,19 +1054,11 @@ document.getElementById('newTabBtn').addEventListener('click',()=>{
   openApp(full,full.replace(/^https?:\/\//,'').split('/')[0],'s-globe');
 });
 
-/* チャットパネル */
-function openPanel(){
-  document.getElementById('chatPanel').classList.add('open');
-}
-function closePanel(){document.getElementById('chatPanel').classList.remove('open');}
-function togglePanel(){
-  document.getElementById('chatPanel').classList.contains('open')?closePanel():openPanel();
-}
-
 /* keyboard */
 document.addEventListener('keydown',e=>{
   if(e.ctrlKey&&e.key==='u'){e.preventDefault();hidePanel();}
   if(e.ctrlKey&&e.key==='w'){e.preventDefault();if(activeId!=='home'&&tabs.length)closeTab({stopPropagation:()=>{}},activeId);}
+  if(e.key==='F11'){e.preventDefault();toggleFullscreen();}
 });
 
 function hidePanel(){
@@ -920,11 +1073,11 @@ function hidePanel(){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 
-<!-- Firebase (オンライン人数 + 表示名変更のみ) -->
+<!-- Firebase -->
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import{getFirestore,collection,query,orderBy,limit,onSnapshot,doc,getDocs,where,updateDoc,
-  setDoc,deleteDoc,serverTimestamp}
+import{getFirestore,collection,query,orderBy,limit,onSnapshot,doc,getDocs,getDoc,where,
+  updateDoc,setDoc,deleteDoc,addDoc,serverTimestamp}
   from"https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const db=getFirestore(initializeApp({
@@ -934,7 +1087,7 @@ const db=getFirestore(initializeApp({
   storageBucket:"fir-66339.firebasestorage.app",
   messagingSenderId:"876017617963",
   appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
-},"peji_notif"));
+},"peji_main"));
 
 const myName=localStorage.getItem("accessUserName_2")||"";
 
@@ -945,69 +1098,41 @@ window.submitNameChange = async function(){
   const input = document.getElementById('nameChangeInput');
   const newName = input.value.trim();
   const oldName = localStorage.getItem('accessUserName_2')||'';
-
   errEl.textContent = '';
   if(!newName){ errEl.textContent = '表示名を入力してください'; return; }
   if(newName === oldName){ errEl.textContent = '現在と同じ名前です'; return; }
   if(newName.length > 20){ errEl.textContent = '20文字以内で入力してください'; return; }
-
-  btn.disabled = true;
-  btn.textContent = '確認中...';
-
+  btn.disabled = true; btn.textContent = '確認中...';
   try {
     const dupSnap = await getDocs(query(collection(db,'users'),where('name','==',newName)));
     if(!dupSnap.empty){ errEl.textContent = 'その表示名は既に使われています'; btn.disabled=false; btn.textContent='変更する'; return; }
-
     const mySnap = await getDocs(query(collection(db,'users'),where('name','==',oldName)));
     if(mySnap.empty){ errEl.textContent = 'ユーザーデータが見つかりません'; btn.disabled=false; btn.textContent='変更する'; return; }
-
     const myDocId = mySnap.docs[0].id;
     const today = new Date().toISOString().slice(0,10);
-
     await updateDoc(doc(db,'users',myDocId),{
-      name: newName,
-      nameChangedAt: today,
+      name: newName, nameChangedAt: today,
       nameChangeHistory: (mySnap.docs[0].data().nameChangeHistory||[]).concat([{from:oldName,to:newName,date:today}]).slice(-10)
     });
-
     localStorage.setItem('accessUserName_2', newName);
     localStorage.setItem('nameChangedDate_2', today);
-
-    closeNameChange();
-    updateNameBarUI();
-  } catch(e) {
-    errEl.textContent = 'エラー: ' + e.message;
-  }
-  btn.disabled = false;
-  btn.textContent = '変更する';
+    closeNameChange(); updateNameBarUI();
+  } catch(e) { errEl.textContent = 'エラー: ' + e.message; }
+  btn.disabled = false; btn.textContent = '変更する';
 };
 
-/* ━━━ プレゼンス（オンライン人数）のみ ━━━ */
+/* ━━━ プレゼンス（オンライン人数） ━━━ */
 const presenceId = myName + '_' + Math.random().toString(36).slice(2,7);
 const presenceRef = doc(db, "presence_2", presenceId);
-
-async function heartbeat(){
-  try{
-    await setDoc(presenceRef, { name: myName, ts: serverTimestamp() });
-  }catch(e){}
-}
-
+async function heartbeat(){ try{ await setDoc(presenceRef, { name: myName, ts: serverTimestamp() }); }catch(e){} }
 heartbeat();
 const hbInterval = setInterval(heartbeat, 30000);
-
-function leavePresence(){
-  clearInterval(hbInterval);
-  deleteDoc(presenceRef).catch(()=>{});
-}
+function leavePresence(){ clearInterval(hbInterval); deleteDoc(presenceRef).catch(()=>{}); }
 window.addEventListener('beforeunload', leavePresence);
 window.addEventListener('pagehide', leavePresence);
-
 onSnapshot(collection(db,"presence_2"), snap=>{
   const fiveMinAgo = Date.now()/1000 - 300;
-  const online = snap.docs.filter(d=>{
-    const ts = d.data().ts?.seconds;
-    return ts && ts > fiveMinAgo;
-  });
+  const online = snap.docs.filter(d=>{ const ts=d.data().ts?.seconds; return ts && ts > fiveMinAgo; });
   document.getElementById('onlineCnt').textContent = online.length;
 });
 
@@ -1020,6 +1145,166 @@ onSnapshot(collection(db,"presence_2"), snap=>{
       document.getElementById("akuApp").style.display="";
   }catch(e){}
 })();
+
+/* ━━━ チャット（chat_2 コレクション） ━━━ */
+const savedChatName = localStorage.getItem("chatName") || (myName || "名無し");
+const chatNameEl = document.getElementById('chatName');
+chatNameEl.value = savedChatName;
+chatNameEl.addEventListener('change', ()=>{
+  const n = chatNameEl.value.trim();
+  if(n) localStorage.setItem("chatName", n);
+});
+
+function getChatName(){ return chatNameEl.value.trim() || savedChatName; }
+
+function escHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* NGワード監視 */
+let ngWordsList = [];
+onSnapshot(doc(db,"config","ngWords"), snap=>{
+  ngWordsList = snap.exists() ? (snap.data().words||[]) : [];
+});
+
+/* コマンド監視 */
+let commandsList = [];
+onSnapshot(doc(db,"config","commands"), snap=>{
+  if(snap.exists()){ const d=snap.data(); commandsList=d.list||d.commands||[]; }
+  else { commandsList=[]; }
+});
+
+/* チャット設定（閉鎖・BAN・tickerSpeed）監視 */
+let tickerSpeed = 15;
+onSnapshot(doc(db,"config","chatSettings_2"), snap=>{
+  if(!snap.exists())return;
+  const data=snap.data();
+  if(data.tickerSpeed) tickerSpeed=data.tickerSpeed;
+  const inputEl=document.getElementById('chatInput');
+  const sendEl=document.getElementById('chatSend');
+  const nEl=document.getElementById('chatName');
+  if(data.closed){
+    inputEl.disabled=true; sendEl.disabled=true; nEl.disabled=true;
+    inputEl.placeholder='【チャット閉鎖中】'; inputEl.style.color='#ffb300';
+  } else {
+    if(!inputEl.style.color||inputEl.style.color==='rgb(255, 179, 0)'){
+      inputEl.disabled=false; sendEl.disabled=false; nEl.disabled=false;
+      inputEl.placeholder='メッセージ...'; inputEl.style.color='';
+    }
+  }
+  const banned=data.banned||[];
+  if(banned.includes(getChatName())){
+    inputEl.disabled=true; sendEl.disabled=true;
+    inputEl.placeholder='【BANされています】'; inputEl.style.color='var(--red)';
+  }
+});
+
+/* 送信 */
+async function sendMsg(){
+  const input=document.getElementById('chatInput');
+  const text=input.value.trim();
+  if(!text)return;
+
+  // コマンド判定
+  if(text.startsWith('/')){
+    const cmdKey=text.slice(1).toLowerCase().trim();
+    let latestCmds=commandsList;
+    try{ const snap=await getDoc(doc(db,'config','commands')); if(snap.exists()){const d=snap.data();latestCmds=d.list||d.commands||[];} }catch(e){}
+    const cmd=latestCmds.find(c=>c.key&&c.key.toLowerCase()===cmdKey);
+    if(cmd){
+      input.value='';
+      try{ await addDoc(collection(db,"chat_2"),{name:cmd.name||'BOT',text:cmd.message||cmd.text||'',ts:serverTimestamp()}); }catch(e){}
+      return;
+    } else {
+      input.value=''; input.style.borderColor='#ffb300'; input.style.color='#ffb300';
+      input.placeholder='⚠ /'+cmdKey+' は未登録';
+      setTimeout(()=>{ input.style.borderColor=''; input.style.color=''; input.placeholder='メッセージ...'; },3000);
+      return;
+    }
+  }
+
+  // NGワード
+  const hitNg=ngWordsList.find(w=>text.toLowerCase().includes(w.toLowerCase()));
+  if(hitNg){
+    input.value=''; input.style.borderColor='var(--red)'; input.style.color='var(--red)';
+    input.placeholder='⚠ NGワードが含まれています';
+    setTimeout(()=>{ input.style.borderColor=''; input.style.color=''; input.placeholder='メッセージ...'; },2500);
+    return;
+  }
+
+  input.value='';
+  try{ await addDoc(collection(db,"chat_2"),{name:getChatName(),text:text,ts:serverTimestamp()}); }catch(e){}
+}
+
+document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg();});
+document.getElementById('chatSend').addEventListener('click',sendMsg);
+
+/* ━━━ テロップシステム ━━━ */
+const tickerInner=document.getElementById('tickerInner');
+const tickerItems=[];
+let tickerRAF=null;
+let tickerWrapW=0;
+
+function getTickerW(){ return tickerInner.parentElement ? tickerInner.parentElement.offsetWidth : 200; }
+
+function tickerLoop(){
+  tickerWrapW=getTickerW();
+  const pxPerFrame=(tickerWrapW+600)/(tickerSpeed*60);
+  for(let i=tickerItems.length-1;i>=0;i--){
+    const item=tickerItems[i];
+    item.x-=pxPerFrame;
+    item.el.style.transform='translateX('+item.x+'px) translateY(-50%)';
+    if(item.x+item.el.offsetWidth<-10){ item.el.remove(); tickerItems.splice(i,1); }
+  }
+  if(tickerItems.length>0){ tickerRAF=requestAnimationFrame(tickerLoop); }
+  else { tickerRAF=null; }
+}
+
+function launchTicker(text, delayX=0){
+  const span=document.createElement('span');
+  span.className='ticker-text';
+  span.textContent=text;
+  tickerInner.appendChild(span);
+  tickerWrapW=getTickerW();
+  const startX=tickerWrapW+delayX;
+  span.style.transform='translateX('+startX+'px) translateY(-50%)';
+  tickerItems.push({el:span,x:startX});
+  if(!tickerRAF) tickerRAF=requestAnimationFrame(tickerLoop);
+}
+
+/* リアルタイム受信 */
+let lastCount=0, unread=0;
+const msgsEl=document.getElementById('chatMsgs');
+const q2=query(collection(db,"chat_2"),orderBy("ts","desc"),limit(50));
+onSnapshot(q2, snap=>{
+  const msgs=[];
+  snap.forEach(d=>msgs.push({id:d.id,...d.data()}));
+  msgs.reverse();
+
+  msgsEl.innerHTML=msgs.map(m=>{
+    const isMe=m.name===getChatName();
+    const time=m.ts?new Date(m.ts.seconds*1000).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'';
+    return '<div class="chat-msg">'
+      +'<span class="chat-msg-name'+(isMe?' me':'')+'">' +escHtml(m.name)+'</span>'
+      +'<span class="chat-msg-text">'+escHtml(m.text)+'</span>'
+      +'<span class="chat-msg-time">'+time+'</span>'
+      +'</div>';
+  }).join('');
+  msgsEl.scrollTop=msgsEl.scrollHeight;
+
+  if(msgs.length>lastCount&&lastCount!==0){
+    const newMsgs=msgs.slice(lastCount);
+    newMsgs.forEach((m,i)=>{ launchTicker(m.name+': '+m.text, i*240); });
+    const popup=document.getElementById('chatPopup');
+    if(!popup.classList.contains('open')){
+      unread+=newMsgs.length;
+      const badge=document.getElementById('chatUnread');
+      badge.textContent=unread>9?'9+':unread;
+      badge.classList.add('show');
+    }
+  }
+  lastCount=msgs.length;
+});
 </script>
 </body>
 </html>
