@@ -44,7 +44,10 @@
   .chat-msg-name.bot { color: var(--green); }
   .chat-msg-text { color: #d4f0ec; word-break: break-all; flex: 1; font-size: 13px; }
   .chat-msg-time { font-size: 10px; color: var(--dim); flex-shrink: 0; }
-  .chat-msg-group { font-size: 9px; letter-spacing: .08em; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; }
+
+  /* グループバッジ: グループ文字 + 4桁番号 */
+  .chat-msg-group { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; letter-spacing: .06em; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; }
+  .chat-msg-group .grp-num { font-size: 9px; opacity: 0.75; letter-spacing: .04em; }
   .chat-msg-group.k  { background: rgba(0,255,231,0.1); color: var(--accent); border: 1px solid rgba(0,255,231,0.2); }
   .chat-msg-group.g2 { background: rgba(255,179,0,0.1); color: var(--amber); border: 1px solid rgba(255,179,0,0.2); }
 
@@ -56,7 +59,7 @@
   .send-btn:hover { background: rgba(0,255,231,0.15); border-color: var(--accent); }
   .send-btn:disabled { opacity: .3; cursor: not-allowed; }
 
-  /* モーダル共通 */
+  /* モーダル */
   .modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
   .modal.open { display: flex; }
   .modal-box { background: #0a1020; border: 1px solid var(--border2); border-radius: 10px; padding: 32px; width: 340px; max-width: 90vw; text-align: center; }
@@ -67,7 +70,6 @@
   .modal-box .err { font-size: 11px; color: var(--red); margin: -8px 0 10px; }
   .modal-box button { width: 100%; padding: 11px; border-radius: 6px; border: 1px solid rgba(0,255,231,0.4); background: rgba(0,255,231,0.08); color: var(--accent); font-family: var(--mono); font-size: 12px; letter-spacing: .1em; cursor: pointer; text-transform: uppercase; transition: all .15s; }
   .modal-box button:hover { background: rgba(0,255,231,0.18); }
-  .modal-box button:disabled { opacity: .4; cursor: not-allowed; }
 
   /* アクセス拒否画面 */
   #blockedScreen { display: none; position: fixed; inset: 0; z-index: 200; background: var(--bg); justify-content: center; align-items: center; flex-direction: column; gap: 16px; }
@@ -102,10 +104,10 @@
 <div id="nameModal" class="modal open">
   <div class="modal-box">
     <h3>NAME SET</h3>
-    <p>申請時に登録した名前を入力してください。<br>許可されていないと入れません。</p>
+    <p>チャットで使う名前を入力してください。</p>
     <input id="nameInput" placeholder="名前を入力..." maxlength="20">
     <div class="err" id="nameErr"></div>
-    <button id="nameBtn" onclick="submitName()">確認して入室</button>
+    <button id="nameBtn" onclick="submitName()">入室</button>
   </div>
 </div>
 
@@ -119,7 +121,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
   import { getFirestore, collection, addDoc, query, orderBy, limit,
-           onSnapshot, serverTimestamp, getDocs, where, getDoc, doc }
+           onSnapshot, serverTimestamp, getDoc, doc }
     from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -137,61 +139,20 @@
 
   let myName  = "";
   let myGroup = "k";
+  let myNum   = "";   // 4桁番号
 
-  // ── ユーザー情報をFirestoreから取得 ──
-  async function fetchUser(name) {
-    const snap = await getDocs(query(collection(db, "users"), where("name", "==", name)));
-    if (snap.empty) return null;
-    return snap.docs[0].data();
-  }
-
-  // ── 名前入力して入室 ──
-  window.submitName = async function() {
+  // ── 名前入力して入室（Firestore認証なし）──
+  window.submitName = function() {
     const input = document.getElementById("nameInput");
-    const btn   = document.getElementById("nameBtn");
     const err   = document.getElementById("nameErr");
     const name  = input.value.trim();
     if (!name) { err.textContent = "名前を入力してください"; return; }
 
-    btn.disabled = true;
-    btn.textContent = "確認中...";
-    err.textContent = "";
-
-    try {
-      // アク禁チェック（全員）
-      const banSnap = await getDoc(doc(db, "config", "banList"));
-      if (banSnap.exists()) {
-        if (banSnap.data().allBanned) { showBlocked("全員アクセス停止中です", ""); return; }
-        if ((banSnap.data().names || []).includes(name)) { showBlocked("アクセスが停止されています", name); return; }
-      }
-
-      // ユーザー確認
-      const user = await fetchUser(name);
-      if (!user) {
-        err.textContent = "その名前は登録されていません";
-        btn.disabled = false; btn.textContent = "確認して入室";
-        return;
-      }
-      if (user.status === "ng") { showBlocked("アクセスが拒否されています", name); return; }
-      if (user.status === "wait") {
-        err.textContent = "まだ承認待ちです。管理者の許可をお待ちください。";
-        btn.disabled = false; btn.textContent = "確認して入室";
-        return;
-      }
-
-      // status === "ok" → 入室
-      myName  = name;
-      myGroup = user.group || "k";
-      localStorage.setItem("chatName_all", name);
-      document.getElementById("nameModal").classList.remove("open");
-      document.getElementById("myNameDisp").textContent = name;
-      startChat();
-
-    } catch(e) {
-      err.textContent = "エラーが発生しました。再度お試しください。";
-      btn.disabled = false; btn.textContent = "確認して入室";
-      console.error(e);
-    }
+    myName = name;
+    localStorage.setItem("chatName_all", name);
+    document.getElementById("nameModal").classList.remove("open");
+    document.getElementById("myNameDisp").textContent = name;
+    startChat();
   };
 
   document.getElementById("nameInput").addEventListener("keydown", e => {
@@ -204,7 +165,7 @@
     document.getElementById("blockedScreen").classList.add("show");
   }
 
-  // キャッシュされた名前があれば自動ログイン試行
+  // キャッシュされた名前があれば自動ログイン
   const cached = localStorage.getItem("chatName_all");
   if (cached) {
     document.getElementById("nameInput").value = cached;
@@ -217,20 +178,8 @@
     document.getElementById("chatInput").focus();
   }
 
-  // ── リアルタイム監視：アク禁・拒否を即反映 ──
+  // ── リアルタイム監視：アク禁・閉鎖を反映 ──
   function startRealtimeCheck() {
-    // usersのstatusを監視
-    const userQuery = query(collection(db, "users"), where("name", "==", myName));
-    onSnapshot(userQuery, snap => {
-      if (snap.empty) return;
-      const data = snap.docs[0].data();
-      if (data.status === "ng") {
-        localStorage.removeItem("chatName_all");
-        showBlocked("アクセスが拒否されました", myName);
-      }
-    });
-
-    // banListを監視
     onSnapshot(doc(db, "config", "banList"), snap => {
       if (!snap.exists()) return;
       const data = snap.data();
@@ -239,14 +188,12 @@
         showBlocked("全員アクセス停止中です", "");
         return;
       }
-      const names = data.names || [];
-      if (names.includes(myName)) {
+      if ((data.names || []).includes(myName)) {
         localStorage.removeItem("chatName_all");
         showBlocked("アクセスが停止されました", myName);
       }
     });
 
-    // chatSettings_allの閉鎖を監視
     onSnapshot(doc(db, "config", "chatSettings_all"), snap => {
       if (!snap.exists()) return;
       const input = document.getElementById("chatInput");
@@ -260,7 +207,6 @@
         input.placeholder = "メッセージを入力...";
         btn.disabled = false;
       }
-      // BANチェック
       const banned = snap.data().banned || [];
       if (banned.includes(myName)) {
         localStorage.removeItem("chatName_all");
@@ -281,6 +227,7 @@
         name:  myName,
         text:  text,
         group: myGroup,
+        num:   myNum,
         ts:    serverTimestamp()
       });
     } catch(e) { console.error(e); }
@@ -304,12 +251,14 @@
         const isBot    = m.name === "SYSTEM";
         const grpClass = m.group === "2" ? "g2" : "k";
         const grpLabel = m.group || "k";
+        // 4桁番号：メッセージにnumフィールドがあれば表示
+        const numPart  = m.num ? '<span class="grp-num">#' + esc(m.num) + '</span>' : '';
         const time     = m.ts
           ? new Date(m.ts.seconds * 1000).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })
           : "";
         return '<div class="chat-msg">' +
           '<span class="chat-msg-name' + (isMe ? ' me' : isBot ? ' bot' : '') + '">' + esc(m.name) + '</span>' +
-          '<span class="chat-msg-group ' + grpClass + '">' + esc(grpLabel) + '</span>' +
+          '<span class="chat-msg-group ' + grpClass + '">' + esc(grpLabel) + numPart + '</span>' +
           '<span class="chat-msg-text">' + esc(m.text) + '</span>' +
           '<span class="chat-msg-time">' + time + '</span>' +
           '</div>';
