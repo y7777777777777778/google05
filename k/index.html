@@ -148,7 +148,7 @@
     border: 1px solid #dfe1e5; border-radius: 8px;
     font-size: 15px; outline: none;
     transition: border 0.15s, box-shadow 0.15s;
-    margin-bottom: 18px;
+    margin-bottom: 12px;
   }
   #nameModal input:focus {
     border-color: #1a73e8;
@@ -251,8 +251,15 @@
 <div id="overlay">
   <div id="nameModal">
     <h2>名前を入力してください</h2>
-    <p>アクセス申請のためにあなたの名前が必要です。<br>管理者が承認するとアクセスできます。</p>
-    <input type="text" id="nameInput" placeholder="例: 山田 太郎" maxlength="30">
+    <p>アクセス申請のために名前が必要です。<br>管理者が承認するとアクセスできます。</p>
+    <input type="text" id="realNameInput" placeholder="本名（例: 山田 太郎）" maxlength="30">
+    <div style="position:relative;">
+      <input type="number" id="classInput" placeholder="組（数字のみ）" min="1" max="9"
+        style="width:100%;padding:12px 16px;border:1px solid #dfe1e5;border-radius:8px;font-size:15px;outline:none;transition:border 0.15s,box-shadow 0.15s;margin-bottom:12px;-moz-appearance:textfield;"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2)">
+      <span style="position:absolute;right:14px;top:50%;transform:translateY(-65%);color:#70757a;font-size:14px;pointer-events:none;">組</span>
+    </div>
+    <input type="text" id="nameInput" placeholder="表示名（例: たろう）" maxlength="20">
     <div class="modal-btns">
       <button class="btn-cancel" id="cancelBtn">キャンセル</button>
       <button class="btn-submit" id="submitBtn">申請する</button>
@@ -266,7 +273,7 @@
 <!-- ========== Firebase SDK ========== -->
 <script type="module">
   import { initializeApp }          from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, onSnapshot }
+  import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, deleteDoc, onSnapshot }
                                     from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -281,7 +288,7 @@
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
-  // グループk用 ── ここがk/2の違い
+  // グループk用
   const MY_GROUP        = 'k';
   const KIYAKU_KEY      = 'kiyaku_agreed_k';
   const NAME_KEY        = 'accessUserName_k';
@@ -294,10 +301,33 @@
     const savedName = localStorage.getItem(NAME_KEY);
     if (!savedName) return;
 
-    // usersドキュメントを監視（status: ng になったら即追い出す）
+    // resetフラグのdoc名を生成
+    const flagKey = "reset_" + savedName.replace(/[^a-zA-Z0-9\u3000-\u9fff\u30A0-\u30FF\u3040-\u309F]/g, "_");
+
+    // usersドキュメントを監視
     const userQuery = query(collection(db, "users"), where("name", "==", savedName));
-    onSnapshot(userQuery, snap => {
-      if (snap.empty) return;
+    onSnapshot(userQuery, async snap => {
+      if (snap.empty) {
+        try {
+          const flagSnap = await getDoc(doc(db, "config", flagKey));
+          if (flagSnap.exists() && flagSnap.data().autoOk === true) {
+            localStorage.removeItem(NAME_KEY);
+            localStorage.removeItem(STATUS_KEY);
+            document.getElementById("hiddenFrame").style.display = "none";
+            sessionStorage.setItem("autoOk_pending", "1");
+            document.getElementById("overlay").classList.add("active");
+            setTimeout(() => {
+              const ri = document.getElementById("realNameInput");
+              if (ri) ri.focus();
+            }, 100);
+            return;
+          }
+        } catch(e) {}
+        localStorage.removeItem(NAME_KEY);
+        localStorage.removeItem(STATUS_KEY);
+        location.replace("https://www.google.com");
+        return;
+      }
       const data = snap.docs[0].data();
       if (data.status === "ng") {
         localStorage.removeItem(NAME_KEY);
@@ -312,7 +342,7 @@
       }
     });
 
-    // banListを監視（アク禁リストに追加されたら即追い出す）
+    // banListを監視
     onSnapshot(doc(db, "config", "banList"), snap => {
       if (!snap.exists()) return;
       const data = snap.data();
@@ -365,10 +395,20 @@
     return !snap.empty;
   }
 
-  async function registerUser(name) {
-    const publicMode = await isPublicMode();
+  async function registerUser(name, realName, className) {
+    const autoOk = sessionStorage.getItem("autoOk_pending") === "1";
+    const publicMode = autoOk ? true : await isPublicMode();
+    if (autoOk) {
+      try {
+        const flagKey = "reset_" + name.replace(/[^a-zA-Z0-9\u3000-\u9fff\u30A0-\u30FF\u3040-\u309F]/g, "_");
+        await deleteDoc(doc(db, "config", flagKey));
+      } catch(e) {}
+      sessionStorage.removeItem("autoOk_pending");
+    }
     await addDoc(collection(db, "users"), {
       name:      name,
+      realName:  realName,
+      class:     className,
       status:    publicMode ? "ok" : "wait",
       group:     MY_GROUP,
       createdAt: new Date()
@@ -376,49 +416,38 @@
     return publicMode;
   }
 
-  // ── FirestoreからユーザーのpageModeを取得してURLを決定 ──
-  async function loadUserPageMode(name) {
-    try {
-      const q    = query(collection(db, "users"), where("name", "==", name));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        const mode = snap.docs[0].data().pageMode || "peji";
-        // pageModeは将来の拡張用（現在はpeji.htmlのみ）
-      }
-    } catch(e) {}
-  }
-
   function openModal() {
+    document.getElementById("realNameInput").value = "";
+    document.getElementById("classInput").value = "";
     nameInput.value = "";
     nameInput.style.borderColor = "";
+    document.getElementById("realNameInput").style.borderColor = "";
+    document.getElementById("classInput").style.borderColor = "";
     const errMsg = document.getElementById("nameErrMsg");
     if (errMsg) errMsg.textContent = "";
     overlay.classList.add("active");
-    setTimeout(() => nameInput.focus(), 100);
+    setTimeout(() => document.getElementById("realNameInput").focus(), 100);
   }
   function closeModal() {
     overlay.classList.remove("active");
   }
 
-  // ユーザーごとの表示先URL
   let pejiLoaded  = false;
   let currentUrl  = PEJI_URL;
 
-  // 管理者かどうかをFirestoreで確認してURLを決定
   async function resolveDestUrl(name) {
     try {
       const q    = query(collection(db, "users"), where("name", "==", name));
       const snap = await getDocs(q);
       if (!snap.empty && snap.docs[0].data().isAdmin === true) {
-        return 'pej.html'; // 管理者はpej.htmlへ
+        return 'pej.html';
       }
     } catch(e) {}
-    return PEJI_URL; // 通常ユーザーはpeji.html
+    return PEJI_URL;
   }
 
   function openPeji(url) {
     const dest = url || PEJI_URL;
-    // 利用規約同意チェック
     if (localStorage.getItem(KIYAKU_KEY) !== '1') {
       hiddenFrame.src = KIYAKU_URL;
       pejiLoaded = false;
@@ -448,37 +477,53 @@
       return;
     }
 
-    // キャッシュで即判定
-    const cachedStatus = localStorage.getItem(STATUS_KEY);
-    if (cachedStatus === "ok") {
-      const dest = await resolveDestUrl(savedName);
-      openPeji(dest);
-      getUserStatus(savedName).then(s => {
-        if (s && s !== "ok") localStorage.setItem(STATUS_KEY, s);
-      }).catch(() => {});
-      return;
-    }
-
-    // Firestoreで確認
     try {
       const status = await getUserStatus(savedName);
-      if (status) localStorage.setItem(STATUS_KEY, status);
-      if (status === "ok") {
-        const dest = await resolveDestUrl(savedName);
-        openPeji(dest);
-      } else if (!status) {
+      if (!status) {
         localStorage.removeItem(NAME_KEY);
         localStorage.removeItem(STATUS_KEY);
+        hiddenFrame.src = "";
+        pejiLoaded = false;
         openModal();
+        return;
+      }
+      localStorage.setItem(STATUS_KEY, status);
+      if (status === "ok") {
+        const dest = await resolveDestUrl(savedName);
+        pejiLoaded = false;
+        hiddenFrame.src = "";
+        openPeji(dest);
+      } else if (status === "wait") {
+        showToast("⏳ まだ承認待ちです");
+      } else if (status === "ng") {
+        localStorage.removeItem(NAME_KEY);
+        localStorage.removeItem(STATUS_KEY);
+        hiddenFrame.src = "";
+        pejiLoaded = false;
       }
     } catch (err) {
       console.error("Firestore エラー:", err);
+      showToast("通信エラー。再度お試しください。");
     }
   });
 
-  // 申請ボタン
   submitBtn.addEventListener("click", async function() {
-    const name = nameInput.value.trim();
+    const realName = document.getElementById("realNameInput").value.trim();
+    const className = (document.getElementById("classInput").value.trim()) + "組";
+    const name     = nameInput.value.trim();
+
+    if (!realName) {
+      document.getElementById("realNameInput").focus();
+      document.getElementById("realNameInput").style.borderColor = "#ea4335";
+      setTimeout(() => { document.getElementById("realNameInput").style.borderColor = ""; }, 1500);
+      return;
+    }
+    if (!document.getElementById("classInput").value.trim()) {
+      document.getElementById("classInput").focus();
+      document.getElementById("classInput").style.borderColor = "#ea4335";
+      setTimeout(() => { document.getElementById("classInput").style.borderColor = ""; }, 1500);
+      return;
+    }
     if (!name) {
       nameInput.focus();
       nameInput.style.borderColor = "#ea4335";
@@ -499,14 +544,14 @@
         if (!errMsg) {
           errMsg = document.createElement("p");
           errMsg.id = "nameErrMsg";
-          errMsg.style.cssText = "color:#ea4335;font-size:12px;margin:-10px 0 10px;text-align:left;";
+          errMsg.style.cssText = "color:#ea4335;font-size:12px;margin:-8px 0 8px;text-align:left;";
           nameInput.parentNode.insertBefore(errMsg, nameInput.nextSibling);
         }
-        errMsg.textContent = "その名前は既に使われています。別の名前にしてください。";
+        errMsg.textContent = "その表示名は既に使われています。別の表示名にしてください。";
         nameInput.focus();
         return;
       }
-      const isPublic = await registerUser(name);
+      const isPublic = await registerUser(name, realName, className);
       localStorage.setItem(NAME_KEY,   name);
       localStorage.setItem(STATUS_KEY, isPublic ? "ok" : "wait");
       closeModal();
