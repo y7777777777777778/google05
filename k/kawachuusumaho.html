@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>管理画面 Lite [グループk]</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:         #0f1117;
+    --surface:    #1a1d27;
+    --surface2:   #22263a;
+    --border:     #2e3354;
+    --text:       #e8eaf6;
+    --text-muted: #8b92b8;
+    --ok:         #00e676;
+    --wait:       #ffb300;
+    --ng:         #ff5252;
+    --accent:     #5c6bc0;
+    --accent2:    #7986cb;
+    --gap: 12px;
+    --pad: 14px;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', 'Consolas', monospace;
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* ===== ヘッダー ===== */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 var(--pad);
+    display: flex;
+    align-items: center;
+    height: 54px;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .header-icon {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  header h1 { font-size: 13px; font-weight: 700; letter-spacing: .08em; }
+  header .subtitle { font-size: 10px; color: var(--text-muted); }
+
+  /* ===== ステータスカード ===== */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 8px;
+    padding: var(--pad);
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .stat-card .stat-num { font-size: 22px; font-weight: 700; }
+  .stat-card .stat-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; }
+  .stat-card.total .stat-num { color: var(--accent2); }
+  .stat-card.ok    .stat-num { color: var(--ok); }
+  .stat-card.wait  .stat-num { color: var(--wait); }
+  .stat-card.ng    .stat-num { color: var(--ng); }
+
+  /* ===== パネル共通 ===== */
+  .panel {
+    margin: 0 var(--pad) var(--gap);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .panel-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .panel-left { display: flex; align-items: center; gap: 10px; }
+  .panel-icon { font-size: 18px; flex-shrink:0; }
+  .panel-title { font-size: 13px; font-weight: 700; }
+  .panel-desc  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ===== トグル ===== */
+  .toggle-switch {
+    position: relative; display: inline-block;
+    width: 48px; height: 26px; flex-shrink: 0; cursor: pointer;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 26px; transition: .25s;
+  }
+  .toggle-slider::before {
+    content: "";
+    position: absolute;
+    width: 18px; height: 18px;
+    left: 3px; top: 3px;
+    background: var(--text-muted);
+    border-radius: 50%; transition: .25s;
+  }
+  .toggle-switch input:checked + .toggle-slider { background: rgba(0,230,118,.2); border-color: var(--ok); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(22px); background: var(--ok); }
+
+  /* ===== 一般公開 ===== */
+  .public-panel { transition: border .2s, background .2s; }
+  .public-panel.active { border-color: var(--ok); background: rgba(0,230,118,.05); }
+
+  /* ===== アク禁 ===== */
+  .ban-panel-wrap { margin: 0 var(--pad) var(--gap); }
+  .ban-header {
+    background: rgba(255,68,102,.05);
+    border: 1px solid rgba(255,68,102,.25);
+    border-radius: 10px 10px 0 0;
+    padding: 12px 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .ban-header.all-banned { background: rgba(255,68,102,.12); border-color: rgba(255,68,102,.5); }
+  .ban-body {
+    background: var(--surface);
+    border: 1px solid rgba(255,68,102,.2);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    padding: 10px 12px;
+  }
+  .ban-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 24px; }
+  .ban-tag {
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(255,68,102,.1); border: 1px solid rgba(255,68,102,.3);
+    border-radius: 20px; padding: 4px 10px; font-size: 12px; color: #ff6680;
+  }
+  .ban-tag button {
+    background: none; border: none; cursor: pointer;
+    color: rgba(255,68,102,.6); font-size: 14px; line-height: 1; padding: 0;
+  }
+  .ban-add-row { display: flex; gap: 8px; }
+  .ban-add-row input {
+    flex: 1; padding: 9px 12px; border-radius: 6px;
+    border: 1px solid rgba(255,68,102,.3);
+    background: rgba(255,68,102,.05);
+    color: var(--text); font-size: 14px; outline: none; font-family: inherit;
+  }
+  .ban-add-row input:focus { border-color: #ff4466; }
+
+  /* ===== ボタン共通 ===== */
+  .btn {
+    padding: 7px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: inherit; border: 1px solid transparent;
+    transition: all .15s; white-space: nowrap;
+  }
+  .btn:disabled { opacity: .35; cursor: not-allowed; }
+  .btn-ok  { background: rgba(0,230,118,.12); border-color: rgba(0,230,118,.35); color: var(--ok); }
+  .btn-ok:hover:not(:disabled)  { background: rgba(0,230,118,.25); }
+  .btn-ng  { background: rgba(255,179,0,.10); border-color: rgba(255,179,0,.35); color: var(--wait); }
+  .btn-ng:hover:not(:disabled)  { background: rgba(255,179,0,.22); }
+  .btn-del {
+    background: rgba(255,82,82,.10); border-color: rgba(255,82,82,.3); color: var(--ng);
+    width: 34px; height: 34px; padding: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+    flex-shrink: 0;
+  }
+  .btn-red {
+    padding: 8px 14px; border-radius: 6px;
+    border: 1px solid rgba(255,68,102,.4);
+    background: rgba(255,68,102,.08);
+    color: #ff4466; font-size: 12px; cursor: pointer;
+    font-family: inherit; font-weight: 600; transition: all .15s; white-space: nowrap;
+  }
+  .btn-red.active { background: rgba(255,68,102,.25); border-color: #ff4466; color: #fff; }
+  .danger-btn {
+    padding: 9px 16px; border-radius: 6px;
+    border: 1px solid rgba(255,82,82,.4);
+    background: rgba(255,82,82,.08);
+    color: var(--ng); font-size: 13px; cursor: pointer;
+    font-family: inherit; font-weight: 600; transition: all .15s;
+    display: flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .danger-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* ===== チャット管理グリッド ===== */
+  .chat-grid {
+    margin: 0 var(--pad) var(--gap);
+    display: flex; flex-direction: column; gap: var(--gap);
+  }
+  .chat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px;
+  }
+  .chat-card-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  }
+  .cc-icon { font-size: 18px; }
+  .cc-title { font-size: 13px; font-weight: 700; }
+  .cc-desc  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* 部屋・NGワード タグ */
+  .tag-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 26px; }
+  .room-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(92,107,192,.1); border: 1px solid rgba(92,107,192,.25);
+    border-radius: 16px; padding: 4px 10px; font-size: 12px; color: var(--accent2);
+  }
+  .room-tag.fixed { background: rgba(92,107,192,.15); }
+  .room-tag button {
+    background: none; border: none; cursor: pointer;
+    color: rgba(121,134,203,.6); font-size: 13px; line-height: 1; padding: 0;
+  }
+  .ng-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(255,82,82,.1); border: 1px solid rgba(255,82,82,.25);
+    border-radius: 16px; padding: 4px 10px; font-size: 12px; color: var(--ng);
+  }
+  .ng-tag button {
+    background: none; border: none; cursor: pointer;
+    color: rgba(255,82,82,.5); font-size: 13px; line-height: 1; padding: 0;
+  }
+  .add-row { display: flex; gap: 8px; }
+  .add-row input {
+    flex: 1; padding: 9px 12px; border-radius: 6px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,.04);
+    color: var(--text); font-size: 14px; outline: none; font-family: inherit;
+    transition: border .15s;
+    min-width: 0;
+  }
+  .add-row input:focus { border-color: var(--accent2); }
+  .add-row input.ng-input { border-color: rgba(255,82,82,.3); background: rgba(255,82,82,.05); }
+  .btn-add-room {
+    padding: 9px 12px; border-radius: 6px;
+    border: 1px solid rgba(92,107,192,.4);
+    background: rgba(92,107,192,.1); color: var(--accent2);
+    font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 600;
+    white-space: nowrap;
+  }
+  .btn-add-ng {
+    padding: 9px 12px; border-radius: 6px;
+    border: 1px solid rgba(255,82,82,.4);
+    background: rgba(255,82,82,.1); color: var(--ng);
+    font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* チャット閉鎖カード：横並び */
+  .chat-card-close {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  /* ===== チャット全削除パネル ===== */
+  .delete-panel {
+    margin: 0 var(--pad) var(--gap);
+    background: rgba(255,82,82,.05);
+    border: 1px solid rgba(255,82,82,.25);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+
+  /* ===== ツールバー ===== */
+  .toolbar {
+    padding: 0 var(--pad) var(--gap);
+    display: flex; gap: 8px;
+  }
+  .search-wrap { position: relative; flex: 1; }
+  .search-wrap input {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    padding: 10px 12px 10px 34px; font-size: 14px; font-family: inherit;
+    width: 100%; outline: none; transition: border .15s;
+  }
+  .search-wrap input:focus { border-color: var(--accent2); }
+  .search-wrap::before {
+    content: "🔍";
+    position: absolute; left: 10px; top: 50%;
+    transform: translateY(-50%); font-size: 13px; pointer-events: none;
+  }
+  .refresh-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text-muted);
+    padding: 10px 12px; font-size: 13px; cursor: pointer; font-family: inherit;
+    white-space: nowrap;
+  }
+
+  /* ===== ユーザーカードリスト（スマホ用） ===== */
+  .user-list {
+    margin: 0 var(--pad) 28px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .user-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    transition: background .12s;
+  }
+  .user-card.admin-card {
+    background: linear-gradient(135deg, rgba(255,200,0,.07), var(--surface));
+    border-color: rgba(255,200,0,.3);
+    border-left: 3px solid #ffc800;
+  }
+
+  /* カード上部：アバター + 名前 + ステータス */
+  .uc-top {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .user-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .user-avatar.admin-av { background: #b8860b; border: 1.5px solid #ffd700; }
+  .uc-names { flex: 1; min-width: 0; }
+  .uc-display { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .uc-real { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; flex-shrink: 0;
+  }
+  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
+  .badge-ok   { background: rgba(0,230,118,.12); color: var(--ok);   border: 1px solid rgba(0,230,118,.3); }
+  .badge-ok::before   { background: var(--ok); }
+  .badge-wait { background: rgba(255,179,0,.12); color: var(--wait); border: 1px solid rgba(255,179,0,.3); }
+  .badge-wait::before { background: var(--wait); animation: blink 1.4s infinite; }
+  .badge-ng   { background: rgba(255,82,82,.12);  color: var(--ng);   border: 1px solid rgba(255,82,82,.3); }
+  .badge-ng::before   { background: var(--ng); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* カード詳細行（アコーディオン） */
+  .uc-actions-main {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .uc-expand-btn {
+    background: none; border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text-muted);
+    padding: 6px 10px; font-size: 11px; cursor: pointer;
+    font-family: inherit; transition: all .15s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .uc-expand-btn.open { border-color: var(--accent2); color: var(--accent2); }
+
+  .uc-detail {
+    display: none; margin-top: 10px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+  .uc-detail.open { display: block; }
+
+  .uc-detail-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;
+  }
+  .uc-detail-label {
+    font-size: 10px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .06em; min-width: 56px;
+  }
+  .uc-detail-row input {
+    flex: 1; min-width: 0;
+    padding: 7px 10px; border-radius: 5px; border: 1px solid var(--border);
+    background: rgba(255,255,255,.05); color: var(--text);
+    font-size: 13px; outline: none; font-family: inherit; transition: border .15s;
+  }
+  .uc-detail-row input:focus { border-color: var(--accent2); }
+  .uc-detail-row .small-btn {
+    padding: 7px 10px; border-radius: 5px; font-size: 11px; font-weight: 600;
+    cursor: pointer; border: 1px solid transparent; font-family: inherit;
+    white-space: nowrap;
+  }
+  .btn-save { border-color: rgba(92,107,192,.4); color: var(--accent2); background: rgba(92,107,192,.1); }
+  .btn-unlock { border-color: rgba(0,230,118,.3); color: var(--ok); background: rgba(0,230,118,.08); }
+
+  .uc-flags {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .flag-btn {
+    padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--border);
+    background: rgba(255,255,255,.04); color: var(--text-muted);
+    font-family: inherit; transition: all .15s;
+  }
+  .flag-btn.on-admin { border-color: rgba(255,200,0,.4); color: #ffd700; background: rgba(255,200,0,.1); }
+  .flag-btn.on-akuchat { border-color: rgba(0,230,118,.35); color: var(--ok); background: rgba(0,230,118,.1); }
+
+  .uc-namechange-info {
+    font-size: 11px; color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ローディング */
+  .loading-card {
+    text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  }
+  .spinner {
+    display: inline-block; width: 26px; height: 26px;
+    border: 3px solid var(--border); border-top-color: var(--accent2);
+    border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== トースト ===== */
+  #toast {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 20px; border-radius: 8px;
+    font-size: 13px; opacity: 0; transition: opacity .25s, transform .25s;
+    z-index: 100; pointer-events: none; white-space: nowrap;
+    max-width: calc(100vw - 32px);
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ===== 確認ダイアログ ===== */
+  #confirmOverlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.7); z-index: 200;
+    justify-content: center; align-items: flex-end;
+    padding: 16px;
+  }
+  #confirmOverlay.active { display: flex; }
+  #confirmBox {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 20px; width: 100%; max-width: 400px;
+    text-align: center; animation: slideUp .2s ease;
+    margin: 0 auto;
+  }
+  @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+  #confirmBox h3 { font-size: 15px; margin-bottom: 10px; color: var(--ng); }
+  #confirmBox p  { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.6; }
+  .confirm-btns { display: flex; gap: 10px; }
+  .btn-confirm-cancel {
+    flex: 1; padding: 12px; border-radius: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+  .btn-confirm-ok {
+    flex: 1; padding: 12px; border-radius: 8px;
+    background: rgba(255,82,82,.18); border: 1px solid var(--ng);
+    color: var(--ng); font-size: 14px; cursor: pointer; font-family: inherit; font-weight: 700;
+  }
+
+  /* ===== PC向け（768px以上でテーブル表示） ===== */
+  .user-list  { display: flex; }
+  .table-wrap { display: none; }
+
+  @media (min-width: 768px) {
+    :root { --pad: 28px; --gap: 14px; }
+
+    .stats-bar { grid-template-columns: repeat(4,auto); justify-content: start; gap: 16px; }
+    .stat-card { padding: 14px 22px; align-items: flex-start; }
+    .stat-card .stat-num { font-size: 26px; }
+    .stat-card .stat-label { font-size: 11px; }
+
+    .chat-grid { flex-direction: row; flex-wrap: wrap; }
+    .chat-card { flex: 1; min-width: 220px; }
+
+    .user-list  { display: none; }
+    .table-wrap {
+      display: block;
+      margin: 0 var(--pad) 28px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
+    thead th {
+      padding: 12px 16px; text-align: left;
+      font-size: 11px; letter-spacing: .1em;
+      color: var(--text-muted); text-transform: uppercase; font-weight: 600;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td { padding: 12px 16px; vertical-align: middle; }
+    .user-name { display: flex; align-items: center; gap: 10px; }
+    .user-name-text { font-weight: 500; }
+    .action-btns { display: flex; gap: 6px; align-items: center; }
+    .loading-row td, .empty-row td {
+      text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<header>
+  <div class="header-icon">🔐</div>
+  <div>
+    <h1>KANRI LITE</h1>
+    <span class="subtitle">簡易管理画面｜グループk</span>
+  </div>
+</header>
+
+<!-- ステータス -->
+<div class="stats-bar">
+  <div class="stat-card total"><span class="stat-num" id="countTotal">-</span><span class="stat-label">Total</span></div>
+  <div class="stat-card ok">  <span class="stat-num" id="countOk">-</span>  <span class="stat-label">許可</span></div>
+  <div class="stat-card wait"><span class="stat-num" id="countWait">-</span><span class="stat-label">待機中</span></div>
+  <div class="stat-card ng">  <span class="stat-num" id="countNg">-</span>  <span class="stat-label">拒否</span></div>
+</div>
+
+<!-- 一般公開モード -->
+<div class="panel public-panel" id="publicModeBar">
+  <div class="panel-row">
+    <div class="panel-left">
+      <span class="panel-icon">🌐</span>
+      <div>
+        <div class="panel-title">一般公開モード</div>
+        <div class="panel-desc" id="publicModeDesc">OFF：申請者は管理者の許可が必要です</div>
+      </div>
+    </div>
+    <label class="toggle-switch">
+      <input type="checkbox" id="publicModeToggle">
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+</div>
+
+<!-- アク禁 -->
+<div class="ban-panel-wrap">
+  <div class="ban-header" id="banHeader">
+    <div class="panel-left">
+      <span class="panel-icon">🚫</span>
+      <div>
+        <div class="panel-title">アク禁管理</div>
+        <div class="panel-desc" id="banPanelDesc">読み込み中...</div>
+      </div>
+    </div>
+    <button class="btn-red" id="banAllBtn" onclick="toggleAllBan()">全員アク禁</button>
+  </div>
+  <div class="ban-body">
+    <div class="ban-tags" id="banTags"></div>
+    <div class="ban-add-row">
+      <input type="text" id="banNameInput" placeholder="アク禁するユーザー名..." inputmode="text">
+      <button class="btn-red" onclick="addBanName()">+ 追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- チャット管理 -->
+<div class="chat-grid">
+
+  <!-- 部屋管理 -->
+  <div class="chat-card">
+    <div class="chat-card-head">
+      <span class="cc-icon">💬</span>
+      <div>
+        <div class="cc-title">チャット部屋管理</div>
+        <div class="cc-desc">部屋の追加・削除（全体は固定）</div>
+      </div>
+    </div>
+    <div class="tag-wrap" id="roomTagsWrap"><span style="font-size:12px;color:var(--text-muted);">読み込み中...</span></div>
+    <div class="add-row">
+      <input type="text" id="newRoomInput" placeholder="部屋名を入力..." maxlength="20" inputmode="text">
+      <button class="btn-add-room" onclick="addRoom()">+ 追加</button>
+    </div>
+  </div>
+
+  <!-- チャット閉鎖 -->
+  <div class="chat-card chat-card-close">
+    <div class="chat-card-head" style="margin-bottom:0;">
+      <span class="cc-icon">🔒</span>
+      <div>
+        <div class="cc-title">チャット閉鎖</div>
+        <div class="cc-desc" id="chatCloseDesc">読み込み中...</div>
+      </div>
+    </div>
+    <label class="toggle-switch">
+      <input type="checkbox" id="chatCloseToggle">
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+
+  <!-- NGワード -->
+  <div class="chat-card">
+    <div class="chat-card-head">
+      <span class="cc-icon">🚫</span>
+      <div>
+        <div class="cc-title">NGワード</div>
+        <div class="cc-desc">chat.htmlのメッセージをフィルタ</div>
+      </div>
+    </div>
+    <div class="tag-wrap" id="ngWordTags"><span style="font-size:12px;color:var(--text-muted);">読み込み中...</span></div>
+    <div class="add-row">
+      <input type="text" id="ngWordInput" placeholder="NGワードを追加..." maxlength="30" class="ng-input" inputmode="text">
+      <button class="btn-add-ng" onclick="addNgWord()">+ 追加</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- チャット全削除 -->
+<div class="delete-panel">
+  <div class="panel-left">
+    <span style="font-size:18px;">🗑️</span>
+    <div>
+      <div class="panel-title">チャット全削除</div>
+      <div class="panel-desc">chat_k コレクションを全消去</div>
+    </div>
+  </div>
+  <button class="danger-btn" id="deleteChatBtn" onclick="confirmDeleteChat()">🗑 全削除</button>
+</div>
+
+<!-- ツールバー -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="名前で絞り込み..." inputmode="search">
+  </div>
+  <button class="refresh-btn" id="refreshBtn">🔄 更新</button>
+</div>
+
+<!-- ===== スマホ：ユーザーカードリスト ===== -->
+<div class="user-list" id="userCardList">
+  <div class="loading-card"><div class="spinner"></div><br>読み込み中...</div>
+</div>
+
+<!-- ===== PC：ユーザーテーブル ===== -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:12%">本名</th>
+        <th style="width:15%">表示名</th>
+        <th style="width:9%">Status</th>
+        <th style="width:11%">クラス名</th>
+        <th style="width:8%">管理者</th>
+        <th style="width:8%">芥chat</th>
+        <th style="width:13%">名前変更</th>
+        <th style="width:24%">操作</th>
+      </tr>
+    </thead>
+    <tbody id="userTableBody">
+      <tr class="loading-row">
+        <td colspan="8"><div class="spinner"></div><br>読み込み中...</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="toast"></div>
+
+<div id="confirmOverlay">
+  <div id="confirmBox">
+    <h3 id="confirmTitle">⚠ 削除しますか？</h3>
+    <p id="confirmMsg">この操作は取り消せません。</p>
+    <div class="confirm-btns">
+      <button class="btn-confirm-cancel" id="confirmCancelBtn">キャンセル</button>
+      <button class="btn-confirm-ok" id="confirmOkBtn">削除する</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import {
+    getFirestore, collection, getDocs, doc, updateDoc,
+    deleteDoc, query, where, orderBy, setDoc, getDoc, onSnapshot, writeBatch
+  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
+    authDomain:        "fir-66339.firebaseapp.com",
+    projectId:         "fir-66339",
+    storageBucket:     "fir-66339.firebasestorage.app",
+    messagingSenderId: "876017617963",
+    appId:             "1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+  const MY_GROUP = 'k';
+
+  const cardList       = document.getElementById("userCardList");
+  const tbody          = document.getElementById("userTableBody");
+  const searchInput    = document.getElementById("searchInput");
+  const toast          = document.getElementById("toast");
+  const confirmOverlay = document.getElementById("confirmOverlay");
+  const confirmTitle   = document.getElementById("confirmTitle");
+  const confirmMsg     = document.getElementById("confirmMsg");
+  const confirmOkBtn   = document.getElementById("confirmOkBtn");
+  const confirmCancelBtn = document.getElementById("confirmCancelBtn");
+
+  let allUsers = [];
+  let pendingDeleteId = null;
+  let confirmCallback = null;
+
+  function showToast(msg, d=3000) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(()=>toast.classList.remove("show"), d);
+  }
+
+  function openConfirm(title, msg, okLabel, cb) {
+    confirmTitle.textContent = title;
+    confirmMsg.innerHTML = msg;
+    confirmOkBtn.textContent = okLabel || "削除する";
+    confirmCallback = cb;
+    pendingDeleteId = null;
+    confirmOverlay.classList.add("active");
+  }
+
+  confirmOkBtn.addEventListener("click", async ()=>{
+    confirmOverlay.classList.remove("active");
+    if (confirmCallback) { await confirmCallback(); confirmCallback=null; }
+    else if (pendingDeleteId) {
+      const id = pendingDeleteId;
+      const user = allUsers.find(u=>u.id===id);
+      try {
+        await deleteDoc(doc(db,"users",id));
+        allUsers = allUsers.filter(u=>u.id!==id);
+        renderAll(allUsers);
+        showToast(`🗑 「${user?.name||''}」を削除しました`);
+      } catch(e) { showToast("削除に失敗しました"); }
+      pendingDeleteId = null;
+    }
+  });
+  confirmCancelBtn.addEventListener("click", ()=>{ confirmOverlay.classList.remove("active"); pendingDeleteId=null; confirmCallback=null; });
+  confirmOverlay.addEventListener("click", e=>{ if(e.target===confirmOverlay){ confirmOverlay.classList.remove("active"); pendingDeleteId=null; confirmCallback=null; }});
+
+  window.confirmDeleteChat = ()=>{
+    openConfirm("🗑️ チャット全削除",
+      "chat_k のメッセージを<strong style='color:var(--ng)'>全て削除</strong>します。",
+      "全削除する", async ()=>{
+        const btn=document.getElementById("deleteChatBtn");
+        btn.disabled=true; btn.textContent="削除中...";
+        try {
+          let n=0;
+          while(true){
+            const s=await getDocs(collection(db,"chat_k"));
+            if(s.empty) break;
+            const b=writeBatch(db); s.docs.forEach(d=>b.delete(d.ref)); await b.commit(); n+=s.docs.length;
+          }
+          showToast(`🗑️ ${n}件削除しました`);
+        } catch(e){ showToast("エラー: "+e.message,5000); }
+        btn.disabled=false; btn.textContent="🗑 全削除";
+      });
+  };
+
+  function escapeHTML(s){
+    if(!s) return '';
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+  function getInitial(n){ return n ? n.charAt(0).toUpperCase() : "?"; }
+  function badgeHTML(s){
+    const m={ok:{cls:"badge-ok",l:"許可"},wait:{cls:"badge-wait",l:"待機中"},ng:{cls:"badge-ng",l:"拒否"}};
+    const i=m[s]||{cls:"",l:s};
+    return `<span class="badge ${i.cls}">${i.l}</span>`;
+  }
+
+  // ===== スマホ用カード描画 =====
+  function renderCards(users){
+    const q=searchInput.value.trim().toLowerCase();
+    const list=q ? users.filter(u=>u.name.toLowerCase().includes(q)||(u.realName||'').toLowerCase().includes(q)) : users;
+    if(!list.length){
+      cardList.innerHTML=`<div class="loading-card">ユーザーが見つかりません</div>`;
+      return;
+    }
+    cardList.innerHTML = list.map(user=>{
+      const isAdmin=!!user.isAdmin;
+      return `
+      <div class="user-card${isAdmin?' admin-card':''}" id="card-${user.id}">
+        <div class="uc-top">
+          <div class="user-avatar${isAdmin?' admin-av':''}">${getInitial(user.name)}</div>
+          <div class="uc-names">
+            <div class="uc-display">${escapeHTML(user.name)}${isAdmin?' 👑':''}</div>
+            <div class="uc-real">${escapeHTML(user.realName||'本名未設定')}</div>
+          </div>
+          ${badgeHTML(user.status)}
+        </div>
+
+        <!-- メインアクション -->
+        <div class="uc-actions-main">
+          <button class="btn btn-ok" onclick="handleAllow('${user.id}','${escapeHTML(user.name)}')" ${user.status==='ok'?'disabled':''}>✓ 許可</button>
+          <button class="btn btn-ng" onclick="handleDeny('${user.id}','${escapeHTML(user.name)}')" ${user.status==='ng'?'disabled':''}>✕ 拒否</button>
+          <button class="btn btn-del" onclick="handleDelete('${user.id}','${escapeHTML(user.name)}')">🗑</button>
+          <button class="uc-expand-btn" id="expand-${user.id}" onclick="toggleDetail('${user.id}')">詳細 ▾</button>
+        </div>
+
+        <!-- 詳細（アコーディオン） -->
+        <div class="uc-detail" id="detail-${user.id}">
+          <!-- クラス名 -->
+          <div class="uc-detail-row">
+            <span class="uc-detail-label">クラス名</span>
+            <input type="text" id="cls-${user.id}" value="${escapeHTML(user.className||'')}" placeholder="クラス名..." maxlength="20"
+              onkeydown="if(event.key==='Enter')saveClassName('${user.id}','${escapeHTML(user.name)}',this.value)">
+            <button class="small-btn btn-save" onclick="saveClassName('${user.id}','${escapeHTML(user.name)}',document.getElementById('cls-${user.id}').value)">💾</button>
+          </div>
+
+          <!-- フラグ -->
+          <div class="uc-flags">
+            <button class="flag-btn${user.isAdmin?' on-admin':''}" onclick="toggleAdmin('${user.id}','${escapeHTML(user.name)}')">👑 管理者${user.isAdmin?' ON':' OFF'}</button>
+            <button class="flag-btn${user.akuchat?' on-akuchat':''}" onclick="toggleAkuchat('${user.id}','${escapeHTML(user.name)}')">🌐 芥chat${user.akuchat?' ON':' OFF'}</button>
+          </div>
+
+          <!-- 名前変更 -->
+          <div class="uc-namechange-info">
+            🔤 名前変更: ${user.nameChangedAt||'未変更'}
+            <button class="small-btn btn-unlock" style="margin-left:8px;" onclick="resetNameChangeLimit('${user.id}','${escapeHTML(user.name)}')">🔓 制限解除</button>
+          </div>
+          ${user.nameChangeHistory&&user.nameChangeHistory.length?
+            '<details style="font-size:10px;color:var(--text-muted);margin-top:6px;"><summary style="cursor:pointer;">履歴を見る</summary>'+
+            user.nameChangeHistory.slice(-3).reverse().map(h=>'<div style="margin-top:4px;">'+escapeHTML(h.from)+'→'+escapeHTML(h.to)+'<br><span>'+h.date+'</span></div>').join('')+
+            '</details>':''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.toggleDetail = (id)=>{
+    const detail = document.getElementById(`detail-${id}`);
+    const btn    = document.getElementById(`expand-${id}`);
+    const open   = detail.classList.toggle('open');
+    btn.classList.toggle('open', open);
+    btn.textContent = open ? '詳細 ▴' : '詳細 ▾';
+  };
+
+  // ===== PC テーブル描画 =====
+  function renderTable(users){
+    const q=searchInput.value.trim().toLowerCase();
+    const list=q ? users.filter(u=>u.name.toLowerCase().includes(q)||(u.realName||'').toLowerCase().includes(q)) : users;
+    if(!list.length){ tbody.innerHTML=`<tr class="empty-row"><td colspan="8">ユーザーが見つかりません</td></tr>`; return; }
+    tbody.innerHTML = list.map(user=>{
+      const isAdmin=!!user.isAdmin;
+      const adminStyle=isAdmin ? 'background:linear-gradient(90deg,rgba(255,200,0,.10),rgba(255,200,0,.04));border-left:3px solid #ffc800;' : '';
+      return `
+      <tr data-id="${user.id}" style="${adminStyle}">
+        <td><span style="font-size:12px;color:${isAdmin?'#ffd700':'var(--text-muted)'};">${escapeHTML(user.realName||'—')}</span></td>
+        <td>
+          <div class="user-name">
+            <div class="user-avatar" style="${isAdmin?'background:#b8860b;border:1px solid #ffd700;':''}">
+              ${getInitial(user.name)}
+            </div>
+            <span class="user-name-text" style="${isAdmin?'color:#ffd700;font-weight:700;':''}">${escapeHTML(user.name)}${isAdmin?' 👑':''}</span>
+          </div>
+        </td>
+        <td>${badgeHTML(user.status)}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="text" value="${escapeHTML(user.className||'')}" placeholder="クラス名..." maxlength="20"
+              style="width:90px;padding:4px 8px;border-radius:5px;border:1px solid var(--border);
+                background:rgba(255,255,255,.05);color:var(--text);font-size:12px;
+                outline:none;font-family:inherit;transition:border .15s;"
+              onfocus="this.style.borderColor='var(--accent2)'"
+              onblur="this.style.borderColor='var(--border)'"
+              onkeydown="if(event.key==='Enter')saveClassName('${user.id}','${escapeHTML(user.name)}',this.value)">
+            <button class="btn" style="font-size:11px;padding:4px 8px;border-color:rgba(92,107,192,.4);color:var(--accent2);background:rgba(92,107,192,.08);"
+              onclick="saveClassName('${user.id}','${escapeHTML(user.name)}',this.previousElementSibling.value)">💾</button>
+          </div>
+        </td>
+        <td>
+          <button class="btn ${isAdmin?'btn-ok':''}" onclick="toggleAdmin('${user.id}','${escapeHTML(user.name)}')" style="${isAdmin?'':'opacity:.4'}">
+            ${isAdmin?'👑 管理者':'👑'}
+          </button>
+        </td>
+        <td>
+          <button class="btn ${user.akuchat?'btn-ok':''}" onclick="toggleAkuchat('${user.id}','${escapeHTML(user.name)}')" style="${user.akuchat?'':'opacity:.4'}">🌐</button>
+        </td>
+        <td>
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
+            <span style="font-size:11px;color:var(--text-muted);">${user.nameChangedAt||'未変更'}</span>
+            <button class="btn" style="font-size:11px;padding:3px 8px;opacity:.8;border-color:rgba(92,107,192,.4);color:var(--accent2);background:rgba(92,107,192,.08);"
+              onclick="resetNameChangeLimit('${user.id}','${escapeHTML(user.name)}')">🔓 制限解除</button>
+            ${user.nameChangeHistory&&user.nameChangeHistory.length?
+              '<details style="font-size:10px;color:var(--text-muted);margin-top:2px;"><summary style="cursor:pointer;">履歴</summary>'+
+              user.nameChangeHistory.slice(-3).reverse().map(h=>'<div>'+escapeHTML(h.from)+'→'+escapeHTML(h.to)+'<br><span style="color:var(--text-muted)">'+h.date+'</span></div>').join('')+
+              '</details>':''}
+          </div>
+        </td>
+        <td>
+          <div class="action-btns">
+            <button class="btn btn-ok" onclick="handleAllow('${user.id}','${escapeHTML(user.name)}')" ${user.status==='ok'?'disabled':''}>✓ 許可</button>
+            <button class="btn btn-ng" onclick="handleDeny('${user.id}','${escapeHTML(user.name)}')"  ${user.status==='ng'?'disabled':''}>✕ 拒否</button>
+            <button class="btn btn-del" onclick="handleDelete('${user.id}','${escapeHTML(user.name)}')">🗑</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function updateCounts(users){
+    document.getElementById("countTotal").textContent = users.length;
+    document.getElementById("countOk").textContent    = users.filter(u=>u.status==="ok").length;
+    document.getElementById("countWait").textContent  = users.filter(u=>u.status==="wait").length;
+    document.getElementById("countNg").textContent    = users.filter(u=>u.status==="ng").length;
+  }
+
+  function renderAll(users){
+    updateCounts(users);
+    renderCards(users);
+    renderTable(users);
+  }
+
+  async function loadUsers(){
+    cardList.innerHTML=`<div class="loading-card"><div class="spinner"></div><br>読み込み中...</div>`;
+    tbody.innerHTML=`<tr class="loading-row"><td colspan="8"><div class="spinner"></div><br>読み込み中...</td></tr>`;
+    try {
+      let snap;
+      try { snap=await getDocs(query(collection(db,"users"),where("group","==",MY_GROUP),orderBy("createdAt","desc"))); }
+      catch { snap=await getDocs(query(collection(db,"users"),where("group","==",MY_GROUP))); }
+      allUsers=snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderAll(allUsers);
+    } catch(e){
+      cardList.innerHTML=`<div class="loading-card">⚠ 取得失敗<br><small>${e.message}</small></div>`;
+      tbody.innerHTML=`<tr class="empty-row"><td colspan="8">⚠ 取得失敗<br><small>${e.message}</small></td></tr>`;
+    }
+  }
+
+  // ユーザー操作
+  window.handleAllow=async(id,name)=>{ try{ await updateDoc(doc(db,"users",id),{status:"ok"}); const u=allUsers.find(u=>u.id===id);if(u)u.status="ok"; renderAll(allUsers); showToast(`✅ 「${name}」を許可`); }catch{showToast("失敗")}};
+  window.handleDeny =async(id,name)=>{ try{ await updateDoc(doc(db,"users",id),{status:"ng"}); const u=allUsers.find(u=>u.id===id);if(u)u.status="ng"; renderAll(allUsers); showToast(`🚫 「${name}」を拒否`); }catch{showToast("失敗")}};
+  window.handleDelete=(id,name)=>{ confirmCallback=null; pendingDeleteId=id; confirmTitle.textContent="⚠ ユーザーを削除しますか？"; confirmMsg.innerHTML=`<strong style="color:var(--text)">${name}</strong> を完全に削除します。`; confirmOkBtn.textContent="削除する"; confirmOverlay.classList.add("active"); };
+  window.saveClassName=async(id,name,val)=>{ const v=val.trim(); try{ await updateDoc(doc(db,"users",id),{className:v}); const u=allUsers.find(u=>u.id===id);if(u)u.className=v; showToast(`✅ 「${name}」クラス名: ${v||'(空)'}`); }catch(e){showToast("エラー: "+e.message)}};
+  window.toggleAdmin=async(id,name)=>{ const u=allUsers.find(u=>u.id===id);if(!u)return; const v=!u.isAdmin; try{ await updateDoc(doc(db,"users",id),{isAdmin:v}); u.isAdmin=v; renderAll(allUsers); showToast(v?`👑「${name}」を管理者に`:`「${name}」管理者解除`); }catch(e){showToast("エラー: "+e.message)}};
+  window.toggleAkuchat=async(id,name)=>{ const u=allUsers.find(u=>u.id===id);if(!u)return; const v=!u.akuchat; try{ await updateDoc(doc(db,"users",id),{akuchat:v}); u.akuchat=v; renderAll(allUsers); showToast(v?`🌐「${name}」芥chat有効`:`「${name}」芥chat無効`); }catch(e){showToast("エラー: "+e.message)}};
+  window.resetNameChangeLimit=async(id,name)=>{ try{ await updateDoc(doc(db,"users",id),{nameChangedAt:""}); const u=allUsers.find(u=>u.id===id);if(u)u.nameChangedAt=""; renderAll(allUsers); showToast(`🔓「${name}」制限解除`); }catch(e){showToast("エラー: "+e.message)}};
+
+  searchInput.addEventListener("input",()=>renderAll(allUsers));
+  document.getElementById("refreshBtn").addEventListener("click",()=>{ loadUsers(); showToast("🔄 更新中...",1200); });
+
+  // 一般公開モード
+  const publicToggle=document.getElementById("publicModeToggle");
+  const publicBar   =document.getElementById("publicModeBar");
+  const publicDesc  =document.getElementById("publicModeDesc");
+  let publicLoading=true;
+  async function loadPublicMode(){
+    publicLoading=true;
+    try{ const s=await getDoc(doc(db,"config","publicMode")); const v=s.exists()?s.data().value===true:false; publicToggle.checked=v; updatePublicUI(v); }catch{}
+    finally{ publicLoading=false; }
+  }
+  function updatePublicUI(on){
+    if(on){ publicBar.classList.add("active"); publicDesc.textContent="ON：申請者は全員自動的に許可されます"; }
+    else  { publicBar.classList.remove("active"); publicDesc.textContent="OFF：申請者は管理者の許可が必要です"; }
+  }
+  publicToggle.addEventListener("change",async()=>{
+    if(publicLoading) return;
+    const on=publicToggle.checked; updatePublicUI(on);
+    try{ await setDoc(doc(db,"config","publicMode"),{key:"publicMode",value:on},{merge:true}); showToast(on?"🌐 一般公開モード ON":"🔒 一般公開モード OFF"); }
+    catch(e){ publicToggle.checked=!on; updatePublicUI(!on); showToast("保存失敗: "+e.message,4000); }
+  });
+
+  // アク禁
+  let banList=[]; let allBanned=false;
+  async function loadBanList(){
+    try{ const s=await getDoc(doc(db,"config","banList")); if(s.exists()){ banList=s.data().names||[]; allBanned=s.data().allBanned||false; } }catch{}
+    renderBanList();
+  }
+  async function saveBanList(){ try{ await setDoc(doc(db,"config","banList"),{names:banList,allBanned}); }catch(e){ showToast("保存エラー: "+e.message); }}
+  function renderBanList(){
+    const tags=document.getElementById("banTags");
+    const header=document.getElementById("banHeader");
+    const btn=document.getElementById("banAllBtn");
+    const desc=document.getElementById("banPanelDesc");
+    if(allBanned){ header.classList.add("all-banned"); btn.classList.add("active"); btn.textContent="✅ 全員禁中 (解除)"; }
+    else         { header.classList.remove("all-banned"); btn.classList.remove("active"); btn.textContent="全員アク禁"; }
+    desc.textContent="アク禁リスト: "+banList.length+"人"+(allBanned?" ／ ⚠ 全員アク禁中":"");
+    tags.innerHTML=banList.length
+      ? banList.map((n,i)=>`<div class="ban-tag">${escapeHTML(n)}<button onclick="removeBan(${i})">×</button></div>`).join('')
+      : '<span style="font-size:12px;color:var(--text-muted);">アク禁ユーザーなし</span>';
+  }
+  window.addBanName=async()=>{ const inp=document.getElementById("banNameInput"); const n=inp.value.trim(); if(!n)return; if(banList.includes(n)){showToast("既にアク禁済み");return;} banList.push(n); inp.value=''; await saveBanList(); renderBanList(); showToast(`🚫「${n}」アク禁`); };
+  window.removeBan =async(i)=>{ const n=banList[i]; banList.splice(i,1); await saveBanList(); renderBanList(); showToast(`✅「${n}」アク禁解除`); };
+  window.toggleAllBan=async()=>{ allBanned=!allBanned; await saveBanList(); renderBanList(); showToast(allBanned?"🚫 全員アク禁":"✅ 全員アク禁解除"); };
+  document.getElementById("banNameInput").addEventListener("keydown",e=>{ if(e.key==="Enter") window.addBanName(); });
+
+  // チャット部屋
+  let roomList=[];
+  onSnapshot(doc(db,"config","chatRooms_k"),snap=>{
+    roomList=(snap.exists()&&Array.isArray(snap.data().rooms))?snap.data().rooms:[];
+    renderRooms();
+  });
+  function renderRooms(){
+    const el=document.getElementById("roomTagsWrap");
+    const fixed='<span class="room-tag fixed"># 全体（固定）</span>';
+    el.innerHTML=fixed+(roomList.length
+      ? roomList.map((r,i)=>`<span class="room-tag"># ${escapeHTML(r.name)}<button onclick="removeRoom(${i})">×</button></span>`).join('')
+      : '<span style="font-size:12px;color:var(--text-muted);">追加された部屋なし</span>');
+  }
+  window.addRoom=async()=>{ const inp=document.getElementById("newRoomInput"); const n=inp.value.trim(); if(!n)return; if(n==="全体"||n==="general"){showToast("追加できません");return;} if(roomList.some(r=>r.name===n)){showToast("同名の部屋あり");return;} roomList.push({id:"room_"+Date.now(),name:n}); inp.value=''; await setDoc(doc(db,"config","chatRooms_k"),{rooms:roomList},{merge:true}); showToast(`✅ 部屋「${n}」追加`); };
+  window.removeRoom=async(i)=>{ const n=roomList[i]?.name; roomList.splice(i,1); await setDoc(doc(db,"config","chatRooms_k"),{rooms:roomList},{merge:true}); showToast(`🗑 部屋「${n}」削除`); };
+  document.getElementById("newRoomInput").addEventListener("keydown",e=>{ if(e.key==="Enter") window.addRoom(); });
+
+  // チャット閉鎖
+  const chatCloseToggle=document.getElementById("chatCloseToggle");
+  let chatCloseLoading=true;
+  onSnapshot(doc(db,"config","chatSettings_k"),snap=>{
+    const closed=snap.exists()?snap.data().closed===true:false;
+    chatCloseLoading=true; chatCloseToggle.checked=closed;
+    document.getElementById("chatCloseDesc").textContent=closed?"閉鎖中：送信不可":"開放中：送信可";
+    chatCloseLoading=false;
+  });
+  chatCloseToggle.addEventListener("change",async()=>{
+    if(chatCloseLoading)return;
+    const closed=chatCloseToggle.checked;
+    document.getElementById("chatCloseDesc").textContent=closed?"閉鎖中：送信不可":"開放中：送信可";
+    await setDoc(doc(db,"config","chatSettings_k"),{closed},{merge:true});
+    showToast(closed?"🔒 チャット閉鎖":"✅ チャット開放");
+  });
+
+  // NGワード
+  let ngWords=[];
+  onSnapshot(doc(db,"config","ngWords_k"),snap=>{ ngWords=snap.exists()?(snap.data().words||[]):[];  renderNgTags(); });
+  function renderNgTags(){
+    const el=document.getElementById("ngWordTags");
+    el.innerHTML=ngWords.length
+      ? ngWords.map((w,i)=>`<span class="ng-tag">${escapeHTML(w)}<button onclick="removeNgWord(${i})">×</button></span>`).join('')
+      : '<span style="font-size:12px;color:var(--text-muted);">NGワードなし</span>';
+  }
+  window.addNgWord=async()=>{ const inp=document.getElementById("ngWordInput"); const w=inp.value.trim(); if(!w)return; if(ngWords.includes(w)){showToast("登録済み");return;} ngWords.push(w); inp.value=''; await setDoc(doc(db,"config","ngWords_k"),{words:ngWords},{merge:true}); showToast(`🚫 NGワード「${w}」追加`); };
+  window.removeNgWord=async(i)=>{ const w=ngWords[i]; ngWords.splice(i,1); await setDoc(doc(db,"config","ngWords_k"),{words:ngWords},{merge:true}); showToast(`✅ NGワード「${w}」解除`); };
+  document.getElementById("ngWordInput").addEventListener("keydown",e=>{ if(e.key==="Enter") window.addNgWord(); });
+
+  // 初期ロード
+  loadPublicMode();
+  loadBanList();
+  loadUsers();
+</script>
+</body>
+</html>
