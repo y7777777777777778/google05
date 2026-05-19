@@ -694,6 +694,12 @@ body.fullscreen #fullscreenBtn:hover {
   <line x1="10" y1="14" x2="3" y2="21"/>
   <line x1="21" y1="3" x2="14" y2="10"/>
 </symbol>
+<!-- ★ サウンドボタン アイコン -->
+<symbol id="s-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+</symbol>
 </defs>
 </svg>
 
@@ -827,6 +833,14 @@ body.fullscreen #fullscreenBtn:hover {
             <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-chat"/></svg>
           </div>
           <div class="app-lbl">共通チャット</div>
+        </div>
+
+        <!-- ★ サウンドボタン -->
+        <div class="app-item" onclick="openApp('https://www.myinstants.com/ja/index/jp/','サウンドボタン','s-sound')">
+          <div class="app-shell sk-teal">
+            <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-sound"/></svg>
+          </div>
+          <div class="app-lbl">サウンドボタン</div>
         </div>
 
       </div>
