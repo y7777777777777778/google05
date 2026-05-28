@@ -8,34 +8,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#000;
-  --bg2:#1C1C1E;
-  --bg3:#2C2C2E;
-  --bg4:#3A3A3C;
-  --sep:rgba(84,84,88,.65);
-  --sep2:rgba(84,84,88,.35);
-  --fill:rgba(120,120,128,.2);
-  --fill2:rgba(120,120,128,.16);
-  --fill3:rgba(120,120,128,.1);
-  --t1:#fff;
-  --t2:rgba(235,235,245,.6);
-  --t3:rgba(235,235,245,.3);
-  --t4:rgba(235,235,245,.16);
-  --blue:#0A84FF;
-  --blue-l:#409CFF;
-  --green:#30D158;
-  --red:#FF453A;
-  --gold:#FFD60A;
-  --teal:#5AC8FA;
-  --glass:rgba(26,26,28,.97);
-  --blur:blur(32px) saturate(180%);
-  --r1:8px;
-  --r2:12px;
-  --r3:16px;
+  --bg:#000;--bg2:#1C1C1E;--bg3:#2C2C2E;
+  --sep:rgba(84,84,88,.65);--sep2:rgba(84,84,88,.35);
+  --fill:rgba(120,120,128,.2);--fill2:rgba(120,120,128,.16);--fill3:rgba(120,120,128,.1);
+  --t1:#fff;--t2:rgba(235,235,245,.6);--t3:rgba(235,235,245,.3);--t4:rgba(235,235,245,.16);
+  --blue:#0A84FF;--blue-l:#409CFF;--green:#30D158;--red:#FF453A;
+  --glass:rgba(26,26,28,.97);--blur:blur(32px) saturate(180%);
+  --r1:8px;--r2:12px;--r3:16px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;min-height:100%;font-family:'Figtree',sans-serif;background:var(--bg);color:var(--t1);}
-
 .wall{
   position:fixed;inset:0;z-index:0;pointer-events:none;
   background:
@@ -44,43 +26,20 @@ html,body{width:100%;min-height:100%;font-family:'Figtree',sans-serif;background
     radial-gradient(circle at 70% 80%,#21092f 0%,transparent 40%),
     #02040b;
 }
-
 #app{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;}
-
-/* トップバー */
 #topBar{
-  height:44px;flex-shrink:0;
-  display:flex;align-items:center;gap:10px;
-  padding:0 16px;
-  background:var(--glass);
-  backdrop-filter:var(--blur);
-  -webkit-backdrop-filter:var(--blur);
-  border-bottom:.5px solid var(--sep);
-  position:sticky;top:0;z-index:100;
+  height:44px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 16px;
+  background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border-bottom:.5px solid var(--sep);position:sticky;top:0;z-index:100;
 }
-.logo-icon{
-  width:28px;height:28px;border-radius:7px;
-  background:#185FA5;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.logo-icon svg{color:#fff;}
-#topBar h1{font-size:14px;font-weight:700;letter-spacing:.01em;}
+.logo-icon{width:28px;height:28px;border-radius:7px;background:#185FA5;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#topBar h1{font-size:14px;font-weight:700;}
 .top-sub{font-size:11px;color:var(--t3);margin-left:auto;}
-
-/* メイン */
 #main{flex:1;max-width:720px;margin:0 auto;width:100%;padding:24px 16px 48px;}
-
-/* ドロップゾーン */
 #dropZone{
-  border:1.5px dashed var(--sep);
-  border-radius:var(--r3);
-  padding:40px 20px;
-  text-align:center;
-  cursor:pointer;
-  transition:background .15s,border-color .15s;
-  background:var(--fill3);
-  position:relative;
-  margin-bottom:24px;
+  border:1.5px dashed var(--sep);border-radius:var(--r3);padding:40px 20px;
+  text-align:center;cursor:pointer;transition:background .15s,border-color .15s;
+  background:var(--fill3);position:relative;margin-bottom:24px;
 }
 #dropZone.dragover{background:rgba(10,132,255,.08);border-color:var(--blue);}
 #dropZone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
@@ -88,105 +47,55 @@ html,body{width:100%;min-height:100%;font-family:'Figtree',sans-serif;background
 #dropZone p{font-size:15px;font-weight:600;color:var(--t1);margin-bottom:4px;}
 #dropZone small{font-size:12px;color:var(--t3);}
 .browse-btn{
-  display:inline-block;margin-top:12px;
-  padding:7px 18px;
-  border:.5px solid var(--sep2);
-  border-radius:var(--r1);
-  font-size:12px;font-weight:600;
-  color:var(--t2);background:var(--fill2);
-  cursor:pointer;transition:background .12s;
+  display:inline-block;margin-top:12px;padding:7px 18px;
+  border:.5px solid var(--sep2);border-radius:var(--r1);
+  font-size:12px;font-weight:600;color:var(--t2);background:var(--fill2);cursor:pointer;
 }
 .browse-btn:hover{background:var(--fill);}
-
-/* セクションヘッダー */
 .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .sec-hd h2{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;}
-.file-count{
-  font-size:11px;color:var(--t4);
-  background:var(--fill2);
-  padding:2px 8px;border-radius:99px;
-  border:.5px solid var(--sep2);
-}
-
-/* ファイルリスト */
+.file-count{font-size:11px;color:var(--t4);background:var(--fill2);padding:2px 8px;border-radius:99px;border:.5px solid var(--sep2);}
 #fileList{display:flex;flex-direction:column;gap:6px;}
-
 .file-item{
-  background:var(--bg2);
-  border:.5px solid var(--sep2);
-  border-radius:var(--r2);
-  padding:10px 14px;
-  display:flex;align-items:center;gap:12px;
-  transition:background .12s;
+  background:var(--bg2);border:.5px solid var(--sep2);border-radius:var(--r2);
+  padding:10px 14px;display:flex;align-items:center;gap:12px;transition:background .12s;
 }
 .file-item:hover{background:var(--bg3);}
-
-.file-icon{
-  width:38px;height:38px;border-radius:var(--r1);
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;flex-shrink:0;
-}
+.file-icon{width:38px;height:38px;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .fi-pdf{background:rgba(255,69,58,.12);}
 .fi-img{background:rgba(10,132,255,.12);}
 .fi-doc{background:rgba(48,209,88,.12);}
 .fi-zip{background:rgba(255,214,10,.1);}
 .fi-other{background:var(--fill3);}
-
 .file-info{flex:1;min-width:0;}
 .file-name{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .file-meta{font-size:11px;color:var(--t3);margin-top:2px;}
-
 .file-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-
-/* プログレス */
 .prog-wrap{width:72px;height:4px;background:var(--fill2);border-radius:2px;overflow:hidden;}
-.prog-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .3s;}
-
-.status-pill{
-  font-size:10px;font-weight:700;
-  padding:2px 8px;border-radius:99px;
-  white-space:nowrap;
-}
+.prog-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .2s;}
+.status-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;}
 .s-done{background:rgba(48,209,88,.15);color:var(--green);}
 .s-uploading{background:rgba(10,132,255,.15);color:var(--blue-l);}
 .s-error{background:rgba(255,69,58,.15);color:var(--red);}
-
 .icon-btn{
-  width:30px;height:30px;border-radius:var(--r1);
-  border:.5px solid var(--sep2);
-  background:transparent;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:var(--t3);
-  transition:background .1s,color .1s;
+  width:30px;height:30px;border-radius:var(--r1);border:.5px solid var(--sep2);
+  background:transparent;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--t3);transition:background .1s,color .1s;text-decoration:none;
 }
 .icon-btn:hover{background:var(--fill);color:var(--t1);}
 .icon-btn svg{width:14px;height:14px;}
-
-/* フッターバー */
-#footerBar{
-  margin-top:20px;padding-top:14px;
-  border-top:.5px solid var(--sep2);
-  display:flex;align-items:center;justify-content:space-between;
-}
+#footerBar{margin-top:20px;padding-top:14px;border-top:.5px solid var(--sep2);display:flex;align-items:center;justify-content:space-between;}
 .storage-label{font-size:12px;color:var(--t3);margin-bottom:5px;}
 .storage-track{width:140px;height:3px;background:var(--fill2);border-radius:2px;}
-.storage-fill{height:100%;background:var(--blue);border-radius:2px;}
-
+.storage-fill-bar{height:100%;background:var(--blue);border-radius:2px;}
 .upload-btn{
-  height:34px;padding:0 18px;
-  background:var(--blue);color:#fff;
-  border:none;border-radius:var(--r1);
-  font-size:12px;font-weight:700;
-  font-family:'Figtree',sans-serif;
-  cursor:pointer;display:flex;align-items:center;gap:6px;
-  transition:background .12s;
+  height:34px;padding:0 18px;background:var(--blue);color:#fff;border:none;border-radius:var(--r1);
+  font-size:12px;font-weight:700;font-family:'Figtree',sans-serif;cursor:pointer;
+  display:flex;align-items:center;gap:6px;transition:background .12s;
 }
 .upload-btn:hover{background:#1a8fff;}
 .upload-btn svg{width:14px;height:14px;}
-
-.empty-state{
-  text-align:center;padding:32px;color:var(--t4);font-size:13px;
-}
+.empty-state{text-align:center;padding:32px;color:var(--t4);font-size:13px;}
 </style>
 </head>
 <body>
@@ -203,7 +112,6 @@ html,body{width:100%;min-height:100%;font-family:'Figtree',sans-serif;background
   </div>
 
   <div id="main">
-    <!-- ドロップゾーン -->
     <div id="dropZone">
       <input type="file" id="fileInput" multiple>
       <span class="dz-icon">☁️</span>
@@ -213,7 +121,6 @@ html,body{width:100%;min-height:100%;font-family:'Figtree',sans-serif;background
       <small style="display:block;margin-top:10px;color:var(--t4);">最大ファイルサイズ: 100MB</small>
     </div>
 
-    <!-- ファイル一覧 -->
     <div class="sec-hd">
       <h2>アップロード済みファイル</h2>
       <span class="file-count" id="fileCount">0 件</span>
@@ -222,8 +129,8 @@ html,body{width:100%;min-height:100%;font-family:'Figtree',sans-serif;background
 
     <div id="footerBar">
       <div>
-        <div class="storage-label" id="storageLabel">読み込み中...</div>
-        <div class="storage-track"><div class="storage-fill" id="storageFill" style="width:0%"></div></div>
+        <div class="storage-label" id="storageLabel">Cloudinary</div>
+        <div class="storage-track"><div class="storage-fill-bar" id="storageFill" style="width:0%"></div></div>
       </div>
       <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -235,23 +142,16 @@ html,body{width:100%;min-height:100%;font-family:'Figtree',sans-serif;background
   </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL, listAll, deleteObject, getMetadata } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+<script>
+const CLOUD_NAME = 'dpond4wd2';
+const UPLOAD_PRESET = 'ml_default';
+const API_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
 
-const app = initializeApp({
-  apiKey:"AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
-  authDomain:"fir-66339.firebaseapp.com",
-  projectId:"fir-66339",
-  storageBucket:"fir-66339.firebasestorage.app",
-  messagingSenderId:"876017617963",
-  appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
-}, "upload_portal");
+// ローカルにアップロード済みファイルを保存
+let uploadedFiles = JSON.parse(localStorage.getItem('uploaded_files') || '[]');
 
-const storage = getStorage(app);
-const FOLDER = "uploads/";
+function saveFiles(){ localStorage.setItem('uploaded_files', JSON.stringify(uploadedFiles)); }
 
-/* ユーティリティ */
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function fmtSize(b){
   if(b<1024) return b+'B';
@@ -260,7 +160,7 @@ function fmtSize(b){
 }
 function fmtDate(d){ return new Date(d).toLocaleDateString('ja-JP',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
 function fileIcon(name){
-  const ext = (name.split('.').pop()||'').toLowerCase();
+  const ext=(name.split('.').pop()||'').toLowerCase();
   if(['pdf'].includes(ext)) return {cls:'fi-pdf',icon:'📄'};
   if(['png','jpg','jpeg','gif','webp','svg'].includes(ext)) return {cls:'fi-img',icon:'🖼️'};
   if(['doc','docx','txt','md'].includes(ext)) return {cls:'fi-doc',icon:'📝'};
@@ -268,43 +168,27 @@ function fileIcon(name){
   return {cls:'fi-other',icon:'📎'};
 }
 
-/* ファイル一覧読み込み */
-async function loadFiles(){
-  const listRef = ref(storage, FOLDER);
-  try{
-    const res = await listAll(listRef);
-    const items = await Promise.all(res.items.map(async item=>{
-      const [url, meta] = await Promise.all([getDownloadURL(item), getMetadata(item)]);
-      return { name: item.name, url, size: meta.size, updated: meta.updated, fullPath: item.fullPath };
-    }));
-    renderFiles(items.sort((a,b)=> new Date(b.updated)-new Date(a.updated)));
-  } catch(e){
-    console.error(e);
-    document.getElementById('statusText').textContent = '読み込みエラー';
-  }
-}
-
-function renderFiles(items){
+function renderFiles(){
   const el = document.getElementById('fileList');
-  document.getElementById('fileCount').textContent = items.length + ' 件';
+  const countEl = document.getElementById('fileCount');
+  countEl.textContent = uploadedFiles.length + ' 件';
 
-  if(!items.length){
+  if(!uploadedFiles.length){
     el.innerHTML = '<div class="empty-state">ファイルがありません</div>';
-    updateStorage(0);
     return;
   }
 
-  const totalBytes = items.reduce((s,f)=>s+f.size,0);
-  updateStorage(totalBytes);
+  const totalBytes = uploadedFiles.reduce((s,f)=>s+(f.size||0),0);
+  document.getElementById('storageLabel').textContent = `合計: ${fmtSize(totalBytes)}`;
 
-  el.innerHTML = items.map(f=>{
+  el.innerHTML = uploadedFiles.map((f,i)=>{
     const {cls,icon} = fileIcon(f.name);
     return `
-      <div class="file-item" id="item_${CSS.escape(f.name)}">
+      <div class="file-item">
         <div class="file-icon ${cls}">${icon}</div>
         <div class="file-info">
           <div class="file-name">${esc(f.name)}</div>
-          <div class="file-meta">${fmtSize(f.size)} · ${fmtDate(f.updated)}</div>
+          <div class="file-meta">${fmtSize(f.size||0)} · ${fmtDate(f.date)}</div>
         </div>
         <div class="file-actions">
           <span class="status-pill s-done">完了</span>
@@ -313,7 +197,7 @@ function renderFiles(items){
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
           </a>
-          <button class="icon-btn" title="削除" onclick="deleteFile('${esc(f.fullPath)}','${esc(f.name)}')">
+          <button class="icon-btn" title="削除" onclick="deleteFile(${i})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
             </svg>
@@ -323,17 +207,14 @@ function renderFiles(items){
   }).join('');
 }
 
-function updateStorage(bytes){
-  const gb = bytes/(1024*1024*1024);
-  const pct = Math.min(100, (gb/1)*100).toFixed(0);
-  document.getElementById('storageLabel').textContent = `ストレージ: ${fmtSize(bytes)} / 1GB`;
-  document.getElementById('storageFill').style.width = pct + '%';
+function deleteFile(i){
+  if(!confirm(`「${uploadedFiles[i].name}」をリストから削除しますか？`)) return;
+  uploadedFiles.splice(i,1);
+  saveFiles();
+  renderFiles();
 }
 
-/* ファイルアップロード */
 function uploadFile(file){
-  const storageRef = ref(storage, FOLDER + file.name);
-  const task = uploadBytesResumable(storageRef, file);
   const {cls,icon} = fileIcon(file.name);
   const id = 'up_' + Date.now() + '_' + Math.random().toString(36).slice(2);
 
@@ -356,56 +237,51 @@ function uploadFile(file){
     </div>`;
   el.prepend(div);
 
-  const countEl = document.getElementById('fileCount');
-  countEl.textContent = (parseInt(countEl.textContent)||0)+1 + ' 件';
+  document.getElementById('statusText').textContent = 'アップロード中...';
 
-  task.on('state_changed',
-    snap=>{
-      const pct = Math.round(snap.bytesTransferred/snap.totalBytes*100);
-      const bar = document.getElementById(id+'_bar');
-      const lbl = document.getElementById(id+'_lbl');
-      if(bar) bar.style.width = pct+'%';
-      if(lbl) lbl.textContent = pct+'%';
-    },
-    err=>{
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', UPLOAD_PRESET);
+  formData.append('folder', 'uploads');
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', API_URL);
+
+  xhr.upload.onprogress = e => {
+    if(!e.lengthComputable) return;
+    const pct = Math.round(e.loaded / e.total * 100);
+    const bar = document.getElementById(id+'_bar');
+    const lbl = document.getElementById(id+'_lbl');
+    if(bar) bar.style.width = pct + '%';
+    if(lbl) lbl.textContent = pct + '%';
+  };
+
+  xhr.onload = () => {
+    if(xhr.status === 200){
+      const res = JSON.parse(xhr.responseText);
+      const fileData = { name: file.name, url: res.secure_url, size: file.size, date: Date.now(), public_id: res.public_id };
+      uploadedFiles.unshift(fileData);
+      saveFiles();
+      document.getElementById('statusText').textContent = '完了';
+      renderFiles();
+    } else {
       const lbl = document.getElementById(id+'_lbl');
       if(lbl){ lbl.textContent='エラー'; lbl.className='status-pill s-error'; }
-      console.error(err);
-      document.getElementById('statusText').textContent = 'アップロード失敗';
-    },
-    async ()=>{
-      const url = await getDownloadURL(task.snapshot.ref);
-      const itemDiv = document.getElementById(id);
-      if(itemDiv){
-        itemDiv.querySelector('.file-actions').innerHTML = `
-          <span class="status-pill s-done">完了</span>
-          <a href="${esc(url)}" target="_blank" download="${esc(file.name)}" class="icon-btn" title="ダウンロード">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-          </a>
-          <button class="icon-btn" title="削除" onclick="deleteFile('${esc(FOLDER+file.name)}','${esc(file.name)}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-            </svg>
-          </button>`;
-        itemDiv.querySelector('.file-meta').textContent = fmtSize(file.size) + ' · ' + fmtDate(new Date());
-      }
-      document.getElementById('statusText').textContent = '完了';
+      document.getElementById('statusText').textContent = 'エラー: ' + xhr.status;
+      console.error(xhr.responseText);
     }
-  );
+  };
+
+  xhr.onerror = () => {
+    const lbl = document.getElementById(id+'_lbl');
+    if(lbl){ lbl.textContent='失敗'; lbl.className='status-pill s-error'; }
+    document.getElementById('statusText').textContent = 'ネットワークエラー';
+  };
+
+  xhr.send(formData);
 }
 
-/* 削除 */
-window.deleteFile = async function(fullPath, name){
-  if(!confirm(`「${name}」を削除しますか？`)) return;
-  try{
-    await deleteObject(ref(storage, fullPath));
-    await loadFiles();
-  }catch(e){ alert('削除できませんでした: '+e.message); }
-};
-
-/* ドロップゾーン */
+// ドロップゾーン
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 
@@ -418,12 +294,11 @@ dropZone.addEventListener('drop', e=>{
 });
 fileInput.addEventListener('change', ()=>{
   [...fileInput.files].forEach(uploadFile);
-  fileInput.value='';
+  fileInput.value = '';
 });
 
-/* 初期化 */
-document.getElementById('statusText').textContent = 'ファイルを読み込み中...';
-loadFiles().then(()=> document.getElementById('statusText').textContent = '準備完了');
+// 初期表示
+renderFiles();
 </script>
 </body>
 </html>
