@@ -46,22 +46,16 @@ html,body{width:100%;min-height:100%;font-family:'Figtree',sans-serif;background
 .dz-icon{font-size:36px;margin-bottom:10px;display:block;}
 #dropZone p{font-size:15px;font-weight:600;color:var(--t1);margin-bottom:4px;}
 #dropZone small{font-size:12px;color:var(--t3);}
-.browse-btn{
-  display:inline-block;margin-top:12px;padding:7px 18px;
-  border:.5px solid var(--sep2);border-radius:var(--r1);
-  font-size:12px;font-weight:600;color:var(--t2);background:var(--fill2);cursor:pointer;
-}
+.browse-btn{display:inline-block;margin-top:12px;padding:7px 18px;border:.5px solid var(--sep2);border-radius:var(--r1);font-size:12px;font-weight:600;color:var(--t2);background:var(--fill2);cursor:pointer;}
 .browse-btn:hover{background:var(--fill);}
 .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .sec-hd h2{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;}
 .file-count{font-size:11px;color:var(--t4);background:var(--fill2);padding:2px 8px;border-radius:99px;border:.5px solid var(--sep2);}
 #fileList{display:flex;flex-direction:column;gap:6px;}
-.file-item{
-  background:var(--bg2);border:.5px solid var(--sep2);border-radius:var(--r2);
-  padding:10px 14px;display:flex;align-items:center;gap:12px;transition:background .12s;
-}
+.file-item{background:var(--bg2);border:.5px solid var(--sep2);border-radius:var(--r2);padding:10px 14px;display:flex;align-items:center;gap:12px;transition:background .12s;}
 .file-item:hover{background:var(--bg3);}
 .file-icon{width:38px;height:38px;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.fi-vid{background:rgba(90,200,250,.12);}
 .fi-pdf{background:rgba(255,69,58,.12);}
 .fi-img{background:rgba(10,132,255,.12);}
 .fi-doc{background:rgba(48,209,88,.12);}
@@ -71,31 +65,24 @@ html,body{width:100%;min-height:100%;font-family:'Figtree',sans-serif;background
 .file-name{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .file-meta{font-size:11px;color:var(--t3);margin-top:2px;}
 .file-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.prog-wrap{width:72px;height:4px;background:var(--fill2);border-radius:2px;overflow:hidden;}
+.prog-wrap{width:80px;height:4px;background:var(--fill2);border-radius:2px;overflow:hidden;}
 .prog-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .2s;}
 .status-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;}
 .s-done{background:rgba(48,209,88,.15);color:var(--green);}
 .s-uploading{background:rgba(10,132,255,.15);color:var(--blue-l);}
 .s-error{background:rgba(255,69,58,.15);color:var(--red);}
-.icon-btn{
-  width:30px;height:30px;border-radius:var(--r1);border:.5px solid var(--sep2);
-  background:transparent;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:var(--t3);transition:background .1s,color .1s;text-decoration:none;
-}
+.icon-btn{width:30px;height:30px;border-radius:var(--r1);border:.5px solid var(--sep2);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);transition:background .1s,color .1s;text-decoration:none;}
 .icon-btn:hover{background:var(--fill);color:var(--t1);}
 .icon-btn svg{width:14px;height:14px;}
 #footerBar{margin-top:20px;padding-top:14px;border-top:.5px solid var(--sep2);display:flex;align-items:center;justify-content:space-between;}
 .storage-label{font-size:12px;color:var(--t3);margin-bottom:5px;}
 .storage-track{width:140px;height:3px;background:var(--fill2);border-radius:2px;}
 .storage-fill-bar{height:100%;background:var(--blue);border-radius:2px;}
-.upload-btn{
-  height:34px;padding:0 18px;background:var(--blue);color:#fff;border:none;border-radius:var(--r1);
-  font-size:12px;font-weight:700;font-family:'Figtree',sans-serif;cursor:pointer;
-  display:flex;align-items:center;gap:6px;transition:background .12s;
-}
+.upload-btn{height:34px;padding:0 18px;background:var(--blue);color:#fff;border:none;border-radius:var(--r1);font-size:12px;font-weight:700;font-family:'Figtree',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .12s;}
 .upload-btn:hover{background:#1a8fff;}
 .upload-btn svg{width:14px;height:14px;}
 .empty-state{text-align:center;padding:32px;color:var(--t4);font-size:13px;}
+.speed-txt{font-size:10px;color:var(--t4);margin-top:3px;}
 </style>
 </head>
 <body>
@@ -113,12 +100,11 @@ html,body{width:100%;min-height:100%;font-family:'Figtree',sans-serif;background
 
   <div id="main">
     <div id="dropZone">
-      <input type="file" id="fileInput" multiple>
+      <input type="file" id="fileInput" multiple accept="video/*,image/*,application/pdf,.zip,.doc,.docx,.txt">
       <span class="dz-icon">☁️</span>
       <p>ファイルをここにドラッグ＆ドロップ</p>
-      <small>または</small>
+      <small>動画・画像・PDF など対応 ／ 最大 1GB</small>
       <div class="browse-btn">ファイルを選択</div>
-      <small style="display:block;margin-top:10px;color:var(--t4);">最大ファイルサイズ: 100MB</small>
     </div>
 
     <div class="sec-hd">
@@ -145,22 +131,22 @@ html,body{width:100%;min-height:100%;font-family:'Figtree',sans-serif;background
 <script>
 const CLOUD_NAME = 'dpond4wd2';
 const UPLOAD_PRESET = 'ml_default';
-const API_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
+const CHUNK_SIZE = 20 * 1024 * 1024; // 20MB チャンク
 
-// ローカルにアップロード済みファイルを保存
-let uploadedFiles = JSON.parse(localStorage.getItem('uploaded_files') || '[]');
-
-function saveFiles(){ localStorage.setItem('uploaded_files', JSON.stringify(uploadedFiles)); }
+let uploadedFiles = JSON.parse(localStorage.getItem('uploaded_files_v2') || '[]');
+function saveFiles(){ localStorage.setItem('uploaded_files_v2', JSON.stringify(uploadedFiles)); }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function fmtSize(b){
   if(b<1024) return b+'B';
-  if(b<1024*1024) return (b/1024).toFixed(0)+'KB';
-  return (b/(1024*1024)).toFixed(1)+'MB';
+  if(b<1024*1024) return (b/1024).toFixed(1)+'KB';
+  if(b<1024*1024*1024) return (b/(1024*1024)).toFixed(1)+'MB';
+  return (b/(1024*1024*1024)).toFixed(2)+'GB';
 }
 function fmtDate(d){ return new Date(d).toLocaleDateString('ja-JP',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
 function fileIcon(name){
   const ext=(name.split('.').pop()||'').toLowerCase();
+  if(['mp4','mov','avi','mkv','webm','m4v'].includes(ext)) return {cls:'fi-vid',icon:'🎬'};
   if(['pdf'].includes(ext)) return {cls:'fi-pdf',icon:'📄'};
   if(['png','jpg','jpeg','gif','webp','svg'].includes(ext)) return {cls:'fi-img',icon:'🖼️'};
   if(['doc','docx','txt','md'].includes(ext)) return {cls:'fi-doc',icon:'📝'};
@@ -170,134 +156,155 @@ function fileIcon(name){
 
 function renderFiles(){
   const el = document.getElementById('fileList');
-  const countEl = document.getElementById('fileCount');
-  countEl.textContent = uploadedFiles.length + ' 件';
-
-  if(!uploadedFiles.length){
-    el.innerHTML = '<div class="empty-state">ファイルがありません</div>';
-    return;
-  }
-
+  document.getElementById('fileCount').textContent = uploadedFiles.length + ' 件';
+  if(!uploadedFiles.length){ el.innerHTML='<div class="empty-state">ファイルがありません</div>'; return; }
   const totalBytes = uploadedFiles.reduce((s,f)=>s+(f.size||0),0);
-  document.getElementById('storageLabel').textContent = `合計: ${fmtSize(totalBytes)}`;
-
+  document.getElementById('storageLabel').textContent = '合計: '+fmtSize(totalBytes);
   el.innerHTML = uploadedFiles.map((f,i)=>{
-    const {cls,icon} = fileIcon(f.name);
-    return `
-      <div class="file-item">
-        <div class="file-icon ${cls}">${icon}</div>
-        <div class="file-info">
-          <div class="file-name">${esc(f.name)}</div>
-          <div class="file-meta">${fmtSize(f.size||0)} · ${fmtDate(f.date)}</div>
-        </div>
-        <div class="file-actions">
-          <span class="status-pill s-done">完了</span>
-          <a href="${esc(f.url)}" target="_blank" download="${esc(f.name)}" class="icon-btn" title="ダウンロード">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-          </a>
-          <button class="icon-btn" title="削除" onclick="deleteFile(${i})">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-            </svg>
-          </button>
-        </div>
-      </div>`;
+    const {cls,icon}=fileIcon(f.name);
+    return `<div class="file-item">
+      <div class="file-icon ${cls}">${icon}</div>
+      <div class="file-info">
+        <div class="file-name">${esc(f.name)}</div>
+        <div class="file-meta">${fmtSize(f.size||0)} · ${fmtDate(f.date)}</div>
+      </div>
+      <div class="file-actions">
+        <span class="status-pill s-done">完了</span>
+        <a href="${esc(f.url)}" target="_blank" class="icon-btn" title="開く／ダウンロード">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </a>
+        <button class="icon-btn" title="削除" onclick="deleteFile(${i})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+          </svg>
+        </button>
+      </div>
+    </div>`;
   }).join('');
 }
 
 function deleteFile(i){
-  if(!confirm(`「${uploadedFiles[i].name}」をリストから削除しますか？`)) return;
-  uploadedFiles.splice(i,1);
-  saveFiles();
-  renderFiles();
+  if(!confirm(`「${uploadedFiles[i].name}」を削除しますか？`)) return;
+  uploadedFiles.splice(i,1); saveFiles(); renderFiles();
 }
 
-function uploadFile(file){
-  const {cls,icon} = fileIcon(file.name);
-  const id = 'up_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+// チャンクアップロード
+async function uploadFileChunked(file){
+  const {cls,icon}=fileIcon(file.name);
+  const id='up_'+Date.now()+'_'+Math.random().toString(36).slice(2);
 
-  const el = document.getElementById('fileList');
-  const emptyState = el.querySelector('.empty-state');
+  const el=document.getElementById('fileList');
+  const emptyState=el.querySelector('.empty-state');
   if(emptyState) emptyState.remove();
 
-  const div = document.createElement('div');
-  div.className = 'file-item';
-  div.id = id;
-  div.innerHTML = `
+  const div=document.createElement('div');
+  div.className='file-item'; div.id=id;
+  div.innerHTML=`
     <div class="file-icon ${cls}">${icon}</div>
     <div class="file-info">
       <div class="file-name">${esc(file.name)}</div>
-      <div class="file-meta">${fmtSize(file.size)} · アップロード中...</div>
+      <div class="file-meta" id="${id}_meta">${fmtSize(file.size)} · 準備中...</div>
     </div>
     <div class="file-actions">
-      <div class="prog-wrap"><div class="prog-fill" id="${id}_bar" style="width:0%"></div></div>
+      <div style="text-align:right">
+        <div class="prog-wrap"><div class="prog-fill" id="${id}_bar" style="width:0%"></div></div>
+        <div class="speed-txt" id="${id}_spd"></div>
+      </div>
       <span class="status-pill s-uploading" id="${id}_lbl">0%</span>
     </div>`;
   el.prepend(div);
+  document.getElementById('statusText').textContent='アップロード中...';
 
-  document.getElementById('statusText').textContent = 'アップロード中...';
+  const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+  const uniqueUploadId = `upl_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  let uploadedUrl = '';
+  let startTime = Date.now();
 
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', UPLOAD_PRESET);
-  formData.append('folder', 'uploads');
-
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', API_URL);
-
-  xhr.upload.onprogress = e => {
-    if(!e.lengthComputable) return;
-    const pct = Math.round(e.loaded / e.total * 100);
+  const updateUI = (loaded, total) => {
+    const pct = Math.round(loaded/total*100);
     const bar = document.getElementById(id+'_bar');
     const lbl = document.getElementById(id+'_lbl');
-    if(bar) bar.style.width = pct + '%';
-    if(lbl) lbl.textContent = pct + '%';
+    const spd = document.getElementById(id+'_spd');
+    const meta = document.getElementById(id+'_meta');
+    if(bar) bar.style.width=pct+'%';
+    if(lbl) lbl.textContent=pct+'%';
+    const elapsed=(Date.now()-startTime)/1000;
+    const speed=loaded/elapsed;
+    const remaining=(total-loaded)/speed;
+    if(spd) spd.textContent=fmtSize(speed)+'/s';
+    if(meta) meta.textContent=`${fmtSize(loaded)} / ${fmtSize(total)} · 残り約${Math.ceil(remaining)}秒`;
   };
 
-  xhr.onload = () => {
-    if(xhr.status === 200){
-      const res = JSON.parse(xhr.responseText);
-      const fileData = { name: file.name, url: res.secure_url, size: file.size, date: Date.now(), public_id: res.public_id };
-      uploadedFiles.unshift(fileData);
-      saveFiles();
-      document.getElementById('statusText').textContent = '完了';
-      renderFiles();
-    } else {
-      const lbl = document.getElementById(id+'_lbl');
-      if(lbl){ lbl.textContent='エラー'; lbl.className='status-pill s-error'; }
-      document.getElementById('statusText').textContent = 'エラー: ' + xhr.status;
-      console.error(xhr.responseText);
+  try{
+    for(let i=0;i<totalChunks;i++){
+      const start=i*CHUNK_SIZE;
+      const end=Math.min(start+CHUNK_SIZE, file.size);
+      const chunk=file.slice(start,end);
+
+      const fd=new FormData();
+      fd.append('file', chunk);
+      fd.append('upload_preset', UPLOAD_PRESET);
+      fd.append('folder','uploads');
+
+      const res = await new Promise((resolve, reject)=>{
+        const xhr=new XMLHttpRequest();
+        xhr.open('POST',`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`);
+        xhr.setRequestHeader('X-Unique-Upload-Id', uniqueUploadId);
+        xhr.setRequestHeader('Content-Range', `bytes ${start}-${end-1}/${file.size}`);
+
+        xhr.upload.onprogress = e => {
+          if(!e.lengthComputable) return;
+          updateUI(start+e.loaded, file.size);
+        };
+        xhr.onload=()=>{
+          if(xhr.status===200||xhr.status===201||xhr.status===308){
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject(new Error(`HTTP ${xhr.status}: ${xhr.responseText}`));
+          }
+        };
+        xhr.onerror=()=>reject(new Error('ネットワークエラー'));
+        xhr.send(fd);
+      });
+
+      if(i===totalChunks-1){
+        uploadedUrl=res.secure_url;
+      }
+      updateUI(end, file.size);
     }
-  };
 
-  xhr.onerror = () => {
-    const lbl = document.getElementById(id+'_lbl');
-    if(lbl){ lbl.textContent='失敗'; lbl.className='status-pill s-error'; }
-    document.getElementById('statusText').textContent = 'ネットワークエラー';
-  };
+    // 完了
+    uploadedFiles.unshift({name:file.name, url:uploadedUrl, size:file.size, date:Date.now()});
+    saveFiles();
+    document.getElementById('statusText').textContent='完了';
+    renderFiles();
 
-  xhr.send(formData);
+  } catch(e){
+    const lbl=document.getElementById(id+'_lbl');
+    if(lbl){lbl.textContent='エラー';lbl.className='status-pill s-error';}
+    const meta=document.getElementById(id+'_meta');
+    if(meta) meta.textContent='アップロード失敗: '+e.message;
+    document.getElementById('statusText').textContent='エラー';
+    console.error(e);
+  }
 }
 
 // ドロップゾーン
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-
-dropZone.addEventListener('dragover', e=>{ e.preventDefault(); dropZone.classList.add('dragover'); });
-dropZone.addEventListener('dragleave', ()=> dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', e=>{
-  e.preventDefault();
-  dropZone.classList.remove('dragover');
-  [...e.dataTransfer.files].forEach(uploadFile);
+const dropZone=document.getElementById('dropZone');
+const fileInput=document.getElementById('fileInput');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('dragover');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop',e=>{
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  [...e.dataTransfer.files].forEach(uploadFileChunked);
 });
-fileInput.addEventListener('change', ()=>{
-  [...fileInput.files].forEach(uploadFile);
-  fileInput.value = '';
+fileInput.addEventListener('change',()=>{
+  [...fileInput.files].forEach(uploadFileChunked);
+  fileInput.value='';
 });
 
-// 初期表示
 renderFiles();
 </script>
 </body>
