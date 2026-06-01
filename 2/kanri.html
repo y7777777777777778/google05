@@ -104,6 +104,7 @@
   .stat-card.ok     .stat-num { color: var(--ok); }
   .stat-card.wait   .stat-num { color: var(--wait); }
   .stat-card.ng     .stat-num { color: var(--ng); }
+  .stat-card.online .stat-num { color: #00e5ff; }
 
   /* ===== ツールバー ===== */
   .toolbar {
@@ -237,6 +238,20 @@
   @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
+  }
+
+  /* ===== オンラインドット点滅 ===== */
+  @keyframes pulse-online {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,230,118,0.6); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 4px rgba(0,230,118,0); }
+  }
+  .online-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--ok);
+    animation: pulse-online 1.6s ease-in-out infinite;
+    flex-shrink: 0;
   }
 
   /* ===== 操作ボタン ===== */
@@ -598,6 +613,10 @@
     <span class="stat-num" id="countNg">-</span>
     <span class="stat-label">拒否</span>
   </div>
+  <div class="stat-card online">
+    <span class="stat-num" id="countOnline">-</span>
+    <span class="stat-label">🟢 オンライン</span>
+  </div>
 </div>
 
 <!-- ========== 表示モード ========== -->
@@ -901,14 +920,14 @@
   <table>
     <thead>
       <tr>
-        <th style="width:12%">本名</th>
+        <th style="width:13%">本名 / 状態</th>
         <th style="width:14%">Name（表示名）</th>
         <th style="width:9%">Status</th>
         <th style="width:8%">グループ</th>
-        <th style="width:8%">管理者</th>
-        <th style="width:9%">芥chat</th>
-        <th style="width:12%">表示先</th>
-        <th style="width:10%">名前変更</th>
+        <th style="width:7%">管理者</th>
+        <th style="width:7%">芥chat</th>
+        <th style="width:10%">表示先</th>
+        <th style="width:12%">名前変更</th>
         <th style="width:20%">操作</th>
       </tr>
     </thead>
@@ -976,10 +995,10 @@
   const countOk          = document.getElementById("countOk");
   const countWait        = document.getElementById("countWait");
   const countNg          = document.getElementById("countNg");
+  const countOnline      = document.getElementById("countOnline");
 
   let allUsers = [];
   let pendingDeleteId = null;
-  // 汎用確認ダイアログ用コールバック
   let confirmCallback = null;
 
   // ========================================
@@ -999,18 +1018,16 @@
     confirmMsg.innerHTML = msg;
     confirmOkBtn.textContent = okLabel || "削除する";
     confirmCallback = cb;
-    pendingDeleteId = null; // ユーザー削除と区別
+    pendingDeleteId = null;
     confirmOverlay.classList.add("active");
   }
 
-  // OK ボタン
   confirmOkBtn.addEventListener("click", async function() {
     confirmOverlay.classList.remove("active");
     if (confirmCallback) {
       await confirmCallback();
       confirmCallback = null;
     } else if (pendingDeleteId) {
-      // ユーザー削除（従来ロジック）
       const id = pendingDeleteId;
       const user = allUsers.find(u => u.id === id);
       const name = user ? user.name : "";
@@ -1040,6 +1057,52 @@
   });
 
   // ========================================
+  // ★ オンライン状態判定
+  // ========================================
+  function presenceBadge(lastSeen) {
+    if (!lastSeen) {
+      return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
+    }
+
+    // Firestore Timestamp → Date
+    const ts = lastSeen.toDate ? lastSeen.toDate().getTime()
+                                : new Date(lastSeen).getTime();
+    if (isNaN(ts)) {
+      return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
+    }
+
+    const now = Date.now();
+    const diffMs  = now - ts;
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHr  = Math.floor(diffMs / 3600000);
+
+    // 5分以内 → オンライン
+    if (diffMin < 5) {
+      return `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ok);">
+        <span class="online-dot"></span>オンライン
+      </span>`;
+    }
+
+    // 今日中（深夜0時より後）→ 何時間/分前
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    if (ts >= todayStart.getTime()) {
+      const label = diffHr >= 1 ? `${diffHr}時間前` : `${diffMin}分前`;
+      return `<span style="font-size:11px;color:var(--wait);">🟡 ${label}</span>`;
+    }
+
+    // 昨日以前
+    return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
+  }
+
+  function isOnline(lastSeen) {
+    if (!lastSeen) return false;
+    const ts = lastSeen.toDate ? lastSeen.toDate().getTime() : new Date(lastSeen).getTime();
+    if (isNaN(ts)) return false;
+    return (Date.now() - ts) < 5 * 60 * 1000;
+  }
+
+  // ========================================
   // ★ チャット全削除
   // ========================================
   window.confirmDeleteChat = function() {
@@ -1052,7 +1115,6 @@
         btn.disabled = true;
         btn.textContent = "削除中...";
         try {
-          // Firestoreは一括削除をバッチで（500件ずつ）
           let deleted = 0;
           while (true) {
             const snap = await getDocs(collection(db, "chat_2"));
@@ -1121,10 +1183,11 @@
   // テーブル描画
   // ========================================
   function renderTable(users) {
-    countTotal.textContent = users.length;
-    countOk.textContent    = users.filter(u => u.status === "ok").length;
-    countWait.textContent  = users.filter(u => u.status === "wait").length;
-    countNg.textContent    = users.filter(u => u.status === "ng").length;
+    countTotal.textContent  = users.length;
+    countOk.textContent     = users.filter(u => u.status === "ok").length;
+    countWait.textContent   = users.filter(u => u.status === "wait").length;
+    countNg.textContent     = users.filter(u => u.status === "ng").length;
+    countOnline.textContent = users.filter(u => isOnline(u.lastSeen)).length;
 
     const q = searchInput.value.trim().toLowerCase();
     const filtered = q
@@ -1142,20 +1205,30 @@
     tbody.innerHTML = filtered.map(user => {
       const pageMode  = userPageMode[user.id] || 'peji';
       const isAdmin   = !!user.isAdmin;
+      const online    = isOnline(user.lastSeen);
       const adminStyle = isAdmin
         ? 'background:linear-gradient(90deg,rgba(255,200,0,0.10),rgba(255,200,0,0.04));border-left:3px solid #ffc800;'
         : '';
+      const onlineRowStyle = online
+        ? 'border-left: 3px solid rgba(0,230,118,0.5);' : '';
       return `
-      <tr data-id="${user.id}" style="${adminStyle}">
+      <tr data-id="${user.id}" style="${adminStyle || onlineRowStyle}">
         <td>
-          <span style="font-size:12px;color:${isAdmin ? '#ffd700' : 'var(--text-muted)'};">
-            ${escapeHTML(user.realName || '—')}
-          </span>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <span style="font-size:12px;color:${isAdmin ? '#ffd700' : 'var(--text-muted)'};">
+              ${escapeHTML(user.realName || '—')}
+            </span>
+            ${presenceBadge(user.lastSeen)}
+          </div>
         </td>
         <td>
           <div class="user-name">
-            <div class="user-avatar" style="${isAdmin ? 'background:#b8860b;border:1px solid #ffd700;color:#fff;text-shadow:0 0 6px #ffc800;' : ''}">${getInitial(user.name)}</div>
-            <span class="user-name-text" style="${isAdmin ? 'color:#ffd700;font-weight:700;' : ''}">${escapeHTML(user.name)}${isAdmin ? ' 👑' : ''}</span>
+            <div class="user-avatar" style="${isAdmin ? 'background:#b8860b;border:1px solid #ffd700;color:#fff;text-shadow:0 0 6px #ffc800;' : online ? 'border:2px solid var(--ok);' : ''}">
+              ${getInitial(user.name)}
+            </div>
+            <span class="user-name-text" style="${isAdmin ? 'color:#ffd700;font-weight:700;' : ''}">
+              ${escapeHTML(user.name)}${isAdmin ? ' 👑' : ''}
+            </span>
           </div>
         </td>
         <td>${badgeHTML(user.status)}</td>
@@ -1201,10 +1274,12 @@
             <button class="btn" style="font-size:11px;padding:4px 10px;opacity:.8;border-color:rgba(92,107,192,.4);color:var(--accent2);background:rgba(92,107,192,.08);"
               onclick="resetNameChangeLimit('${user.id}','${escapeHTML(user.name)}')"
               title="本日の変更制限を解除">🔓 制限解除</button>
-            ${user.nameChangeHistory&&user.nameChangeHistory.length ? 
+            ${user.nameChangeHistory && user.nameChangeHistory.length ?
               '<details style="font-size:10px;color:var(--text-muted);margin-top:3px;"><summary style="cursor:pointer;">履歴</summary>' +
-              user.nameChangeHistory.slice(-3).reverse().map(h=>'<div>'+escapeHTML(h.from)+'→'+escapeHTML(h.to)+'<br><span style="color:var(--text-muted);">'+h.date+'</span></div>').join('') +
-              '</details>' : ''}
+              user.nameChangeHistory.slice(-3).reverse().map(h =>
+                '<div>' + escapeHTML(h.from) + '→' + escapeHTML(h.to) +
+                '<br><span style="color:var(--text-muted);">' + h.date + '</span></div>'
+              ).join('') + '</details>' : ''}
           </div>
         </td>
         <td>
@@ -1225,44 +1300,42 @@
   }
 
   function escapeHTML(str) {
-    return str
+    return String(str)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;")
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
   // ========================================
-  // ユーザー一覧取得
+  // ★ ユーザー一覧をリアルタイム監視（onSnapshot）
   // ========================================
-  async function loadUsers() {
+  let userPageMode = {};
+
+  function subscribeUsers() {
     tbody.innerHTML = `<tr class="loading-row"><td colspan="9"><div class="spinner"></div><br>読み込み中...</td></tr>`;
     try {
-      let snapshot;
-      try {
-        const q = query(collection(db, "users"), where("group", "==", MY_GROUP), orderBy("createdAt", "desc"));
-        snapshot = await getDocs(q);
-      } catch (indexErr) {
-        snapshot = await getDocs(query(collection(db, "users"), where("group", "==", MY_GROUP)));
-      }
-      allUsers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderTable(allUsers);
-    } catch (e) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="9">⚠ データ取得に失敗しました<br><small>${e.message}</small></td></tr>`;
-      showToast("エラー: " + e.message, 6000);
+      const q = query(
+        collection(db, "users"),
+        where("group", "==", MY_GROUP)
+      );
+      onSnapshot(q, (snapshot) => {
+        allUsers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        // userPageMode も同時更新
+        snapshot.docs.forEach(d => {
+          userPageMode[d.id] = d.data().pageMode || 'peji';
+        });
+        renderTable(allUsers);
+      }, (e) => {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="9">⚠ データ取得に失敗しました<br><small>${e.message}</small></td></tr>`;
+        showToast("エラー: " + e.message, 6000);
+      });
+    } catch(e) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="9">⚠ 初期化エラー<br><small>${e.message}</small></td></tr>`;
     }
   }
 
   // ========================================
   // ユーザー操作
   // ========================================
-  let userPageMode = {};
-
-  async function loadUserPageModes() {
-    try {
-      const snap = await getDocs(query(collection(db, "users"), where("group", "==", MY_GROUP)));
-      snap.docs.forEach(d => { userPageMode[d.id] = d.data().pageMode || 'peji'; });
-    } catch(e) {}
-  }
-
   window.setUserPageMode = async function(id, name, mode) {
     try {
       await updateDoc(doc(db, "users", id), { pageMode: mode });
@@ -1337,9 +1410,6 @@
     confirmOverlay.classList.add("active");
   };
 
-  // ========================================
-  // ★ 名前変更制限解除
-  // ========================================
   window.resetNameChangeLimit = async function(id, name) {
     try {
       await updateDoc(doc(db, "users", id), { nameChangedAt: "" });
@@ -1351,7 +1421,12 @@
   };
 
   searchInput.addEventListener("input", () => renderTable(allUsers));
-  refreshBtn.addEventListener("click", () => { loadUsers(); showToast("🔄 データを更新しています...", 1500); });
+
+  // 更新ボタン：onSnapshot中なので自動更新されるが、手動でも再レンダリング
+  refreshBtn.addEventListener("click", () => {
+    renderTable(allUsers);
+    showToast("🔄 表示を更新しました", 1500);
+  });
 
   // ========================================
   // 一般公開モード
@@ -1511,10 +1586,9 @@
   // 初期ロード
   // ========================================
   loadPublicMode();
-  loadUsers();
+  subscribeUsers();   // ← onSnapshot でリアルタイム監視
   loadBanList();
   loadDisplayMode();
-  loadUserPageModes();
 
   // ========================================
   // チャット管理
@@ -1708,9 +1782,9 @@
     }
     if (!code) { showToast("番号生成に失敗しました"); return; }
     await updateDoc(doc(db,"users",id), {userCode:code});
-    const inp = document.getElementById("codeInput_" + id);
+    const inp  = document.getElementById("codeInput_" + id);
     const disp = document.getElementById("codeDisp_" + id);
-    if (inp) inp.value = code;
+    if (inp)  inp.value = code;
     if (disp) disp.textContent = '#' + code;
     showToast(`🎲 「${name}」の番号を #${code} に再発行しました`);
   };
@@ -1739,6 +1813,7 @@
   document.getElementById("testNotifInput").addEventListener("keydown", e => {
     if (e.key === "Enter") window.sendTestNotif();
   });
+
 </script>
 </body>
 </html>
