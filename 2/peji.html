@@ -681,7 +681,6 @@ body.fullscreen #fullscreenBtn:hover {
 <symbol id="s-chevron-r" viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
   <path d="M2 2l6 7-6 7"/>
 </symbol>
-<!-- 全画面アイコン -->
 <symbol id="s-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="15 3 21 3 21 9"/>
   <polyline points="9 21 3 21 3 15"/>
@@ -694,7 +693,6 @@ body.fullscreen #fullscreenBtn:hover {
   <line x1="10" y1="14" x2="3" y2="21"/>
   <line x1="21" y1="3" x2="14" y2="10"/>
 </symbol>
-<!-- ★ サウンドボタン アイコン -->
 <symbol id="s-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
   <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
   <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
@@ -820,7 +818,6 @@ body.fullscreen #fullscreenBtn:hover {
           <div class="app-lbl">YouTube</div>
         </div>
 
-        <!-- 履歴埋め：別タブで開く -->
         <div class="app-item" onclick="openNewTab('https://google-bice-sigma.vercel.app','履歴埋め')">
           <div class="app-shell sk-graphite">
             <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-history"/></svg>
@@ -835,7 +832,6 @@ body.fullscreen #fullscreenBtn:hover {
           <div class="app-lbl">共通チャット</div>
         </div>
 
-        <!-- ★ サウンドボタン -->
         <div class="app-item" onclick="openApp('https://www.myinstants.com/ja/index/jp/','サウンドボタン','s-sound')">
           <div class="app-shell sk-teal">
             <svg class="app-symbol" width="29" height="29" color="#fff"><use href="#s-sound"/></svg>
@@ -1135,13 +1131,54 @@ window.submitNameChange = async function(){
   btn.disabled = false; btn.textContent = '変更する';
 };
 
+/* ━━━ ★ lastSeen ハートビート（管理画面のオンライン表示用） ━━━ */
+let myDocId = null;
+
+// 自分のusersドキュメントIDを取得
+async function findMyDocId() {
+  if (!myName) return null;
+  if (myDocId) return myDocId;
+  try {
+    const snap = await getDocs(query(collection(db, 'users'), where('name', '==', myName)));
+    if (!snap.empty) {
+      myDocId = snap.docs[0].id;
+      return myDocId;
+    }
+  } catch(e) {}
+  return null;
+}
+
+// lastSeen を serverTimestamp で更新
+async function sendHeartbeat() {
+  const id = await findMyDocId();
+  if (!id) return;
+  try {
+    await updateDoc(doc(db, 'users', id), { lastSeen: serverTimestamp() });
+  } catch(e) {}
+}
+
+// ページ読み込み時に即送信 → 以降30秒ごと
+sendHeartbeat();
+const hbTimer = setInterval(sendHeartbeat, 30000);
+
+// タブを閉じる / 非表示になったときも送信（最終確認）
+document.addEventListener('visibilitychange', () => {
+  sendHeartbeat();
+});
+window.addEventListener('beforeunload', () => {
+  sendHeartbeat();
+});
+window.addEventListener('pagehide', () => {
+  clearInterval(hbTimer);
+});
+
 /* ━━━ プレゼンス（オンライン人数） ━━━ */
 const presenceId = myName + '_' + Math.random().toString(36).slice(2,7);
 const presenceRef = doc(db, "presence_2", presenceId);
-async function heartbeat(){ try{ await setDoc(presenceRef, { name: myName, ts: serverTimestamp() }); }catch(e){} }
-heartbeat();
-const hbInterval = setInterval(heartbeat, 30000);
-function leavePresence(){ clearInterval(hbInterval); deleteDoc(presenceRef).catch(()=>{}); }
+async function heartbeatPresence(){ try{ await setDoc(presenceRef, { name: myName, ts: serverTimestamp() }); }catch(e){} }
+heartbeatPresence();
+const presenceInterval = setInterval(heartbeatPresence, 30000);
+function leavePresence(){ clearInterval(presenceInterval); deleteDoc(presenceRef).catch(()=>{}); }
 window.addEventListener('beforeunload', leavePresence);
 window.addEventListener('pagehide', leavePresence);
 onSnapshot(collection(db,"presence_2"), snap=>{
