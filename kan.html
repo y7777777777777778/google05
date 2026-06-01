@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>簡易承認 [グループ2]</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:      #0f1117;
+    --surface: #1a1d27;
+    --surface2:#22263a;
+    --border:  #2e3354;
+    --text:    #e8eaf6;
+    --muted:   #8b92b8;
+    --ok:      #00e676;
+    --wait:    #ffb300;
+    --ng:      #ff5252;
+    --accent:  #7986cb;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'Helvetica Neue', sans-serif;
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ステータスカード */
+  .stats {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    text-align: center;
+    min-width: 70px;
+  }
+  .stat-num { font-size: 22px; font-weight: 700; }
+  .stat-lbl { font-size: 10px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-top: 2px; }
+  .c-total { color: var(--accent); }
+  .c-wait  { color: var(--wait); }
+  .c-ok    { color: var(--ok); }
+  .c-ng    { color: var(--ng); }
+
+  /* リスト */
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background .12s;
+  }
+  .card:hover { background: var(--surface2); }
+  .card.is-wait { border-left: 3px solid var(--wait); }
+  .card.is-ok   { border-left: 3px solid var(--ok);   opacity: .6; }
+  .card.is-ng   { border-left: 3px solid var(--ng);   opacity: .6; }
+
+  /* アバター */
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #3d4270;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700;
+    color: #fff; flex-shrink: 0;
+  }
+
+  /* 名前 */
+  .info { flex: 1; min-width: 0; }
+  .name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .realname { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  /* バッジ */
+  .badge {
+    font-size: 10px; font-weight: 700;
+    padding: 3px 9px; border-radius: 20px;
+    letter-spacing: .05em; flex-shrink: 0;
+  }
+  .badge-wait { background: rgba(255,179,0,.15); color: var(--wait); border: 1px solid rgba(255,179,0,.3); }
+  .badge-ok   { background: rgba(0,230,118,.12); color: var(--ok);   border: 1px solid rgba(0,230,118,.25); }
+  .badge-ng   { background: rgba(255,82,82,.12);  color: var(--ng);   border: 1px solid rgba(255,82,82,.25); }
+
+  /* 操作ボタン */
+  .btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-size: 12px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    transition: all .13s;
+  }
+  .btn:disabled { opacity: .35; cursor: not-allowed; }
+  .btn-ok {
+    background: rgba(0,230,118,.12);
+    border-color: rgba(0,230,118,.35);
+    color: var(--ok);
+  }
+  .btn-ok:hover:not(:disabled) { background: rgba(0,230,118,.25); border-color: var(--ok); }
+  .btn-ng {
+    background: rgba(255,82,82,.10);
+    border-color: rgba(255,82,82,.3);
+    color: var(--ng);
+  }
+  .btn-ng:hover:not(:disabled) { background: rgba(255,82,82,.22); border-color: var(--ng); }
+
+  /* 空 / ローディング */
+  .empty {
+    text-align: center; padding: 48px 16px;
+    color: var(--muted); font-size: 13px;
+  }
+  .spinner {
+    display: inline-block; width: 24px; height: 24px;
+    border: 3px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin .8s linear infinite;
+    margin-bottom: 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* オンライン状態 */
+  .presence {
+    font-size: 10px;
+    display: flex; align-items: center; gap: 4px;
+    margin-top: 2px;
+  }
+  .dot-online {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ok); flex-shrink: 0;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100%{ box-shadow: 0 0 0 0 rgba(0,230,118,.6); }
+    50%{ box-shadow: 0 0 0 4px rgba(0,230,118,0); }
+  }
+  .presence-online { color: var(--ok); }
+  .presence-today  { color: var(--wait); }
+  .presence-off    { color: var(--muted); }
+
+  /* タブ（全員 / 待機のみ） */
+  .tabs {
+    display: flex; gap: 6px; margin-bottom: 14px;
+  }
+  .tab-btn {
+    padding: 6px 16px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted); font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all .13s;
+  }
+  .tab-btn.active {
+    border-color: var(--accent); color: var(--accent);
+    background: rgba(121,134,203,.1);
+  }
+
+  /* トースト */
+  #toast {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 20px;
+    border-radius: 8px; font-size: 12px;
+    opacity: 0; transition: opacity .2s, transform .2s;
+    z-index: 99; pointer-events: none; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* 更新ボタン */
+  .refresh {
+    margin-left: auto;
+    padding: 5px 12px; border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--surface2); color: var(--muted);
+    font-size: 11px; cursor: pointer; font-family: inherit;
+    transition: all .13s;
+  }
+  .refresh:hover { border-color: var(--accent); color: var(--text); }
+</style>
+</head>
+<body>
+
+<h1>
+  🔐 簡易承認パネル
+  <button class="refresh" id="refreshBtn">🔄 更新</button>
+</h1>
+
+<!-- 統計 -->
+<div class="stats">
+  <div class="stat"><div class="stat-num c-total" id="cTotal">-</div><div class="stat-lbl">Total</div></div>
+  <div class="stat"><div class="stat-num c-wait"  id="cWait">-</div><div class="stat-lbl">待機中</div></div>
+  <div class="stat"><div class="stat-num c-ok"    id="cOk">-</div><div class="stat-lbl">許可</div></div>
+  <div class="stat"><div class="stat-num c-ng"    id="cNg">-</div><div class="stat-lbl">拒否</div></div>
+</div>
+
+<!-- タブ -->
+<div class="tabs">
+  <button class="tab-btn active" id="tabAll"  onclick="setFilter('all')">すべて</button>
+  <button class="tab-btn"        id="tabWait" onclick="setFilter('wait')">⏳ 待機のみ</button>
+</div>
+
+<!-- リスト -->
+<div class="list" id="list">
+  <div class="empty"><div class="spinner"></div><br>読み込み中...</div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import {
+  getFirestore, collection, query, where, onSnapshot, doc, updateDoc
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const db = getFirestore(initializeApp({
+  apiKey:            "AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
+  authDomain:        "fir-66339.firebaseapp.com",
+  projectId:         "fir-66339",
+  storageBucket:     "fir-66339.firebasestorage.app",
+  messagingSenderId: "876017617963",
+  appId:             "1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
+}));
+
+const MY_GROUP = '2';
+let allUsers = [];
+let curFilter = 'all';
+
+// ─── トースト ───
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ─── プレゼンスバッジ ───
+function presenceHTML(lastSeen) {
+  if (!lastSeen) return '<span class="presence presence-off">⚫ オフライン</span>';
+  const ts = lastSeen.toDate ? lastSeen.toDate().getTime() : new Date(lastSeen).getTime();
+  if (isNaN(ts)) return '<span class="presence presence-off">⚫ オフライン</span>';
+  const diff = Date.now() - ts;
+  const min  = Math.floor(diff / 60000);
+  const hr   = Math.floor(diff / 3600000);
+  if (min < 5) {
+    return '<span class="presence presence-online"><span class="dot-online"></span>オンライン</span>';
+  }
+  const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+  if (ts >= todayStart.getTime()) {
+    return `<span class="presence presence-today">🟡 ${hr >= 1 ? hr+'時間前' : min+'分前'}</span>`;
+  }
+  return '<span class="presence presence-off">⚫ オフライン</span>';
+}
+
+// ─── 描画 ───
+function render() {
+  const users = curFilter === 'wait'
+    ? allUsers.filter(u => u.status === 'wait')
+    : allUsers;
+
+  document.getElementById('cTotal').textContent = allUsers.length;
+  document.getElementById('cWait').textContent  = allUsers.filter(u => u.status === 'wait').length;
+  document.getElementById('cOk').textContent    = allUsers.filter(u => u.status === 'ok').length;
+  document.getElementById('cNg').textContent    = allUsers.filter(u => u.status === 'ng').length;
+
+  const list = document.getElementById('list');
+
+  if (users.length === 0) {
+    list.innerHTML = `<div class="empty">${curFilter === 'wait' ? '待機中のユーザーはいません ✅' : 'ユーザーがいません'}</div>`;
+    return;
+  }
+
+  list.innerHTML = users.map(u => {
+    const initial = (u.name || '?').charAt(0).toUpperCase();
+    const badge = u.status === 'ok'
+      ? '<span class="badge badge-ok">許可</span>'
+      : u.status === 'ng'
+      ? '<span class="badge badge-ng">拒否</span>'
+      : '<span class="badge badge-wait">待機中</span>';
+
+    return `
+    <div class="card is-${u.status || 'wait'}">
+      <div class="avatar">${initial}</div>
+      <div class="info">
+        <div class="name">${esc(u.name || '—')}</div>
+        ${u.realName ? `<div class="realname">${esc(u.realName)}</div>` : ''}
+        ${presenceHTML(u.lastSeen)}
+      </div>
+      ${badge}
+      <div class="btns">
+        <button class="btn btn-ok" onclick="allow('${u.id}','${esc(u.name)}')"
+          ${u.status === 'ok' ? 'disabled' : ''}>✓</button>
+        <button class="btn btn-ng" onclick="deny('${u.id}','${esc(u.name)}')"
+          ${u.status === 'ng' ? 'disabled' : ''}>✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ─── フィルター切替 ───
+window.setFilter = function(f) {
+  curFilter = f;
+  document.getElementById('tabAll').classList.toggle('active', f === 'all');
+  document.getElementById('tabWait').classList.toggle('active', f === 'wait');
+  render();
+};
+
+// ─── 許可 / 拒否 ───
+window.allow = async function(id, name) {
+  try {
+    await updateDoc(doc(db, 'users', id), { status: 'ok' });
+    const u = allUsers.find(u => u.id === id);
+    if (u) u.status = 'ok';
+    render();
+    toast('✅ ' + name + ' を許可しました');
+  } catch(e) { toast('エラー: ' + e.message); }
+};
+
+window.deny = async function(id, name) {
+  try {
+    await updateDoc(doc(db, 'users', id), { status: 'ng' });
+    const u = allUsers.find(u => u.id === id);
+    if (u) u.status = 'ng';
+    render();
+    toast('🚫 ' + name + ' を拒否しました');
+  } catch(e) { toast('エラー: ' + e.message); }
+};
+
+// ─── リアルタイム監視 ───
+const q = query(collection(db, 'users'), where('group', '==', MY_GROUP));
+onSnapshot(q, snap => {
+  allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  // 待機中を先頭に
+  allUsers.sort((a, b) => {
+    const order = { wait: 0, ok: 1, ng: 2 };
+    return (order[a.status] ?? 1) - (order[b.status] ?? 1);
+  });
+  render();
+});
+
+document.getElementById('refreshBtn').addEventListener('click', () => {
+  render();
+  toast('🔄 更新しました');
+});
+</script>
+</body>
+</html>
