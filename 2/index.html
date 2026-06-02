@@ -6,11 +6,8 @@
 <title>Google</title>
 <link rel="icon" href="https://www.google.com/favicon.ico">
 <style>
-/* ===== リセット & ベース ===== */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:#fff;color:#202124;min-height:100vh;display:flex;flex-direction:column}
-
-/* ===== ヘッダー ===== */
 header{display:flex;justify-content:space-between;align-items:center;padding:6px 16px;height:60px;flex-shrink:0}
 .hdr-left{display:flex;align-items:center}
 .hdr-left a{font-size:13px;color:#202124;text-decoration:none;padding:8px 10px}
@@ -18,54 +15,32 @@ header{display:flex;justify-content:space-between;align-items:center;padding:6px
 .hdr-right{display:flex;align-items:center;gap:0}
 .hdr-right a{font-size:13px;color:#202124;text-decoration:none;padding:8px 10px}
 .hdr-right a:hover{text-decoration:underline}
-
-/* 9点グリッド（本家gb_Cそのまま） */
 .gb_D{box-sizing:border-box;display:inline-block;height:48px;outline:none;padding:4px;position:relative}
 .gb_C{background-color:transparent;border:0;display:inline-block;height:40px;padding:4px;position:relative;width:40px;cursor:pointer;border-radius:50%;-webkit-tap-highlight-color:transparent}
 .gb_C:hover{background-color:#e8eaed}
 .gb_F{fill:#444746;color:#444746;display:block;width:20px;height:20px}
-
-/* ログインボタン（本家アウトラインスタイル） */
 .gb_signin{background:#0b57d0;border-radius:100px;box-sizing:border-box;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;height:40px;min-height:40px;outline:none;padding:0 24px;text-align:center;text-decoration:none;white-space:nowrap;line-height:1;position:relative;font-family:Arial,sans-serif;min-width:unset;cursor:pointer;border:none;margin-left:8px;vertical-align:middle}
 .gb_signin:hover{background:#1b66c9;text-decoration:none}
 .gb_signin:active{background:#0842a0}
-
-/* ===== メイン ===== */
 main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:110px}
 .logo{margin-bottom:28px}
 .logo img{width:272px;height:92px;display:block}
-
-/* ===== 検索フォーム（本家A8SBwf完全） ===== */
 .A8SBwf{margin:0 auto;max-width:688px;min-width:295px;margin-top:6px;position:relative;width:584px}
-
-/* 検索バー本体（本家RNNXgb） */
 .RNNXgb{display:flex;z-index:3;position:relative;box-sizing:border-box;min-height:50px;background:#fff;border:1px solid #dadce0;box-shadow:0px 3px 10px 0px rgba(31,31,31,0.08);border-radius:26px;margin:0 auto}
 .RNNXgb:hover,.RNNXgb:focus-within{background:#fff;box-shadow:0 2px 8px 1px rgba(64,60,67,.24);border-color:transparent}
-
-/* 内部レイアウト（本家SDkEP） */
 .SDkEP{flex:1;display:flex;background:inherit;border-radius:inherit;padding:0 8px 0 0;align-items:center}
-
-/* + ボタンエリア（本家UMOYhd/A7sPV/UbbAWe） */
 .UMOYhd{display:flex;align-self:center}
 .A7sPV{display:flex;align-items:center;justify-content:center;position:relative;width:48px;height:48px;margin-left:-1px}
 .UbbAWe{align-items:center;border-radius:9999px;cursor:pointer;display:flex;color:#1f1f1f;height:36px;justify-content:center;width:36px;border:none;background:none;-webkit-tap-highlight-color:transparent}
 .UbbAWe:hover{background:#f3f5f6}
 .UbbAWe svg{width:24px;height:24px;fill:currentColor}
-
-/* テキスト入力エリア（本家a4bIc/gLFyf） */
 .a4bIc{display:flex;flex-wrap:wrap;flex:1;position:relative}
 .gLFyf{width:100%;resize:none;background-color:transparent;border:none;margin:0;padding:0;color:rgba(0,0,0,.87);word-wrap:break-word;outline:none;-webkit-tap-highlight-color:transparent;font:16px Arial,sans-serif;line-height:40px;flex:100%;border-bottom:8px solid transparent;padding-top:5px;overflow-x:hidden}
 .gLFyf::placeholder{color:#70757a;opacity:1}
-
-/* 右側ボタン群コンテナ（本家dRYYxd） */
 .dRYYxd{display:flex;flex:0 0 auto;align-items:stretch;flex-direction:row;height:50px;background:inherit;border-radius:inherit}
-
-/* 消去ボタンエリア（本家BKRPef） */
 .BKRPef{background:transparent;align-items:center;flex:1 0 auto;flex-direction:row;display:flex;cursor:pointer;position:relative}
 .vOY7J{background:transparent;border:0;align-items:center;flex:1 0 auto;cursor:pointer;display:none;height:100%;line-height:44px;padding:0 8px}
 .vOY7J svg{width:24px;height:24px;fill:#1f1f1f}
-
-/* 音声・レンズボタンエリア（本家ywK6Rd） */
 .ywK6Rd{background-color:inherit;display:flex;align-self:center}
 .fzj3ad{flex:1 0 auto;display:flex;cursor:pointer;align-items:center;border:0;background:transparent;padding:0 8px;width:40px;line-height:44px;position:relative;border-radius:50%;-webkit-tap-highlight-color:transparent}
 .fzj3ad:hover{background:#f1f3f4}
@@ -73,34 +48,21 @@ main{flex:1;display:flex;flex-direction:column;align-items:center;justify-conten
 .etxtjc{flex:1 0 auto;display:flex;cursor:pointer;align-items:center;border:0;background:transparent;padding:0 8px;width:40px;line-height:44px;position:relative;border-radius:50%;-webkit-tap-highlight-color:transparent}
 .etxtjc:hover{background:#f1f3f4}
 .etxtjc svg{width:24px;height:24px;display:block}
-
-/* AIモードボタン（本家plR5qb） */
 .plR5qb{align-self:center;background:#f3f5f6;border-radius:100px;cursor:pointer;flex-shrink:0;font-family:Arial,sans-serif;font-size:14px;font-weight:500;line-height:20px;margin-inline-start:8px;padding:0 12px 0 10px;position:relative;height:36px;border:none;display:inline-flex;align-items:center;gap:6px;color:#1f1f1f;-webkit-tap-highlight-color:transparent;white-space:nowrap}
 .plR5qb:hover{background:#e8eaed}
 .plR5qb svg{width:20px;height:20px;flex-shrink:0}
-
-/* ===== 検索ボタン（本家T14B5e完全） ===== */
 .T14B5e{height:70px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:2px}
 .gNO89b,.RNmpXc{background-color:#f8f9fa;border:1px solid #f8f9fa;border-radius:4px;color:#3c4043;font-family:Arial,sans-serif;font-size:14px;font-weight:500;margin:11px 4px;padding:0 16px;height:36px;min-width:54px;text-align:center;cursor:pointer;user-select:none;display:inline-block}
 .gNO89b:hover,.RNmpXc:hover{box-shadow:0 1px 1px rgba(0,0,0,.1);background-color:#f8f9fa;border:1px solid #dadce0;color:#202124}
-.gNO89b:focus,.RNmpXc:focus{border:1px solid #4285f4;outline:none}
-
-/* ===== フッター（本家c93Gbe完全） ===== */
 footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Arial,sans-serif}
 .uU7dJb{padding:15px 30px;border-bottom:1px solid #dadce0;font-size:15px;color:#202124;display:flex;flex-wrap:wrap;justify-content:space-between}
 .KxwPGc{display:flex;justify-content:space-between;padding:0 20px}
 .KxwPGc-left,.KxwPGc-right{display:flex;flex-wrap:wrap}
 .pHiOh{display:block;padding:15px;white-space:nowrap;font-size:13px;color:#1f1f1f;text-decoration:none}
 .pHiOh:hover{text-decoration:underline}
-
-/* ===== 隠しiframe（peji.html表示用） ===== */
 #hiddenFrame{display:none;position:fixed;top:0;left:0;width:100%;height:100%;border:none;z-index:999}
-
-/* ===== オーバーレイ背景 ===== */
 #overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:center}
 #overlay.active{display:flex}
-
-/* ===== Name入力モーダル（本家Googleサインイン完全再現） ===== */
 #nameModal{background:#fff;border-radius:28px;padding:48px 40px 36px;width:448px;max-width:92vw;box-shadow:0 3px 5px -1px rgba(0,0,0,.2),0 6px 10px rgba(0,0,0,.14),0 1px 18px rgba(0,0,0,.12);animation:modalIn .2s ease;font-family:Arial,sans-serif}
 @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .modal-logo{display:flex;justify-content:center;margin-bottom:24px}
@@ -123,87 +85,53 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
 .btn-next{padding:0 24px;height:40px;font-size:14px;font-weight:500;color:#fff;background:#0b57d0;border:none;border-radius:100px;cursor:pointer;font-family:Arial,sans-serif;transition:background .15s,box-shadow .15s;box-shadow:0 1px 2px rgba(60,64,67,.3)}
 .btn-next:hover{background:#0842a0;box-shadow:0 2px 6px rgba(60,64,67,.3)}
 .btn-next:disabled{background:#94b9f5;cursor:not-allowed;box-shadow:none}
-
-/* ===== トースト通知 ===== */
 #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#323232;color:#fff;padding:14px 24px;border-radius:4px;font-size:14px;font-family:Arial,sans-serif;opacity:0;transition:opacity .25s,transform .25s;z-index:2000;pointer-events:none;white-space:nowrap}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
 
-<!-- ========== ヘッダー（本家完全再現） ========== -->
 <header>
   <div class="hdr-left">
-    <a href="https://about.google/?fg=1&utm_source=google-JP&utm_medium=referral&utm_campaign=hp-header">Googleについて</a>
-    <a href="https://store.google.com/JP?utm_source=hp_header&utm_medium=google_ooo&utm_campaign=GS100042&hl=ja-JP">ストア</a>
+    <a href="https://about.google/?fg=1">Googleについて</a>
+    <a href="https://store.google.com/JP?hl=ja-JP">ストア</a>
   </div>
   <div class="hdr-right">
     <a href="https://mail.google.com/mail/&ogbl" target="_top">Gmail</a>
     <a href="https://www.google.com/imghp?hl=ja&ogbl" target="_top">画像</a>
-
-    <!-- Googleアプリ 9点グリッド（本家gb_C完全） -->
     <div class="gb_D">
-      <a class="gb_C" aria-label="Google アプリ" href="https://www.google.co.jp/intl/ja/about/products" aria-expanded="false" role="button" tabindex="0">
+      <a class="gb_C" aria-label="Google アプリ" href="https://www.google.co.jp/intl/ja/about/products" role="button" tabindex="0">
         <svg class="gb_F" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
           <path d="M6,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM16,6c0,1.1 0.9,2 2,2s2,-0.9 2,-2 -0.9,-2 -2,-2 -2,0.9 -2,2zM12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2z"/>
         </svg>
       </a>
     </div>
-
-    <!-- ログインボタン（本家アウトラインスタイル） -->
-    <a class="gb_signin" href="https://accounts.google.com/ServiceLogin?hl=ja&passive=true&continue=https://www.google.com/&ec=futura_exp_og_so_72776762_e" target="_top">
-      <span>ログイン</span>
-    </a>
+    <a class="gb_signin" href="https://accounts.google.com/ServiceLogin?hl=ja" target="_top"><span>ログイン</span></a>
   </div>
 </header>
 
-<!-- ========== メインコンテンツ ========== -->
 <main>
-  <!-- ロゴ -->
   <div class="logo">
     <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" aria-label="Google">
   </div>
-
-  <!-- 検索フォーム（本家A8SBwf完全再現） -->
   <form class="A8SBwf" action="/search" autocomplete="off" method="GET" role="search" onsubmit="return doSearch();" data-submitfalse="q">
-    <!-- 検索バー本体（本家RNNXgb） -->
     <div class="RNNXgb">
       <div class="SDkEP">
-
-        <!-- + ボタン（ファイル/ツール追加, 本家UbbAWe） -->
         <div class="UMOYhd">
           <div class="A7sPV">
-            <button type="button" class="UbbAWe" aria-label="ファイルとツールを追加" aria-haspopup="menu" tabindex="0">
+            <button type="button" class="UbbAWe" aria-label="ファイルとツールを追加" tabindex="0">
               <svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
                 <path d="M434.5-434.5H191.87v-91H434.5v-242.63h91v242.63h242.63v91H525.5v242.63h-91V-434.5Z" fill="currentColor"/>
               </svg>
             </button>
           </div>
         </div>
-
-        <!-- テキスト入力（本家a4bIc/gLFyf） -->
         <div class="a4bIc">
-          <input
-            class="gLFyf"
-            id="APjFqb"
-            name="q"
-            type="text"
-            placeholder="検索または URL を入力"
-            autocomplete="off"
-            autocapitalize="off"
-            autocorrect="off"
-            spellcheck="false"
-            aria-label="検索"
-            aria-autocomplete="both"
-            maxlength="2048"
-            tabindex="0"
-          >
+          <input class="gLFyf" id="APjFqb" name="q" type="text" placeholder="検索または URL を入力"
+            autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+            aria-label="検索" maxlength="2048" tabindex="0">
         </div>
-
-        <!-- 右側ボタン群（本家dRYYxd） -->
         <div class="dRYYxd">
-
-          <!-- 消去ボタンエリア（本家BKRPef） -->
           <div class="BKRPef">
             <div class="vOY7J" id="clearBtn" aria-label="消去" role="button" tabindex="0">
               <svg focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -211,60 +139,41 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
               </svg>
             </div>
           </div>
-
-          <!-- 音声・レンズボタン（本家ywK6Rd） -->
           <div class="ywK6Rd">
-            <!-- 音声検索（本家fzj3ad/マイク） -->
             <div class="fzj3ad" aria-label="音声で検索" role="button" tabindex="0" title="音声で検索">
               <svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
                 <path fill="#1f1f1f" d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"/>
               </svg>
             </div>
-
-            <!-- Google レンズ（本家etxtjc/カメラ） -->
             <div class="etxtjc" aria-label="画像で検索" role="button" tabindex="0" title="画像で検索" onclick="location.href='https://lens.google.com/'">
               <svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
                 <path fill="#1f1f1f" d="M480-320q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35Zm240 160q-33 0-56.5-23.5T640-240q0-33 23.5-56.5T720-320q33 0 56.5 23.5T800-240q0 33-23.5 56.5T720-160Zm-440 40q-66 0-113-47t-47-113v-80h80v80q0 33 23.5 56.5T280-200h200v80H280Zm480-320v-160q0-33-23.5-56.5T680-680H280q-33 0-56.5 23.5T200-600v120h-80v-120q0-66 47-113t113-47h80l40-80h160l40 80h80q66 0 113 47t47 113v160h-80Z"/>
               </svg>
             </div>
           </div>
-
-          <!-- AIモードボタン（本家plR5qb完全） -->
-          <button
-            type="button"
-            class="plR5qb"
-            role="link"
-            tabindex="0"
-            title="AI モード"
-            onclick="location.href='https://www.google.com/search?udm=50'"
-          >
+          <button type="button" class="plR5qb" role="link" tabindex="0" title="AI モード" onclick="location.href='https://www.google.com/search?udm=50'">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M17.5 12c0-3.04 2.46-5.5 5.5-5.5-3.04 0-5.5-2.46-5.5-5.5 0 3.04-2.46 5.5-5.5 5.5 3.04 0 5.5 2.46 5.5 5.5z" fill="#1f1f1f"/>
               <path d="M15.65 11.58c.18-.5.27-1.03.31-1.58h-2c-.1 1.03-.51 1.93-1.27 2.69-.88.87-1.94 1.31-3.19 1.31C7.03 14 5 12.07 5 9.5 5 7.03 6.93 5 9.5 5c.46 0 .89.08 1.3.2l1.56-1.56C11.5 3.22 10.55 3 9.5 3 5.85 3 3 5.85 3 9.5S5.85 16 9.5 16c.56 0 2.26-.06 3.8-1.3l6.3 6.3 1.4-1.4-6.3-6.3c.4-.5.72-1.08.95-1.72z" fill="#1f1f1f"/>
             </svg>
             <span>AI モード</span>
           </button>
-
-        </div><!-- /dRYYxd -->
-      </div><!-- /SDkEP -->
-    </div><!-- /RNNXgb -->
-
-    <!-- 検索ボタン（本家T14B5e完全） -->
+        </div>
+      </div>
+    </div>
     <div class="T14B5e">
       <input class="gNO89b" value="Google 検索" aria-label="Google 検索" name="btnK" role="button" tabindex="0" type="submit">
       <input class="RNmpXc" value="I'm Feeling Lucky" aria-label="I'm Feeling Lucky" name="btnI" type="submit" onclick="return luckySearch()">
     </div>
-
   </form>
 </main>
 
-<!-- ========== フッター（本家c93Gbe完全） ========== -->
 <footer>
   <div class="uU7dJb">日本</div>
   <div class="KxwPGc">
     <div class="KxwPGc-left">
-      <a class="pHiOh" href="https://www.google.com/intl/ja_jp/ads/?subid=ww-ww-et-g-awa-a-g_hpafoot1_1!o2&utm_source=google.com&utm_medium=referral&utm_campaign=google_hpafooter&fg=1">広告</a>
-      <a class="pHiOh" href="https://www.google.com/services/?subid=ww-ww-et-g-awa-a-g_hpbfoot1_1!o2&utm_source=google.com&utm_medium=referral&utm_campaign=google_hpbfooter&fg=1">ビジネス</a>
+      <a class="pHiOh" href="https://www.google.com/intl/ja_jp/ads/?fg=1">広告</a>
+      <a class="pHiOh" href="https://www.google.com/services/?fg=1">ビジネス</a>
       <a class="pHiOh" href="https://google.com/search/howsearchworks/?fg=1">検索の仕組み</a>
     </div>
     <div class="KxwPGc-right">
@@ -275,44 +184,30 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
   </div>
 </footer>
 
-<!-- ========== peji.html 表示用 iframe ========== -->
 <iframe id="hiddenFrame"></iframe>
 
-<!-- ========== Name入力オーバーレイ ========== -->
 <div id="overlay">
   <div id="nameModal">
-    <!-- Googleロゴ -->
     <div class="modal-logo">
       <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google">
     </div>
-
     <h2>ログイン</h2>
     <p class="modal-sub">Google アカウントに進む</p>
-
-    <!-- 本名 -->
     <div class="modal-field">
       <input type="text" id="realNameInput" placeholder=" " maxlength="30" autocomplete="off">
       <label for="realNameInput">本名（例: 山田 太郎）</label>
     </div>
-
-    <!-- 組 -->
     <div class="modal-field">
       <input type="number" id="classInput" placeholder=" " min="1" max="9"
         oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2)" autocomplete="off">
       <label for="classInput">組</label>
       <span class="unit">組</span>
     </div>
-
-    <!-- 表示名 -->
     <div class="modal-field">
       <input type="text" id="nameInput" placeholder=" " maxlength="20" autocomplete="off">
       <label for="nameInput">表示名（例: たろう）</label>
     </div>
-
-    <!-- エラーメッセージ -->
     <div id="nameErrMsg"></div>
-
-    <!-- アクションボタン -->
     <div class="modal-actions">
       <button class="btn-cancel" id="cancelBtn">キャンセル</button>
       <button class="btn-next" id="submitBtn">次へ</button>
@@ -320,35 +215,24 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
   </div>
 </div>
 
-<!-- ========== トースト ========== -->
 <div id="toast"></div>
 
-<!-- ========== 入力クリアボタン制御 ========== -->
 <script>
   const qInput   = document.getElementById('APjFqb');
   const clearBtn = document.getElementById('clearBtn');
   if (qInput && clearBtn) {
-    qInput.addEventListener('input', () => {
-      clearBtn.style.display = qInput.value ? 'flex' : 'none';
-    });
-    clearBtn.addEventListener('click', () => {
-      qInput.value = '';
-      clearBtn.style.display = 'none';
-      qInput.focus();
-    });
+    qInput.addEventListener('input', () => { clearBtn.style.display = qInput.value ? 'flex' : 'none'; });
+    clearBtn.addEventListener('click', () => { qInput.value = ''; clearBtn.style.display = 'none'; qInput.focus(); });
   }
 </script>
 
-<!-- ========== Firebase SDK ========== -->
 <script type="module">
-  import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
   import {
     getFirestore, collection, addDoc, query, where,
     getDocs, doc, getDoc, deleteDoc, onSnapshot
   } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-  /* ===== Firebase 設定 ===== */
   const firebaseConfig = {
     apiKey:            "AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
     authDomain:        "fir-66339.firebaseapp.com",
@@ -361,7 +245,6 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
-  /* ===== グループ2用定数 ===== */
   const MY_GROUP   = '2';
   const KIYAKU_KEY = 'kiyaku_agreed_2';
   const NAME_KEY   = 'accessUserName_2';
@@ -369,74 +252,45 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
   const KIYAKU_URL = 'kiyaku.html';
   const PEJI_URL   = 'peji.html';
 
-  /* ===== リアルタイム監視（アク禁・拒否を即反映） ===== */
+  // ===== リアルタイム監視（アク禁・拒否を即反映） =====
   (function startRealtimeCheck() {
     const savedName = localStorage.getItem(NAME_KEY);
     if (!savedName) return;
 
-    const flagKey = "reset_" + savedName.replace(
-      /[^a-zA-Z0-9\u3000-\u9fff\u30A0-\u30FF\u3040-\u309F]/g, "_"
-    );
+    const flagKey = "reset_" + savedName.replace(/[^a-zA-Z0-9\u3000-\u9fff\u30A0-\u30FF\u3040-\u309F]/g,"_");
 
-    /* usersドキュメントを監視 */
-    const userQuery = query(collection(db, "users"), where("name", "==", savedName));
+    const userQuery = query(collection(db,"users"), where("name","==",savedName));
     onSnapshot(userQuery, async snap => {
       if (snap.empty) {
-        /* Firestoreに存在しない → resetフラグ確認 */
         try {
-          const flagSnap = await getDoc(doc(db, "config", flagKey));
+          const flagSnap = await getDoc(doc(db,"config",flagKey));
           if (flagSnap.exists() && flagSnap.data().autoOk === true) {
-            localStorage.removeItem(NAME_KEY);
-            localStorage.removeItem(STATUS_KEY);
+            localStorage.removeItem(NAME_KEY); localStorage.removeItem(STATUS_KEY);
             document.getElementById("hiddenFrame").style.display = "none";
-            sessionStorage.setItem("autoOk_pending", "1");
+            sessionStorage.setItem("autoOk_pending","1");
             document.getElementById("overlay").classList.add("active");
-            setTimeout(() => {
-              const ri = document.getElementById("realNameInput");
-              if (ri) ri.focus();
-            }, 100);
+            setTimeout(() => { const ri = document.getElementById("realNameInput"); if (ri) ri.focus(); }, 100);
             return;
           }
         } catch(e) {}
-        localStorage.removeItem(NAME_KEY);
-        localStorage.removeItem(STATUS_KEY);
+        localStorage.removeItem(NAME_KEY); localStorage.removeItem(STATUS_KEY);
         location.replace("https://www.google.com");
         return;
       }
       const data = snap.docs[0].data();
-      if (data.status === "ng") {
-        localStorage.removeItem(NAME_KEY);
-        localStorage.removeItem(STATUS_KEY);
-        location.replace("https://www.google.com");
-        return;
-      }
-      if (data.group && data.group !== MY_GROUP) {
-        localStorage.removeItem(NAME_KEY);
-        localStorage.removeItem(STATUS_KEY);
-        location.replace("https://www.google.com");
-      }
+      if (data.status === "ng") { localStorage.removeItem(NAME_KEY); localStorage.removeItem(STATUS_KEY); location.replace("https://www.google.com"); return; }
+      if (data.group && data.group !== MY_GROUP) { localStorage.removeItem(NAME_KEY); localStorage.removeItem(STATUS_KEY); location.replace("https://www.google.com"); }
     });
 
-    /* banListを監視 */
-    onSnapshot(doc(db, "config", "banList"), snap => {
+    onSnapshot(doc(db,"config","banList"), snap => {
       if (!snap.exists()) return;
       const data = snap.data();
-      if (data.allBanned === true) {
-        localStorage.removeItem(NAME_KEY);
-        localStorage.removeItem(STATUS_KEY);
-        location.replace("https://www.google.com");
-        return;
-      }
+      if (data.allBanned === true) { localStorage.removeItem(NAME_KEY); localStorage.removeItem(STATUS_KEY); location.replace("https://www.google.com"); return; }
       const names = data.names || [];
-      if (names.includes(savedName)) {
-        localStorage.removeItem(NAME_KEY);
-        localStorage.removeItem(STATUS_KEY);
-        location.replace("https://www.google.com");
-      }
+      if (names.includes(savedName)) { localStorage.removeItem(NAME_KEY); localStorage.removeItem(STATUS_KEY); location.replace("https://www.google.com"); }
     });
   })();
 
-  /* ===== DOM要素取得 ===== */
   const overlay     = document.getElementById("overlay");
   const nameInput   = document.getElementById("nameInput");
   const submitBtn   = document.getElementById("submitBtn");
@@ -444,32 +298,29 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
   const hiddenFrame = document.getElementById("hiddenFrame");
   const toast       = document.getElementById("toast");
 
-  /* ===== ユーティリティ ===== */
   function showToast(msg, duration = 3500) {
     toast.textContent = msg;
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), duration);
   }
 
-  async function getUserStatus(name) {
-    const q        = query(collection(db, "users"), where("name", "==", name));
+  async function getUserData(name) {
+    const q        = query(collection(db,"users"), where("name","==",name));
     const snapshot = await getDocs(q);
     if (snapshot.empty) return null;
-    return snapshot.docs[0].data().status;
+    return snapshot.docs[0].data();
   }
 
   async function isPublicMode() {
     try {
-      const snap = await getDocs(
-        query(collection(db, "config"), where("key", "==", "publicMode"))
-      );
+      const snap = await getDocs(query(collection(db,"config"), where("key","==","publicMode")));
       if (snap.empty) return false;
       return snap.docs[0].data().value === true;
     } catch(e) { return false; }
   }
 
   async function nameExists(name) {
-    const q    = query(collection(db, "users"), where("name", "==", name));
+    const q    = query(collection(db,"users"), where("name","==",name));
     const snap = await getDocs(q);
     return !snap.empty;
   }
@@ -479,41 +330,41 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     const publicMode = autoOk ? true : await isPublicMode();
     if (autoOk) {
       try {
-        const flagKey = "reset_" + name.replace(
-          /[^a-zA-Z0-9\u3000-\u9fff\u30A0-\u30FF\u3040-\u309F]/g, "_"
-        );
-        await deleteDoc(doc(db, "config", flagKey));
+        const flagKey = "reset_" + name.replace(/[^a-zA-Z0-9\u3000-\u9fff\u30A0-\u30FF\u3040-\u309F]/g,"_");
+        await deleteDoc(doc(db,"config",flagKey));
       } catch(e) {}
       sessionStorage.removeItem("autoOk_pending");
     }
-    await addDoc(collection(db, "users"), {
-      name,
-      realName,
-      class:     className,
-      status:    publicMode ? "ok" : "wait",
-      group:     MY_GROUP,
-      createdAt: new Date()
+    await addDoc(collection(db,"users"), {
+      name, realName, class: className,
+      status: publicMode ? "ok" : "wait",
+      group: MY_GROUP, createdAt: new Date()
     });
     return publicMode;
   }
 
+  // ===== ⭐ サブ管理者判定を追加した resolveDestUrl =====
   async function resolveDestUrl(name) {
     try {
-      const q    = query(collection(db, "users"), where("name", "==", name));
+      const q    = query(collection(db,"users"), where("name","==",name));
       const snap = await getDocs(q);
-      if (!snap.empty && snap.docs[0].data().isAdmin === true) {
-        return 'pej.html';
+      if (!snap.empty) {
+        const data = snap.docs[0].data();
+        // 👑 管理者 → pej.html
+        if (data.isAdmin === true) return 'pej.html';
+        // ⭐ サブ管理者 → pej2.html
+        if (data.isSubAdmin === true) return 'pej2.html';
       }
     } catch(e) {}
+    // 一般ユーザー → peji.html
     return PEJI_URL;
   }
 
-  /* ===== モーダル操作 ===== */
   function openModal() {
     document.getElementById("realNameInput").value = "";
     document.getElementById("classInput").value    = "";
     nameInput.value = "";
-    ["realNameInput", "classInput", "nameInput"].forEach(id => {
+    ["realNameInput","classInput","nameInput"].forEach(id => {
       const el = document.getElementById(id);
       if (el) { el.style.borderColor = ""; el.style.borderWidth = ""; }
     });
@@ -523,69 +374,48 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     setTimeout(() => document.getElementById("realNameInput").focus(), 100);
   }
 
-  function closeModal() {
-    overlay.classList.remove("active");
-  }
+  function closeModal() { overlay.classList.remove("active"); }
 
-  /* ===== ページ（iframe）操作 ===== */
   let pejiLoaded = false;
 
   function openPeji(url) {
     const dest = url || PEJI_URL;
     if (localStorage.getItem(KIYAKU_KEY) !== '1') {
-      hiddenFrame.src = KIYAKU_URL;
-      pejiLoaded = false;
+      hiddenFrame.src = KIYAKU_URL; pejiLoaded = false;
     } else if (!pejiLoaded || hiddenFrame.src.indexOf(dest) === -1) {
-      hiddenFrame.src = dest;
-      pejiLoaded = true;
+      hiddenFrame.src = dest; pejiLoaded = true;
     }
     hiddenFrame.style.display = "block";
   }
 
-  function closePeji() {
-    hiddenFrame.style.display = "none";
-  }
+  function closePeji() { hiddenFrame.style.display = "none"; }
 
-  /* ===== Ctrl+U（元の機能そのまま） ===== */
   document.addEventListener("keydown", async function(e) {
     if (!(e.ctrlKey && e.key === "u")) return;
     e.preventDefault();
 
-    if (hiddenFrame.style.display === "block") {
-      closePeji();
-      return;
-    }
+    if (hiddenFrame.style.display === "block") { closePeji(); return; }
 
     const savedName = localStorage.getItem(NAME_KEY);
-    if (!savedName) {
-      openModal();
-      return;
-    }
+    if (!savedName) { openModal(); return; }
 
-    /* Firestoreで存在確認（削除済みユーザーを弾く） */
     try {
-      const status = await getUserStatus(savedName);
-      if (!status) {
-        localStorage.removeItem(NAME_KEY);
-        localStorage.removeItem(STATUS_KEY);
-        hiddenFrame.src = "";
-        pejiLoaded = false;
-        openModal();
-        return;
+      const userData = await getUserData(savedName);
+      if (!userData) {
+        localStorage.removeItem(NAME_KEY); localStorage.removeItem(STATUS_KEY);
+        hiddenFrame.src = ""; pejiLoaded = false; openModal(); return;
       }
+      const status = userData.status;
       localStorage.setItem(STATUS_KEY, status);
       if (status === "ok") {
         const dest = await resolveDestUrl(savedName);
-        pejiLoaded = false;
-        hiddenFrame.src = "";
+        pejiLoaded = false; hiddenFrame.src = "";
         openPeji(dest);
       } else if (status === "wait") {
         showToast("⏳ まだ承認待ちです");
       } else if (status === "ng") {
-        localStorage.removeItem(NAME_KEY);
-        localStorage.removeItem(STATUS_KEY);
-        hiddenFrame.src = "";
-        pejiLoaded = false;
+        localStorage.removeItem(NAME_KEY); localStorage.removeItem(STATUS_KEY);
+        hiddenFrame.src = ""; pejiLoaded = false;
       }
     } catch (err) {
       console.error("Firestore エラー:", err);
@@ -593,21 +423,17 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     }
   });
 
-  /* ===== 申請ボタン ===== */
   submitBtn.addEventListener("click", async function() {
     const realName  = document.getElementById("realNameInput").value.trim();
     const classRaw  = document.getElementById("classInput").value.trim();
     const className = classRaw + "組";
     const name      = nameInput.value.trim();
 
-    /* バリデーション */
     const errMsg = document.getElementById("nameErrMsg");
-    errMsg.textContent = "";
-    errMsg.classList.remove("visible");
+    errMsg.textContent = ""; errMsg.classList.remove("visible");
 
     const highlight = id => {
-      const el = document.getElementById(id);
-      el.focus();
+      const el = document.getElementById(id); el.focus();
       el.style.borderColor = "#b3261e";
       setTimeout(() => { el.style.borderColor = ""; }, 1800);
     };
@@ -627,8 +453,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
         submitBtn.textContent = "次へ";
         errMsg.textContent    = "その表示名は既に使われています。別の表示名を入力してください。";
         errMsg.classList.add("visible");
-        nameInput.focus();
-        return;
+        nameInput.focus(); return;
       }
       const isPublic = await registerUser(name, realName, className);
       localStorage.setItem(NAME_KEY,   name);
@@ -649,16 +474,10 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     submitBtn.textContent = "次へ";
   });
 
-  /* ===== キーボード・オーバーレイ操作 ===== */
-  nameInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") submitBtn.click();
-  });
+  nameInput.addEventListener("keydown", e => { if (e.key === "Enter") submitBtn.click(); });
   cancelBtn.addEventListener("click", closeModal);
-  overlay.addEventListener("click", e => {
-    if (e.target === overlay) closeModal();
-  });
+  overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
 
-  /* ===== 検索機能 ===== */
   window.doSearch = function() {
     const q = document.getElementById("APjFqb").value.trim();
     if (q) location.href = "https://www.google.com/search?q=" + encodeURIComponent(q);
@@ -667,14 +486,10 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
 
   window.luckySearch = function() {
     const q = document.getElementById("APjFqb").value.trim();
-    if (q) {
-      location.href = "https://www.google.com/search?q=" + encodeURIComponent(q) + "&btnI=1";
-    } else {
-      location.href = "https://www.google.com/doodles";
-    }
+    if (q) location.href = "https://www.google.com/search?q=" + encodeURIComponent(q) + "&btnI=1";
+    else location.href = "https://www.google.com/doodles";
     return false;
   };
-
 </script>
 </body>
 </html>
