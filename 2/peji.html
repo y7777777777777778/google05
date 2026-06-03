@@ -73,10 +73,8 @@ body{
   background-size:180px;opacity:.6;
 }
 
-/* ━━━ SVG SPRITE ━━━ */
 svg.sprite-defs{display:none;}
 
-/* ━━━ TAB BAR ━━━ */
 #tabBar{
   position:relative;z-index:60;
   height:var(--tabH);
@@ -91,7 +89,6 @@ svg.sprite-defs{display:none;}
 }
 #tabBar::-webkit-scrollbar{display:none;}
 
-/* ━━━ 全画面モード ━━━ */
 body.fullscreen #tabBar,
 body.fullscreen #uBar {
   height: 0;
@@ -104,7 +101,6 @@ body.fullscreen #uBar {
   transition: height .25s cubic-bezier(.4,0,.2,1), opacity .25s;
 }
 
-/* 全画面ボタン */
 #fullscreenBtn {
   position: fixed;
   bottom: 14px;
@@ -194,7 +190,6 @@ body.fullscreen #fullscreenBtn:hover {
 }
 #newTabBtn:hover{background:var(--fill2);color:var(--t1);}
 
-/* ━━━ タブバー右端 ━━━ */
 #tabRight{
   margin-left:auto;
   display:flex;align-items:center;gap:6px;
@@ -204,7 +199,6 @@ body.fullscreen #fullscreenBtn:hover {
   flex-shrink:0;
 }
 
-/* テロップエリア */
 #tickerWrap{
   width:160px;height:26px;
   border:.5px solid rgba(10,132,255,.25);
@@ -226,7 +220,6 @@ body.fullscreen #fullscreenBtn:hover {
   overflow:hidden;
 }
 
-/* チャット開くボタン */
 #chatOpenBtn{
   height:26px;padding:0 10px;border-radius:var(--r1);
   border:.5px solid rgba(10,132,255,.3);
@@ -240,7 +233,6 @@ body.fullscreen #fullscreenBtn:hover {
 }
 #chatOpenBtn:hover{background:rgba(10,132,255,.25);}
 
-/* 未読バッジ */
 #chatUnread{
   position:absolute;top:-5px;right:-5px;
   width:14px;height:14px;border-radius:50%;
@@ -251,7 +243,6 @@ body.fullscreen #fullscreenBtn:hover {
 }
 #chatUnread.show{display:flex;}
 
-/* オンライン人数 */
 #onlineCount{
   display:flex;align-items:center;gap:4px;
   padding:0 8px;height:26px;
@@ -261,7 +252,6 @@ body.fullscreen #fullscreenBtn:hover {
   flex-shrink:0;
 }
 
-/* ━━━ URL BAR ━━━ */
 #uBar{
   position:relative;z-index:59;
   height:var(--ubarH);
@@ -308,7 +298,6 @@ body.fullscreen #fullscreenBtn:hover {
 }
 .ubtn-close:hover{background:rgba(255,69,58,.12);color:var(--red);}
 
-/* ━━━ CONTENT ━━━ */
 #content{
   position:relative;z-index:10;
   flex:1;overflow:hidden;
@@ -319,7 +308,6 @@ body.fullscreen #fullscreenBtn:hover {
 }
 .tview.active{display:flex;}
 
-/* ━━━ HOME VIEW ━━━ */
 #homeV{
   overflow-y:auto;
   padding-bottom:20px;
@@ -394,7 +382,6 @@ body.fullscreen #fullscreenBtn:hover {
   max-width:66px;
 }
 
-/* colour skins */
 .sk-blue    {background:linear-gradient(155deg,#2090ff 0%,#0055d4 100%);}
 .sk-green   {background:linear-gradient(155deg,#3dde62 0%,#1aab3c 100%);}
 .sk-orange  {background:linear-gradient(155deg,#ffb530 0%,#d07200 100%);}
@@ -408,11 +395,9 @@ body.fullscreen #fullscreenBtn:hover {
 .sk-graphite{background:linear-gradient(155deg,#58585a 0%,#1c1c1e 100%);}
 .sk-wine    {background:linear-gradient(155deg,#ff3c5e 0%,#a0102c 100%);}
 
-/* ━━━ iframe views ━━━ */
 .iframe-v{flex:1;}
 .iframe-v iframe{width:100%;height:100%;border:none;display:block;background:#fff;}
 
-/* ━━━ チャットポップアップ ━━━ */
 #chatPopup{
   position:fixed;
   bottom:14px;right:14px;
@@ -520,7 +505,6 @@ body.fullscreen #fullscreenBtn:hover {
   from{opacity:0;transform:translateY(20px);}
   to{opacity:1;transform:translateY(0);}
 }
-
 @keyframes onlinePulse{
   0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(48,209,88,.5);}
   50%{opacity:.7;box-shadow:0 0 0 4px rgba(48,209,88,0);}
@@ -532,7 +516,6 @@ body.fullscreen #fullscreenBtn:hover {
   #chatPopup{width:calc(100vw - 28px);}
 }
 
-/* ━━━ 表示名変更モーダル ━━━ */
 #nameChangeOverlay{
   position:fixed;inset:0;z-index:800;
   background:rgba(0,0,0,.65);
@@ -585,7 +568,6 @@ body.fullscreen #fullscreenBtn:hover {
 .nc-btn-submit:hover{background:#1a8fff;}
 .nc-btn-submit:disabled{background:rgba(10,132,255,.35);cursor:not-allowed;}
 
-/* ホーム画面の名前表示エリア */
 .name-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:-12px;margin-bottom:8px;}
 .name-bar-txt{font-size:13px;color:var(--t2);font-weight:400;}
 .name-change-btn{
@@ -594,12 +576,11 @@ body.fullscreen #fullscreenBtn:hover {
   border:.5px solid rgba(64,156,255,.35);
   background:rgba(10,132,255,.1);
   color:var(--blue-l);font-size:11px;font-weight:500;
-  cursor:pointer;font-family:inherit;transition:background .12s;
+  cursor:pointer;font-family:inherit;transition:background .12px;
 }
 .name-change-btn:hover{background:rgba(10,132,255,.2);}
 .name-change-btn.disabled{border-color:var(--sep2);background:none;color:var(--t4);cursor:default;}
 
-/* ticker text style */
 .ticker-text{
   font-size:11px;color:var(--blue-l);white-space:nowrap;
   position:absolute;left:0;top:50%;
@@ -612,7 +593,6 @@ body.fullscreen #fullscreenBtn:hover {
 
 <div class="wall"></div>
 
-<!-- SVG sprite (hidden) -->
 <svg class="sprite-defs" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <symbol id="s-home-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -701,7 +681,6 @@ body.fullscreen #fullscreenBtn:hover {
 </defs>
 </svg>
 
-<!-- ━━━ TAB BAR ━━━ -->
 <div id="tabBar">
   <div class="tab tab-home active" id="homeTab" onclick="switchTab('home')">
     <svg class="tab-fav" color="var(--blue-l)" width="13" height="13"><use href="#s-home-sm"/></svg>
@@ -715,23 +694,16 @@ body.fullscreen #fullscreenBtn:hover {
       <line x1=".5" y1="6.5" x2="12.5" y2="6.5"/>
     </svg>
   </button>
-
-  <!-- 右端エリア -->
   <div id="tabRight">
-    <!-- テロップ -->
     <div id="tickerWrap" onclick="openChatPopup()" title="チャットを開く">
       <div id="tickerDot"></div>
       <div id="tickerInner"></div>
     </div>
-
-    <!-- オンライン人数 -->
     <div id="onlineCount">
       <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0;animation:onlinePulse 2s ease infinite;"></span>
       <span id="onlineCnt" style="font-size:11px;font-weight:700;color:var(--green);letter-spacing:.02em;">…</span>
       <span style="font-size:10px;color:rgba(48,209,88,.6);letter-spacing:.02em;">人</span>
     </div>
-
-    <!-- チャットを開く -->
     <button id="chatOpenBtn" onclick="openChatPopup()" title="チャットを開く">
       <svg width="13" height="13"><use href="#s-chat"/></svg>
       CHAT
@@ -740,7 +712,6 @@ body.fullscreen #fullscreenBtn:hover {
   </div>
 </div>
 
-<!-- ━━━ URL BAR ━━━ -->
 <div id="uBar">
   <button class="ubtn" id="backBtn" onclick="goBack()" disabled>
     <svg width="10" height="18"><use href="#s-chevron-l"/></svg>
@@ -760,14 +731,12 @@ body.fullscreen #fullscreenBtn:hover {
   </button>
 </div>
 
-<!-- ━━━ CONTENT ━━━ -->
 <div id="content">
   <div class="tview active" id="homeV">
     <div class="clock-wrap">
       <div class="clock-hm" id="clockFace">00:00</div>
       <div class="clock-dt"  id="clockDate">読み込み中</div>
     </div>
-    <!-- 名前表示 & 変更ボタン -->
     <div class="name-bar">
       <span class="name-bar-txt" id="nameBarTxt"></span>
       <button class="name-change-btn" id="nameChangeBtn" onclick="openNameChange()">✏️ 表示名を変更</button>
@@ -844,12 +813,10 @@ body.fullscreen #fullscreenBtn:hover {
   </div>
 </div>
 
-<!-- ━━━ 全画面ボタン ━━━ -->
 <button id="fullscreenBtn" onclick="toggleFullscreen()" title="全画面切り替え">
   <svg width="16" height="16" id="fsIcon"><use href="#s-expand"/></svg>
 </button>
 
-<!-- ━━━ 表示名変更モーダル ━━━ -->
 <div id="nameChangeOverlay">
   <div id="nameChangeBox">
     <h3>✏️ 表示名を変更</h3>
@@ -864,7 +831,6 @@ body.fullscreen #fullscreenBtn:hover {
   </div>
 </div>
 
-<!-- ━━━ チャットポップアップ ━━━ -->
 <div id="chatPopup">
   <div class="popup-header">
     <div class="popup-title">
@@ -887,8 +853,11 @@ body.fullscreen #fullscreenBtn:hover {
   </div>
 </div>
 
-<!-- ━━━ JS ━━━ -->
 <script>
+/* ━━━ localStorageキー（au2_username に統一） ━━━ */
+// NOTE: この定数は通常scriptブロック専用。moduleブロック内では直接文字列を使う。
+const LS_USERNAME = 'au2_username';
+
 /* ━━━ 全画面トグル ━━━ */
 let isFullscreen = false;
 function toggleFullscreen(){
@@ -900,17 +869,17 @@ function toggleFullscreen(){
     : '<use href="#s-expand"/>';
 }
 
-/* ━━━ 履歴埋め：本当の別タブで開く ━━━ */
+/* ━━━ 履歴埋め：別タブで開く ━━━ */
 function openNewTab(url, title){
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 /* ━━━ 表示名変更システム ━━━ */
 function openNameChange(){
-  const myName = localStorage.getItem('accessUserName_2')||'';
+  const myName = localStorage.getItem(LS_USERNAME) || '';
   if(!myName){ alert('ログインしていません'); return; }
   const today = new Date().toISOString().slice(0,10);
-  const lastChange = localStorage.getItem('nameChangedDate_2')||'';
+  const lastChange = localStorage.getItem('nameChangedDate_2') || '';
   const btn = document.getElementById('nameChangeBtn');
   if(lastChange === today){
     btn.classList.add('disabled');
@@ -935,14 +904,14 @@ document.addEventListener('click', function(e){
 });
 
 function updateNameBarUI(){
-  const myName = localStorage.getItem('accessUserName_2')||'';
+  const myName = localStorage.getItem(LS_USERNAME) || '';
   const nameBarTxt = document.getElementById('nameBarTxt');
   const btn = document.getElementById('nameChangeBtn');
   if(!nameBarTxt || !btn) return;
   if(myName){
     nameBarTxt.textContent = 'こんにちは、' + myName + 'さん';
     const today = new Date().toISOString().slice(0,10);
-    const lastChange = localStorage.getItem('nameChangedDate_2')||'';
+    const lastChange = localStorage.getItem('nameChangedDate_2') || '';
     if(lastChange === today){
       btn.classList.add('disabled');
       btn.textContent = '⏳ 本日変更済み';
@@ -965,7 +934,7 @@ function tick(){
   document.getElementById('clockDate').textContent=
     (n.getMonth()+1)+'月'+n.getDate()+'日（'+DAYS[n.getDay()]+'）';
 }
-tick();setInterval(tick,1000);
+tick(); setInterval(tick,1000);
 updateNameBarUI();
 
 /* ━━━ チャットポップアップ開閉 ━━━ */
@@ -984,7 +953,7 @@ function closeChatPopup(){
 }
 
 /* ━━━ タブシステム ━━━ */
-let tabs=[],activeId='home',cnt=0;
+let tabs=[], activeId='home', cnt=0;
 
 function switchTab(id){
   activeId=id;
@@ -995,8 +964,8 @@ function switchTab(id){
     document.getElementById('homeV').classList.add('active');
     setUrl('ホーム','');
   }else{
-    const t=tabs.find(t=>t.id===id);if(!t)return;
-    t.el.classList.add('active');t.view.classList.add('active');
+    const t=tabs.find(t=>t.id===id); if(!t) return;
+    t.el.classList.add('active'); t.view.classList.add('active');
     setUrl(t.title,t.url);
   }
   syncDiv();
@@ -1037,34 +1006,33 @@ function openApp(url,title,iconId){
 
 function closeTab(e,id){
   e.stopPropagation();
-  const i=tabs.findIndex(t=>t.id===id);if(i<0)return;
-  tabs[i].el.remove();tabs[i].view.remove();tabs.splice(i,1);
-  if(activeId===id)switchTab(tabs.length?tabs[Math.max(0,i-1)].id:'home');
+  const i=tabs.findIndex(t=>t.id===id); if(i<0) return;
+  tabs[i].el.remove(); tabs[i].view.remove(); tabs.splice(i,1);
+  if(activeId===id) switchTab(tabs.length?tabs[Math.max(0,i-1)].id:'home');
   syncDiv();
 }
 function syncDiv(){
   document.getElementById('tabDiv').style.display=tabs.length?'':'none';
 }
 function goBack(){
-  const t=tabs.find(t=>t.id===activeId);if(!t||t.hist.length<=1)return;
+  const t=tabs.find(t=>t.id===activeId); if(!t||t.hist.length<=1) return;
   t.fwd.push(t.hist.pop());
-  const u=t.hist[t.hist.length-1];t.iframe.src=u;t.url=u;setUrl(t.title,u);
+  const u=t.hist[t.hist.length-1]; t.iframe.src=u; t.url=u; setUrl(t.title,u);
 }
 function goFwd(){
-  const t=tabs.find(t=>t.id===activeId);if(!t||!t.fwd.length)return;
-  const u=t.fwd.pop();t.hist.push(u);t.iframe.src=u;t.url=u;setUrl(t.title,u);
+  const t=tabs.find(t=>t.id===activeId); if(!t||!t.fwd.length) return;
+  const u=t.fwd.pop(); t.hist.push(u); t.iframe.src=u; t.url=u; setUrl(t.title,u);
 }
 function reloadCur(){
-  if(activeId==='home')return;
-  const t=tabs.find(t=>t.id===activeId);if(t)t.iframe.src=t.iframe.src;
+  if(activeId==='home') return;
+  const t=tabs.find(t=>t.id===activeId); if(t) t.iframe.src=t.iframe.src;
 }
 document.getElementById('newTabBtn').addEventListener('click',()=>{
-  const u=prompt('URLを入力 (例: https://google.com)');if(!u)return;
+  const u=prompt('URLを入力 (例: https://google.com)'); if(!u) return;
   const full=/^https?:\/\//.test(u)?u:'https://'+u;
   openApp(full,full.replace(/^https?:\/\//,'').split('/')[0],'s-globe');
 });
 
-/* keyboard */
 document.addEventListener('keydown',e=>{
   if(e.ctrlKey&&e.key==='u'){e.preventDefault();hidePanel();}
   if(e.ctrlKey&&e.key==='w'){e.preventDefault();if(activeId!=='home'&&tabs.length)closeTab({stopPropagation:()=>{}},activeId);}
@@ -1083,7 +1051,6 @@ function hidePanel(){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 
-<!-- Firebase -->
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import{getFirestore,collection,query,orderBy,limit,onSnapshot,doc,getDocs,getDoc,where,
@@ -1099,7 +1066,9 @@ const db=getFirestore(initializeApp({
   appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
 },"peji_main"));
 
-const myName=localStorage.getItem("accessUserName_2")||"";
+/* ━━━ モジュール内ではキー文字列を直接使う（LS_USERNAMEは通常scriptのスコープ外） ━━━ */
+const LS_KEY = 'au2_username';
+const myName = localStorage.getItem(LS_KEY) || "";
 
 /* ━━━ 表示名変更（Firestore） ━━━ */
 window.submitNameChange = async function(){
@@ -1107,7 +1076,7 @@ window.submitNameChange = async function(){
   const errEl = document.getElementById('nameChangeErr');
   const input = document.getElementById('nameChangeInput');
   const newName = input.value.trim();
-  const oldName = localStorage.getItem('accessUserName_2')||'';
+  const oldName = localStorage.getItem(LS_KEY) || '';
   errEl.textContent = '';
   if(!newName){ errEl.textContent = '表示名を入力してください'; return; }
   if(newName === oldName){ errEl.textContent = '現在と同じ名前です'; return; }
@@ -1124,53 +1093,37 @@ window.submitNameChange = async function(){
       name: newName, nameChangedAt: today,
       nameChangeHistory: (mySnap.docs[0].data().nameChangeHistory||[]).concat([{from:oldName,to:newName,date:today}]).slice(-10)
     });
-    localStorage.setItem('accessUserName_2', newName);
+    localStorage.setItem(LS_KEY, newName);
     localStorage.setItem('nameChangedDate_2', today);
     closeNameChange(); updateNameBarUI();
   } catch(e) { errEl.textContent = 'エラー: ' + e.message; }
   btn.disabled = false; btn.textContent = '変更する';
 };
 
-/* ━━━ ★ lastSeen ハートビート（管理画面のオンライン表示用） ━━━ */
+/* ━━━ lastSeen ハートビート ━━━ */
 let myDocId = null;
 
-// 自分のusersドキュメントIDを取得
 async function findMyDocId() {
   if (!myName) return null;
   if (myDocId) return myDocId;
   try {
     const snap = await getDocs(query(collection(db, 'users'), where('name', '==', myName)));
-    if (!snap.empty) {
-      myDocId = snap.docs[0].id;
-      return myDocId;
-    }
+    if (!snap.empty) { myDocId = snap.docs[0].id; return myDocId; }
   } catch(e) {}
   return null;
 }
 
-// lastSeen を serverTimestamp で更新
 async function sendHeartbeat() {
   const id = await findMyDocId();
   if (!id) return;
-  try {
-    await updateDoc(doc(db, 'users', id), { lastSeen: serverTimestamp() });
-  } catch(e) {}
+  try { await updateDoc(doc(db, 'users', id), { lastSeen: serverTimestamp() }); } catch(e) {}
 }
 
-// ページ読み込み時に即送信 → 以降30秒ごと
 sendHeartbeat();
 const hbTimer = setInterval(sendHeartbeat, 30000);
-
-// タブを閉じる / 非表示になったときも送信（最終確認）
-document.addEventListener('visibilitychange', () => {
-  sendHeartbeat();
-});
-window.addEventListener('beforeunload', () => {
-  sendHeartbeat();
-});
-window.addEventListener('pagehide', () => {
-  clearInterval(hbTimer);
-});
+document.addEventListener('visibilitychange', () => { sendHeartbeat(); });
+window.addEventListener('beforeunload', () => { sendHeartbeat(); });
+window.addEventListener('pagehide', () => { clearInterval(hbTimer); });
 
 /* ━━━ プレゼンス（オンライン人数） ━━━ */
 const presenceId = myName + '_' + Math.random().toString(36).slice(2,7);
@@ -1187,16 +1140,6 @@ onSnapshot(collection(db,"presence_2"), snap=>{
   document.getElementById('onlineCnt').textContent = online.length;
 });
 
-/* ━━━ akuchat 権限チェック ━━━ */
-(async()=>{
-  try{
-    if(!myName)return;
-    const q=await getDocs(query(collection(db,"users"),where("name","==",myName)));
-    if(!q.empty&&q.docs[0].data().akuchat===true)
-      document.getElementById("akuApp").style.display="";
-  }catch(e){}
-})();
-
 /* ━━━ チャット（chat_2 コレクション） ━━━ */
 const savedChatName = localStorage.getItem("chatName") || (myName || "名無し");
 const chatNameEl = document.getElementById('chatName');
@@ -1212,23 +1155,20 @@ function escHtml(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* NGワード監視 */
 let ngWordsList = [];
 onSnapshot(doc(db,"config","ngWords"), snap=>{
   ngWordsList = snap.exists() ? (snap.data().words||[]) : [];
 });
 
-/* コマンド監視 */
 let commandsList = [];
 onSnapshot(doc(db,"config","commands"), snap=>{
   if(snap.exists()){ const d=snap.data(); commandsList=d.list||d.commands||[]; }
   else { commandsList=[]; }
 });
 
-/* チャット設定（閉鎖・BAN・tickerSpeed）監視 */
 let tickerSpeed = 15;
 onSnapshot(doc(db,"config","chatSettings_2"), snap=>{
-  if(!snap.exists())return;
+  if(!snap.exists()) return;
   const data=snap.data();
   if(data.tickerSpeed) tickerSpeed=data.tickerSpeed;
   const inputEl=document.getElementById('chatInput');
@@ -1250,13 +1190,11 @@ onSnapshot(doc(db,"config","chatSettings_2"), snap=>{
   }
 });
 
-/* 送信 */
 async function sendMsg(){
   const input=document.getElementById('chatInput');
   const text=input.value.trim();
-  if(!text)return;
+  if(!text) return;
 
-  // コマンド判定
   if(text.startsWith('/')){
     const cmdKey=text.slice(1).toLowerCase().trim();
     let latestCmds=commandsList;
@@ -1274,7 +1212,6 @@ async function sendMsg(){
     }
   }
 
-  // NGワード
   const hitNg=ngWordsList.find(w=>text.toLowerCase().includes(w.toLowerCase()));
   if(hitNg){
     input.value=''; input.style.borderColor='var(--red)'; input.style.color='var(--red)';
@@ -1323,7 +1260,6 @@ function launchTicker(text, delayX=0){
   if(!tickerRAF) tickerRAF=requestAnimationFrame(tickerLoop);
 }
 
-/* リアルタイム受信 */
 let lastCount=0, unread=0;
 const msgsEl=document.getElementById('chatMsgs');
 const q2=query(collection(db,"chat_2"),orderBy("ts","desc"),limit(50));
