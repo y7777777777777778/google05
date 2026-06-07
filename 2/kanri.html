@@ -450,6 +450,23 @@
   let pendingDeleteId = null;
   let confirmCallback = null;
 
+  // ★ presence_2 をリアルタイム監視してオンライン名前セットを保持
+  let onlineNameSet = new Set();
+
+  onSnapshot(collection(db, "presence_2"), snap => {
+    const fiveMinAgo = Date.now() / 1000 - 300;
+    onlineNameSet = new Set(
+      snap.docs
+        .filter(d => {
+          const ts = d.data().ts?.seconds;
+          return ts && ts > fiveMinAgo;
+        })
+        .map(d => d.data().name)
+    );
+    // データがある場合は再描画
+    if (allUsers.length) renderTable(allUsers);
+  });
+
   function showToast(msg, duration = 3000) {
     toast.textContent = msg;
     toast.classList.add("show");
@@ -494,7 +511,26 @@
     }
   });
 
-  function presenceBadge(lastSeen) {
+  // ★ 修正: presence_2 ベース + lastSeen フォールバック
+  function isOnline(user) {
+    // presence_2 で確認（最優先）
+    if (user.name && onlineNameSet.has(user.name)) return true;
+    // lastSeen フォールバック
+    const lastSeen = user.lastSeen;
+    if (!lastSeen) return false;
+    const ts = lastSeen.toDate ? lastSeen.toDate().getTime() : new Date(lastSeen).getTime();
+    if (isNaN(ts)) return false;
+    return (Date.now() - ts) < 5 * 60 * 1000;
+  }
+
+  // ★ 修正: user オブジェクトを受け取るように変更
+  function presenceBadge(user) {
+    // presence_2 で確実にオンライン
+    if (user.name && onlineNameSet.has(user.name)) {
+      return `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ok);"><span class="online-dot"></span>オンライン</span>`;
+    }
+    // lastSeen フォールバック
+    const lastSeen = user.lastSeen;
     if (!lastSeen) return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
     const ts = lastSeen.toDate ? lastSeen.toDate().getTime() : new Date(lastSeen).getTime();
     if (isNaN(ts)) return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
@@ -509,13 +545,6 @@
       return `<span style="font-size:11px;color:var(--wait);">🟡 ${label}</span>`;
     }
     return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
-  }
-
-  function isOnline(lastSeen) {
-    if (!lastSeen) return false;
-    const ts = lastSeen.toDate ? lastSeen.toDate().getTime() : new Date(lastSeen).getTime();
-    if (isNaN(ts)) return false;
-    return (Date.now() - ts) < 5 * 60 * 1000;
   }
 
   window.confirmDeleteChat = function() {
@@ -571,7 +600,8 @@
     countOk.textContent     = users.filter(u => u.status === "ok").length;
     countWait.textContent   = users.filter(u => u.status === "wait").length;
     countNg.textContent     = users.filter(u => u.status === "ng").length;
-    countOnline.textContent = users.filter(u => isOnline(u.lastSeen)).length;
+    // ★ 修正: isOnline(u) に変更
+    countOnline.textContent = users.filter(u => isOnline(u)).length;
 
     const q = searchInput.value.trim().toLowerCase();
     const filtered = q
@@ -587,7 +617,8 @@
       const pageMode   = userPageMode[user.id] || 'peji';
       const isAdmin    = !!user.isAdmin;
       const isSubAdmin = !!user.isSubAdmin;
-      const online     = isOnline(user.lastSeen);
+      // ★ 修正: isOnline(user) に変更
+      const online     = isOnline(user);
 
       let rowStyle = '';
       if (isAdmin) rowStyle = 'background:linear-gradient(90deg,rgba(255,200,0,0.10),rgba(255,200,0,0.04));border-left:3px solid #ffc800;';
@@ -601,7 +632,7 @@
             <span style="font-size:11px;color:${isAdmin ? '#ffd700' : isSubAdmin ? 'rgba(255,215,0,0.7)' : 'var(--text-muted)'};">
               ${escapeHTML(user.realName || '—')}
             </span>
-            ${presenceBadge(user.lastSeen)}
+            ${presenceBadge(user)}
           </div>
         </td>
         <td>
@@ -1101,131 +1132,4 @@
   window.loadCodeTable();
 
   window.sendTestNotif = async function() {
-    const msg = document.getElementById("testNotifInput").value.trim();
-    if (!msg) { showToast("メッセージを入力してください"); return; }
-    await setDoc(doc(db,"config","testNotif_2"), {message:msg, hype:false, ts:new Date()});
-    showToast("📨 通知を送信しました: " + msg);
-  };
-  window.sendHypeNotif = async function() {
-    const msg = document.getElementById("testNotifInput").value.trim() || "チャットが盛り上がっています！";
-    await setDoc(doc(db,"config","testNotif_2"), {message:msg, hype:true, ts:new Date()});
-    showToast("🔥 盛り上がり通知を送信しました");
-  };
-  window.sendPreset = async function(msg) {
-    await setDoc(doc(db,"config","testNotif_2"), {message:msg, hype:false, ts:new Date()});
-    showToast("📨 送信: " + msg);
-  };
-  document.getElementById("testNotifInput").addEventListener("keydown", e => {
-    if (e.key === "Enter") window.sendTestNotif();
-  });
-
-  // ━━━ SHA-256 ━━━
-  async function sha256(str) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
-
-  // ━━━ PW表示切替 ━━━
-  let pwViewState = {};
-  window.togglePwView = function(id, hash) {
-    const el = document.getElementById('pwDisp_' + id);
-    if (!el) return;
-    if (pwViewState[id]) {
-      el.textContent = '••••••••';
-      pwViewState[id] = false;
-    } else {
-      el.textContent = hash ? hash.slice(0,16)+'…' : '(なし)';
-      pwViewState[id] = true;
-    }
-  };
-
-  // ━━━ ユーザー名/PW編集モーダル ━━━
-  let editingUserId = null;
-
-  window.openEditUser = function(id, currentUsername, displayName) {
-    editingUserId = id;
-    document.getElementById('editUserSubtitle').textContent = '対象: ' + displayName + '（' + (currentUsername || '未設定') + '）';
-    document.getElementById('editUsernameInput').value = currentUsername || '';
-    document.getElementById('editPasswordInput').value = '';
-    document.getElementById('editUserErr').textContent = '';
-    document.getElementById('editUserSubmitBtn').disabled = false;
-    document.getElementById('editUserSubmitBtn').textContent = '保存';
-    const overlay = document.getElementById('editUserOverlay');
-    overlay.style.display = 'flex';
-    setTimeout(() => document.getElementById('editUsernameInput').focus(), 60);
-  };
-
-  window.closeEditUser = function() {
-    document.getElementById('editUserOverlay').style.display = 'none';
-    editingUserId = null;
-  };
-
-  document.getElementById('editUserOverlay').addEventListener('click', function(e) {
-    if (e.target === this) window.closeEditUser();
-  });
-
-  window.submitEditUser = async function() {
-    const btn     = document.getElementById('editUserSubmitBtn');
-    const errEl   = document.getElementById('editUserErr');
-    const newUser = document.getElementById('editUsernameInput').value.trim();
-    const newPw   = document.getElementById('editPasswordInput').value;
-    errEl.textContent = '';
-
-    if (!newUser && !newPw) { errEl.textContent = 'ユーザー名かパスワードを入力してください'; return; }
-    if (newUser && !/^[a-zA-Z0-9_]+$/.test(newUser)) { errEl.textContent = 'ユーザー名は英数字・_のみ使えます'; return; }
-    if (newUser && newUser.length < 3) { errEl.textContent = 'ユーザー名は3文字以上にしてください'; return; }
-    if (newPw && newPw.length < 4) { errEl.textContent = 'パスワードは4文字以上にしてください'; return; }
-
-    btn.disabled = true; btn.textContent = '保存中...';
-
-    try {
-      const updates = {};
-
-      if (newUser) {
-        const currentUser = allUsers.find(u => u.id === editingUserId);
-        if (!currentUser || newUser !== currentUser.username) {
-          const dup = await getDocs(query(collection(db,'users'), where('username','==',newUser)));
-          const dupFiltered = dup.docs.filter(d => d.id !== editingUserId);
-          if (dupFiltered.length) {
-            errEl.textContent = 'そのユーザー名はすでに使われています';
-            btn.disabled = false; btn.textContent = '保存'; return;
-          }
-          updates.username = newUser;
-        }
-      }
-
-      if (newPw) {
-        updates.pwHash = await sha256(newPw);
-      }
-
-      if (Object.keys(updates).length === 0) {
-        errEl.textContent = '変更がありません';
-        btn.disabled = false; btn.textContent = '保存'; return;
-      }
-
-      await updateDoc(doc(db,'users', editingUserId), updates);
-
-      const user = allUsers.find(u => u.id === editingUserId);
-      if (user) Object.assign(user, updates);
-
-      renderTable(allUsers);
-      closeEditUser();
-      showToast('✅ ユーザー情報を更新しました');
-    } catch(e) {
-      errEl.textContent = 'エラー: ' + e.message;
-    }
-    btn.disabled = false; btn.textContent = '保存';
-  };
-
-  document.getElementById('editPasswordInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') window.submitEditUser();
-  });
-
-  // ━━━ 起動 ━━━
-  loadPublicMode();
-  subscribeUsers();
-  loadBanList();
-  loadDisplayMode();
-</script>
-</body>
-</html>
+    const msg = document.getElementById("testNoti
