@@ -854,11 +854,8 @@ body.fullscreen #fullscreenBtn:hover {
 </div>
 
 <script>
-/* ━━━ localStorageキー（au2_username に統一） ━━━ */
-// NOTE: この定数は通常scriptブロック専用。moduleブロック内では直接文字列を使う。
 const LS_USERNAME = 'au2_username';
 
-/* ━━━ 全画面トグル ━━━ */
 let isFullscreen = false;
 function toggleFullscreen(){
   isFullscreen = !isFullscreen;
@@ -869,12 +866,10 @@ function toggleFullscreen(){
     : '<use href="#s-expand"/>';
 }
 
-/* ━━━ 履歴埋め：別タブで開く ━━━ */
 function openNewTab(url, title){
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
-/* ━━━ 表示名変更システム ━━━ */
 function openNameChange(){
   const myName = localStorage.getItem(LS_USERNAME) || '';
   if(!myName){ alert('ログインしていません'); return; }
@@ -925,7 +920,6 @@ function updateNameBarUI(){
   }
 }
 
-/* clock */
 const DAYS=['日','月','火','水','木','金','土'];
 function tick(){
   const n=new Date();
@@ -937,7 +931,6 @@ function tick(){
 tick(); setInterval(tick,1000);
 updateNameBarUI();
 
-/* ━━━ チャットポップアップ開閉 ━━━ */
 function openChatPopup(){
   document.getElementById('chatPopup').classList.add('open');
   const badge = document.getElementById('chatUnread');
@@ -952,7 +945,6 @@ function closeChatPopup(){
   document.getElementById('chatPopup').classList.remove('open');
 }
 
-/* ━━━ タブシステム ━━━ */
 let tabs=[], activeId='home', cnt=0;
 
 function switchTab(id){
@@ -1066,7 +1058,6 @@ const db=getFirestore(initializeApp({
   appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
 },"peji_main"));
 
-/* ━━━ モジュール内ではキー文字列を直接使う（LS_USERNAMEは通常scriptのスコープ外） ━━━ */
 const LS_KEY = 'au2_username';
 const myName = localStorage.getItem(LS_KEY) || "";
 
@@ -1100,7 +1091,7 @@ window.submitNameChange = async function(){
   btn.disabled = false; btn.textContent = '変更する';
 };
 
-/* ━━━ lastSeen ハートビート ━━━ */
+/* ━━━ docId キャッシュ ━━━ */
 let myDocId = null;
 
 async function findMyDocId() {
@@ -1113,31 +1104,41 @@ async function findMyDocId() {
   return null;
 }
 
-async function sendHeartbeat() {
-  const id = await findMyDocId();
-  if (!id) return;
-  try { await updateDoc(doc(db, 'users', id), { lastSeen: serverTimestamp() }); } catch(e) {}
-}
-
-sendHeartbeat();
-const hbTimer = setInterval(sendHeartbeat, 30000);
-document.addEventListener('visibilitychange', () => { sendHeartbeat(); });
-window.addEventListener('beforeunload', () => { sendHeartbeat(); });
-window.addEventListener('pagehide', () => { clearInterval(hbTimer); });
-
-/* ━━━ プレゼンス（オンライン人数） ━━━ */
+/* ━━━ ★ 修正: presence_2 + users.lastSeen を一括更新するハートビート ━━━ */
 const presenceId = myName + '_' + Math.random().toString(36).slice(2,7);
 const presenceRef = doc(db, "presence_2", presenceId);
-async function heartbeatPresence(){ try{ await setDoc(presenceRef, { name: myName, ts: serverTimestamp() }); }catch(e){} }
-heartbeatPresence();
-const presenceInterval = setInterval(heartbeatPresence, 30000);
-function leavePresence(){ clearInterval(presenceInterval); deleteDoc(presenceRef).catch(()=>{}); }
+
+async function heartbeatAll() {
+  // presence_2 を更新（オンライン人数カウント用）
+  try {
+    await setDoc(presenceRef, { name: myName, ts: serverTimestamp() }, { merge: true });
+  } catch(e) {}
+  // users.lastSeen を更新（kanri.htmlのオンライン表示用）
+  const id = await findMyDocId();
+  if (id) {
+    try { await updateDoc(doc(db, 'users', id), { lastSeen: serverTimestamp() }); } catch(e) {}
+  }
+}
+
+heartbeatAll();
+const hbTimer = setInterval(heartbeatAll, 30000);
+
+function leavePresence(){
+  clearInterval(hbTimer);
+  deleteDoc(presenceRef).catch(()=>{});
+}
+document.addEventListener('visibilitychange', () => { heartbeatAll(); });
 window.addEventListener('beforeunload', leavePresence);
 window.addEventListener('pagehide', leavePresence);
+
+/* ━━━ ★ 修正: presence_2 のリアルタイム監視（オンライン人数） ━━━ */
 onSnapshot(collection(db,"presence_2"), snap=>{
-  const fiveMinAgo = Date.now()/1000 - 300;
-  const online = snap.docs.filter(d=>{ const ts=d.data().ts?.seconds; return ts && ts > fiveMinAgo; });
-  document.getElementById('onlineCnt').textContent = online.length;
+  const fiveMinAgo = Date.now() / 1000 - 300;
+  const online = snap.docs.filter(d=>{
+    const ts = d.data().ts?.seconds;
+    return ts && ts > fiveMinAgo;
+  });
+  document.getElementById('onlineCnt').textContent = online.length || 0;
 });
 
 /* ━━━ チャット（chat_2 コレクション） ━━━ */
