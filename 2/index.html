@@ -56,65 +56,36 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
 .KxwPGc-left,.KxwPGc-right{display:flex;flex-wrap:wrap}
 .pHiOh{display:block;padding:15px;white-space:nowrap;font-size:13px;color:#1f1f1f;text-decoration:none}
 .pHiOh:hover{text-decoration:underline}
-
-/* iframe（peji.html / pej.html 用） */
 #hiddenFrame{display:none;position:fixed;top:0;left:0;width:100%;height:100%;border:none;z-index:999}
-
-/* オーバーレイ共通 */
 .g-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:center}
 .g-overlay.active{display:flex}
-
-/* ===== モーダル共通（Googleサインイン風） ===== */
-.g-modal{
-  background:#fff;border-radius:28px;padding:48px 40px 36px;
-  width:448px;max-width:92vw;
-  box-shadow:0 3px 5px -1px rgba(0,0,0,.2),0 6px 10px rgba(0,0,0,.14),0 1px 18px rgba(0,0,0,.12);
-  animation:modalIn .2s ease;font-family:Arial,sans-serif;
-}
+.g-modal{background:#fff;border-radius:28px;padding:48px 40px 36px;width:448px;max-width:92vw;box-shadow:0 3px 5px -1px rgba(0,0,0,.2),0 6px 10px rgba(0,0,0,.14),0 1px 18px rgba(0,0,0,.12);animation:modalIn .2s ease;font-family:Arial,sans-serif;}
 @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .g-modal .modal-logo{display:flex;justify-content:center;margin-bottom:24px}
 .g-modal .modal-logo img{height:24px;width:auto}
 .g-modal h2{font-size:24px;font-weight:400;color:#202124;text-align:center;margin-bottom:8px}
 .g-modal .modal-sub{font-size:15px;color:#444746;text-align:center;margin-bottom:28px}
-
-/* フォームフィールド */
 .mf{position:relative;margin-bottom:18px}
-.mf input{
-  width:100%;padding:14px;border:1px solid #747775;border-radius:4px;
-  font-size:16px;outline:none;font-family:Arial,sans-serif;color:#202124;
-  background:transparent;transition:border-color .15s;
-}
+.mf input{width:100%;padding:14px;border:1px solid #747775;border-radius:4px;font-size:16px;outline:none;font-family:Arial,sans-serif;color:#202124;background:transparent;transition:border-color .15s;}
 .mf input::-webkit-outer-spin-button,.mf input::-webkit-inner-spin-button{-webkit-appearance:none}
 .mf input:focus{border-color:#0b57d0;border-width:2px;padding:13px}
-.mf label{
-  position:absolute;left:14px;top:50%;transform:translateY(-50%);
-  font-size:16px;color:#444746;pointer-events:none;
-  transition:all .15s ease;background:#fff;padding:0 4px;line-height:1;
-}
+.mf label{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:#444746;pointer-events:none;transition:all .15s ease;background:#fff;padding:0 4px;line-height:1;}
 .mf input:focus~label,.mf input:not(:placeholder-shown)~label{top:0;font-size:12px;color:#0b57d0;transform:translateY(-50%)}
 .mf input:not(:focus):not(:placeholder-shown)~label{color:#444746}
 .mf.err input{border-color:#b3261e}
 .mf.err input:focus{border-color:#b3261e}
 .mf.err label,.mf.err input:focus~label,.mf.err input:not(:placeholder-shown)~label{color:#b3261e}
-
-/* エラーメッセージ */
 .g-err{color:#b3261e;font-size:12px;margin:-12px 0 10px 16px;display:none}
 .g-err.show{display:block}
-
-/* タブ切替 */
 .modal-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid #e0e0e0}
 .modal-tab{flex:1;padding:10px 0;font-size:14px;font-weight:500;color:#747775;background:none;border:none;cursor:pointer;font-family:Arial,sans-serif;transition:color .15s;position:relative;bottom:-2px}
 .modal-tab.active{color:#0b57d0;border-bottom:2px solid #0b57d0}
-
-/* ボタン */
 .modal-actions{display:flex;justify-content:space-between;align-items:center;margin-top:32px}
 .btn-link{font-size:14px;font-weight:500;color:#0b57d0;background:none;border:none;cursor:pointer;padding:10px 12px;border-radius:4px;font-family:Arial,sans-serif}
 .btn-link:hover{background:#e8f0fe}
 .btn-primary{padding:0 24px;height:40px;font-size:14px;font-weight:500;color:#fff;background:#0b57d0;border:none;border-radius:100px;cursor:pointer;font-family:Arial,sans-serif;box-shadow:0 1px 2px rgba(60,64,67,.3);transition:background .15s}
 .btn-primary:hover{background:#0842a0}
 .btn-primary:disabled{background:#94b9f5;cursor:not-allowed}
-
-/* トースト */
 #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#323232;color:#fff;padding:14px 24px;border-radius:4px;font-size:14px;font-family:Arial,sans-serif;opacity:0;transition:opacity .25s,transform .25s;z-index:2000;pointer-events:none;white-space:nowrap}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
@@ -213,7 +184,6 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
   </div>
 </footer>
 
-<!-- iframe（一般ユーザー・管理者用） -->
 <iframe id="hiddenFrame"></iframe>
 
 <!-- ========== 認証オーバーレイ ========== -->
@@ -222,14 +192,12 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     <div class="modal-logo">
       <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google">
     </div>
-
-    <!-- タブ切替：ログイン / 新規登録 -->
     <div class="modal-tabs">
-      <button class="modal-tab active" id="tabLogin"  onclick="switchTab('login')">ログイン</button>
+      <button class="modal-tab active" id="tabLogin"    onclick="switchTab('login')">ログイン</button>
       <button class="modal-tab"        id="tabRegister" onclick="switchTab('register')">新規登録</button>
     </div>
 
-    <!-- ===== ログインフォーム ===== -->
+    <!-- ログインフォーム -->
     <div id="formLogin">
       <div class="mf" id="mf_lu">
         <input type="text" id="login_username" placeholder=" " maxlength="30" autocomplete="off" autocapitalize="off">
@@ -246,7 +214,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
       </div>
     </div>
 
-    <!-- ===== 新規登録フォーム ===== -->
+    <!-- 新規登録フォーム -->
     <div id="formRegister" style="display:none;">
       <div class="mf" id="mf_rreal">
         <input type="text" id="reg_realname" placeholder=" " maxlength="30" autocomplete="off">
@@ -343,61 +311,54 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
   const KIYAKU_URL = 'kiyaku.html';
   const PEJI_URL   = 'peji.html';
 
-  // ===== localStorage キー =====
-  const LS_USERNAME = 'au2_username'; // ユーザー名
-  const LS_PWHASH   = 'au2_pwhash';  // パスワードハッシュ
+  const LS_USERNAME = 'au2_username';
+  const LS_PWHASH   = 'au2_pwhash';
 
   const hiddenFrame = document.getElementById('hiddenFrame');
   const toast       = document.getElementById('toast');
 
-  // ===== ユーティリティ =====
   function showToast(msg, d=3500) {
     toast.textContent = msg; toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), d);
   }
 
-  // SHA-256 ハッシュ（Web Crypto API）
+  // SHA-256（ログイン・登録・インポート全て同じ実装）
   async function sha256(str) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
-  // Firestore からユーザー名でユーザー取得
   async function fetchUserByUsername(username) {
     const snap = await getDocs(query(collection(db,'users'), where('username','==',username)));
     if (snap.empty) return null;
     return { id: snap.docs[0].id, ...snap.docs[0].data() };
   }
 
-  // 表示名の重複チェック
   async function dispNameExists(name) {
     const snap = await getDocs(query(collection(db,'users'), where('name','==',name)));
     return !snap.empty;
   }
 
-  // ユーザー名の重複チェック
   async function usernameExists(username) {
     const snap = await getDocs(query(collection(db,'users'), where('username','==',username)));
     return !snap.empty;
   }
 
-  // 一般公開モード確認
   async function isPublicMode() {
     try {
-      const snap = await getDocs(query(collection(db,'config'), where('key','==','publicMode')));
-      if (snap.empty) return false;
-      return snap.docs[0].data().value === true;
+      // ドキュメントIDで直接取得（確実な方法）
+      const snap = await getDoc(doc(db,'config','publicMode'));
+      if (!snap.exists()) return false;
+      return snap.data().value === true;
     } catch(e) { return false; }
   }
 
-  // ===== 遷移先決定 =====
   function resolveDestUrl(userData) {
     if (userData.isAdmin    === true) return { url: 'pej.html',  newTab: false };
     if (userData.isSubAdmin === true) return { url: 'pej2.html', newTab: true  };
     return { url: PEJI_URL, newTab: false };
   }
 
-  // ===== iframe / 新タブ 操作 =====
   let pejiLoaded = false;
 
   function openPeji(url) {
@@ -421,25 +382,21 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     }
   }
 
-  // ===== 認証モーダル =====
   function openAuthModal(tab='login') {
     document.getElementById('authOverlay').classList.add('active');
     window.switchTab(tab);
   }
 
-  // ===== 自動ログイン（起動時） =====
   async function tryAutoLogin() {
     const savedUser = localStorage.getItem(LS_USERNAME);
     const savedHash = localStorage.getItem(LS_PWHASH);
     if (!savedUser || !savedHash) return false;
-
     try {
       const user = await fetchUserByUsername(savedUser);
-      if (!user) { clearLocal(); return false; }
-      if (user.pwHash !== savedHash)  { clearLocal(); return false; }
-      if (user.status === 'ng')       { clearLocal(); return false; }
-      if (user.group !== MY_GROUP)    { clearLocal(); return false; }
-      // 自動ログイン成功 → セッション保持（何もしない。Ctrl+U で開く）
+      if (!user)                       { clearLocal(); return false; }
+      if (user.pwHash !== savedHash)   { clearLocal(); return false; }
+      if (user.status === 'ng')        { clearLocal(); return false; }
+      if (user.group  !== MY_GROUP)    { clearLocal(); return false; }
       return true;
     } catch(e) { return false; }
   }
@@ -449,25 +406,22 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     localStorage.removeItem(LS_PWHASH);
   }
 
-  // ===== リアルタイム監視（ログイン中のユーザーのみ） =====
   let unsubscribeUser = null;
   let unsubscribeBan  = null;
   let emptyRetryTimer = null;
 
   function startRealtimeCheck(username) {
     stopRealtimeCheck();
-
     const userQ = query(collection(db,'users'), where('username','==',username));
     unsubscribeUser = onSnapshot(userQ, snap => {
       if (snap.empty) {
-        // 一時的なエラーに備えて2秒後に再確認
         if (emptyRetryTimer) return;
         emptyRetryTimer = setTimeout(async () => {
           emptyRetryTimer = null;
           try {
             const recheck = await getDocs(query(collection(db,'users'), where('username','==',username)));
             if (recheck.empty) { clearLocal(); location.replace('https://www.google.com'); }
-          } catch(e) { console.warn('再確認エラー:', e); }
+          } catch(e) {}
         }, 2000);
         return;
       }
@@ -508,26 +462,42 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
 
     try {
       const pwHash = await sha256(password);
-      const user = await fetchUserByUsername(username);
+      const user   = await fetchUserByUsername(username);
 
+      // ユーザーが存在しない
       if (!user) {
         window.markField('mf_lu');
         window.showErr('loginErr','ユーザー名またはパスワードが違います');
         btn.disabled = false; btn.textContent = 'ログイン'; return;
       }
+
+      // pwHashフィールドがそもそも存在しない（kanri.jsonインポート時にpwHashが入っていない場合）
+      if (!user.pwHash) {
+        window.markField('mf_lp');
+        window.showErr('loginErr','パスワードが設定されていません。管理者にお問い合わせください。');
+        btn.disabled = false; btn.textContent = 'ログイン'; return;
+      }
+
+      // パスワード不一致
       if (user.pwHash !== pwHash) {
         window.markField('mf_lp');
         window.showErr('loginErr','ユーザー名またはパスワードが違います');
         btn.disabled = false; btn.textContent = 'ログイン'; return;
       }
+
+      // 承認待ち
       if (user.status === 'wait') {
         window.showErr('loginErr','⏳ まだ承認待ちです。管理者の許可をお待ちください。');
         btn.disabled = false; btn.textContent = 'ログイン'; return;
       }
+
+      // アクセス拒否
       if (user.status === 'ng') {
         window.showErr('loginErr','🚫 アクセスが拒否されています。');
         btn.disabled = false; btn.textContent = 'ログイン'; return;
       }
+
+      // グループ違い
       if (user.group !== MY_GROUP) {
         window.showErr('loginErr','このグループへのアクセス権がありません。');
         btn.disabled = false; btn.textContent = 'ログイン'; return;
@@ -556,7 +526,6 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     const username = document.getElementById('reg_username').value.trim();
     const password = document.getElementById('reg_password').value;
 
-    // バリデーション
     if (!realname) { window.markField('mf_rreal'); window.showErr('registerErr','本名を入力してください'); return; }
     if (!classRaw) { window.markField('mf_rclass'); window.showErr('registerErr','組を入力してください'); return; }
     if (!dispname) { window.markField('mf_rdisp');  window.showErr('registerErr','表示名を入力してください'); return; }
@@ -569,7 +538,6 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     btn.disabled = true; btn.textContent = '確認中...';
 
     try {
-      // 重複チェック
       if (await usernameExists(username)) {
         window.markField('mf_ruser');
         window.showErr('registerErr','そのユーザー名はすでに使われています');
@@ -595,13 +563,11 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
         createdAt: new Date()
       });
 
-      // 登録完了
       localStorage.setItem(LS_USERNAME, username);
       localStorage.setItem(LS_PWHASH,   pwHash);
       window.closeAuthModal();
 
       if (pubMode) {
-        // 公開モードは即ログイン
         const user = await fetchUserByUsername(username);
         startRealtimeCheck(username);
         if (user) openDest(user);
@@ -616,7 +582,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     btn.disabled = false; btn.textContent = '登録して申請';
   });
 
-  // Enterキー送信
+  // Enterキー
   document.getElementById('login_password').addEventListener('keydown', e => {
     if (e.key === 'Enter') document.getElementById('loginBtn').click();
   });
@@ -632,48 +598,33 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     if (!(e.ctrlKey && e.key === 'u')) return;
     e.preventDefault();
 
-    // iframeが開いていれば閉じる
     if (hiddenFrame.style.display === 'block') { closePeji(); return; }
 
     const savedUser = localStorage.getItem(LS_USERNAME);
     const savedHash = localStorage.getItem(LS_PWHASH);
 
-    // 未ログインならモーダルを開く
     if (!savedUser || !savedHash) { openAuthModal('login'); return; }
 
     try {
       const user = await fetchUserByUsername(savedUser);
-      if (!user) {
-        clearLocal(); openAuthModal('login'); return;
-      }
-      if (user.pwHash !== savedHash) {
-        clearLocal(); openAuthModal('login'); return;
-      }
-      if (user.status === 'wait') {
-        showToast('⏳ まだ承認待ちです'); return;
-      }
-      if (user.status === 'ng') {
-        clearLocal(); showToast('🚫 アクセスが拒否されています'); return;
-      }
-      if (user.group !== MY_GROUP) {
-        clearLocal(); return;
-      }
-      // ページを開く
+      if (!user)                     { clearLocal(); openAuthModal('login'); return; }
+      if (user.pwHash !== savedHash) { clearLocal(); openAuthModal('login'); return; }
+      if (user.status === 'wait')    { showToast('⏳ まだ承認待ちです'); return; }
+      if (user.status === 'ng')      { clearLocal(); showToast('🚫 アクセスが拒否されています'); return; }
+      if (user.group  !== MY_GROUP)  { clearLocal(); return; }
       openDest(user);
-
     } catch(err) {
       console.error('Firestore エラー:', err);
       showToast('通信エラー。再度お試しください。');
     }
   });
 
-  // ===== 起動時：自動ログイン処理 =====
+  // ===== 起動時：自動ログイン =====
   (async () => {
     const ok = await tryAutoLogin();
     if (ok) {
       const username = localStorage.getItem(LS_USERNAME);
       startRealtimeCheck(username);
-      // Ctrl+U を待つだけ（自動でページは開かない）
     }
   })();
 
