@@ -1,11 +1,26 @@
 [
   {
-    "name": "運営",
-    "realName": "運営",
+    "name": "たろう",
+    "realName": "山田太郎",
     "group": "2",
-    "username": "upc78",
-    "password": "shiyo0708",
+    "username": "taro",
+    "password": "pass1234",
     "role": "admin"
+  },
+  {
+    "name": "はなこ",
+    "realName": "鈴木花子",
+    "group": "2",
+    "username": "hanako",
+    "password": "hana5678",
+    "role": "subadmin"
+  },
+  {
+    "name": "けんじ",
+    "realName": "田中健二",
+    "group": "2",
+    "username": "kenji",
+    "password": "kenji0000",
+    "role": "user"
   }
-
 ]
