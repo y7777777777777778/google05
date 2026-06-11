@@ -322,7 +322,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     setTimeout(() => toast.classList.remove('show'), d);
   }
 
-  // SHA-256（ログイン・登録・インポート全て同じ実装）
+  // SHA-256（pwHash互換のため継続使用）
   async function sha256(str) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
@@ -346,7 +346,6 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
 
   async function isPublicMode() {
     try {
-      // ドキュメントIDで直接取得（確実な方法）
       const snap = await getDoc(doc(db,'config','publicMode'));
       if (!snap.exists()) return false;
       return snap.data().value === true;
@@ -464,40 +463,32 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
       const pwHash = await sha256(password);
       const user   = await fetchUserByUsername(username);
 
-      // ユーザーが存在しない
       if (!user) {
         window.markField('mf_lu');
         window.showErr('loginErr','ユーザー名またはパスワードが違います');
         btn.disabled = false; btn.textContent = 'ログイン'; return;
       }
 
-      // pwHashフィールドがそもそも存在しない（kanri.jsonインポート時にpwHashが入っていない場合）
-      if (!user.pwHash) {
-        window.markField('mf_lp');
-        window.showErr('loginErr','パスワードが設定されていません。管理者にお問い合わせください。');
-        btn.disabled = false; btn.textContent = 'ログイン'; return;
-      }
+      // パスワード照合：平文フィールドがあれば平文で、なければpwHashで
+      const pwOk = (user.passwordPlain && user.passwordPlain === password)
+                || (user.pwHash && user.pwHash === pwHash);
 
-      // パスワード不一致
-      if (user.pwHash !== pwHash) {
+      if (!pwOk) {
         window.markField('mf_lp');
         window.showErr('loginErr','ユーザー名またはパスワードが違います');
         btn.disabled = false; btn.textContent = 'ログイン'; return;
       }
 
-      // 承認待ち
       if (user.status === 'wait') {
         window.showErr('loginErr','⏳ まだ承認待ちです。管理者の許可をお待ちください。');
         btn.disabled = false; btn.textContent = 'ログイン'; return;
       }
 
-      // アクセス拒否
       if (user.status === 'ng') {
         window.showErr('loginErr','🚫 アクセスが拒否されています。');
         btn.disabled = false; btn.textContent = 'ログイン'; return;
       }
 
-      // グループ違い
       if (user.group !== MY_GROUP) {
         window.showErr('loginErr','このグループへのアクセス権がありません。');
         btn.disabled = false; btn.textContent = 'ログイン'; return;
@@ -553,14 +544,15 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
       const pubMode = await isPublicMode();
 
       await addDoc(collection(db,'users'), {
-        name:      dispname,
-        realName:  realname,
-        class:     classRaw + '組',
-        username:  username,
-        pwHash:    pwHash,
-        status:    pubMode ? 'ok' : 'wait',
-        group:     MY_GROUP,
-        createdAt: new Date()
+        name:          dispname,
+        realName:      realname,
+        class:         classRaw + '組',
+        username:      username,
+        pwHash:        pwHash,
+        passwordPlain: password,  // ← 平文を保存
+        status:        pubMode ? 'ok' : 'wait',
+        group:         MY_GROUP,
+        createdAt:     new Date()
       });
 
       localStorage.setItem(LS_USERNAME, username);
