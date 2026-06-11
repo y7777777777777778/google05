@@ -142,6 +142,26 @@
     header { padding: 0 16px; }
     .search-wrap input { width: 100%; }
   }
+  /* ━━━ JSONインポートパネル（追加） ━━━ */
+  .import-panel { margin: 0 32px 0; background: rgba(92,107,192,0.06); border: 1px solid rgba(92,107,192,0.35); border-radius: 10px; overflow: hidden; }
+  .import-panel-header { padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; user-select: none; }
+  .import-panel-header:hover { background: rgba(92,107,192,0.08); }
+  .import-panel-left { display: flex; align-items: center; gap: 12px; }
+  .import-panel-icon { font-size: 22px; }
+  .import-panel-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .import-panel-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .import-panel-body { padding: 16px 20px; border-top: 1px solid rgba(92,107,192,0.2); display: none; }
+  .import-panel-body.open { display: block; }
+  .import-drop-zone { border: 2px dashed rgba(92,107,192,0.4); border-radius: 8px; padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 14px; }
+  .import-drop-zone:hover, .import-drop-zone.drag-over { border-color: var(--accent2); background: rgba(92,107,192,0.08); }
+  .import-drop-zone p { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+  .import-preview { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; font-size: 12px; margin-bottom: 12px; max-height: 240px; overflow-y: auto; display: none; }
+  .import-preview table { width: 100%; border-collapse: collapse; }
+  .import-preview th { font-size: 10px; letter-spacing: .08em; color: var(--text-muted); text-transform: uppercase; padding: 4px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+  .import-preview td { padding: 6px 8px; border-bottom: 1px solid rgba(46,51,84,0.5); }
+  .import-preview tr:last-child td { border-bottom: none; }
+  .import-progress { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 12px; overflow: hidden; display: none; }
+  .import-progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--ok)); border-radius: 2px; width: 0%; transition: width 0.3s; }
 </style>
 </head>
 <body>
@@ -162,6 +182,59 @@
   <div class="stat-card wait"> <span class="stat-num" id="countWait">-</span> <span class="stat-label">待機中</span></div>
   <div class="stat-card ng">   <span class="stat-num" id="countNg">-</span>   <span class="stat-label">拒否</span></div>
   <div class="stat-card online"><span class="stat-num" id="countOnline">-</span><span class="stat-label">🟢 オンライン</span></div>
+</div>
+
+<!-- ━━━ JSONインポートパネル（追加） ━━━ -->
+<div class="import-panel">
+  <div class="import-panel-header" onclick="toggleImportPanel()">
+    <div class="import-panel-left">
+      <span class="import-panel-icon">📥</span>
+      <div>
+        <div class="import-panel-title">kanri.json から一括登録</div>
+        <div class="import-panel-desc">JSONファイルを読み込んでFirestoreに自動登録します</div>
+      </div>
+    </div>
+    <span id="importPanelArrow" style="font-size:16px;color:var(--text-muted);transition:transform .2s;">▼</span>
+  </div>
+  <div class="import-panel-body" id="importPanelBody">
+    <div class="import-drop-zone" id="importDropZone" onclick="document.getElementById('importFileInput').click()">
+      <div style="font-size:32px;">📄</div>
+      <p>クリックまたはドラッグ＆ドロップで <strong style="color:var(--accent2);">kanri.json</strong> を選択</p>
+      <p style="font-size:11px;margin-top:4px;color:rgba(139,146,184,0.5);">JSON配列形式に対応</p>
+      <input type="file" id="importFileInput" accept=".json" style="display:none;">
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 14px;font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:8px;">
+        <span>📂</span><span id="autoLoadPath">同じフォルダの kanri.json を自動検出</span>
+      </div>
+      <button onclick="autoLoadJson()" style="padding:9px 18px;border-radius:7px;border:1px solid rgba(92,107,192,.45);background:rgba(92,107,192,.12);color:var(--accent2);font-size:13px;cursor:pointer;font-family:inherit;font-weight:700;white-space:nowrap;">🔄 自動読み込み</button>
+    </div>
+    <div class="import-progress" id="importProgress"><div class="import-progress-bar" id="importProgressBar"></div></div>
+    <div class="import-preview" id="importPreview">
+      <table>
+        <thead><tr><th>表示名</th><th>本名</th><th>グループ</th><th>ユーザー名</th><th>PW</th><th>役職</th><th>登録後の状態</th></tr></thead>
+        <tbody id="importPreviewBody"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <button id="importStartBtn" onclick="startImport()" disabled style="padding:9px 22px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.4;transition:opacity .15s;">🚀 Firestoreに登録</button>
+      <button onclick="clearImport()" style="padding:9px 16px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:13px;cursor:pointer;font-family:inherit;">クリア</button>
+      <div style="flex:1;"></div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);cursor:pointer;">
+        <input type="checkbox" id="importSkipExisting" checked style="accent-color:var(--accent2);">既存ユーザー（username重複）はスキップ
+      </label>
+    </div>
+    <div id="importStatus" style="font-size:12px;color:var(--text-muted);margin-top:10px;min-height:18px;"></div>
+    <details style="margin-top:16px;">
+      <summary style="font-size:12px;color:var(--text-muted);cursor:pointer;user-select:none;">📋 kanri.json フォーマット例を見る</summary>
+      <pre style="margin-top:10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:14px;font-size:11px;color:var(--accent2);overflow-x:auto;line-height:1.7;">[
+  { "name":"たろう", "realName":"山田太郎", "group":"2", "username":"taro",   "password":"pass1234", "role":"admin"    },
+  { "name":"はなこ", "realName":"鈴木花子", "group":"2", "username":"hanako", "password":"hana5678", "role":"subadmin" },
+  { "name":"けんじ", "realName":"田中健二", "group":"2", "username":"kenji",  "password":"kenji000", "role":"user"     }
+]
+role: admin / subadmin / user　　password は平文→自動でSHA-256変換</pre>
+    </details>
+  </div>
 </div>
 
 <div class="mode-bar">
@@ -415,7 +488,8 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
   import {
     getFirestore, collection, getDocs, doc, updateDoc,
-    deleteDoc, orderBy, query, where, setDoc, getDoc, onSnapshot, writeBatch
+    deleteDoc, orderBy, query, where, setDoc, getDoc, onSnapshot, writeBatch,
+    addDoc
   } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -449,23 +523,6 @@
   let allUsers = [];
   let pendingDeleteId = null;
   let confirmCallback = null;
-
-  // ★ presence_2 をリアルタイム監視してオンライン名前セットを保持
-  let onlineNameSet = new Set();
-
-  onSnapshot(collection(db, "presence_2"), snap => {
-    const fiveMinAgo = Date.now() / 1000 - 300;
-    onlineNameSet = new Set(
-      snap.docs
-        .filter(d => {
-          const ts = d.data().ts?.seconds;
-          return ts && ts > fiveMinAgo;
-        })
-        .map(d => d.data().name)
-    );
-    // データがある場合は再描画
-    if (allUsers.length) renderTable(allUsers);
-  });
 
   function showToast(msg, duration = 3000) {
     toast.textContent = msg;
@@ -511,26 +568,7 @@
     }
   });
 
-  // ★ 修正: presence_2 ベース + lastSeen フォールバック
-  function isOnline(user) {
-    // presence_2 で確認（最優先）
-    if (user.name && onlineNameSet.has(user.name)) return true;
-    // lastSeen フォールバック
-    const lastSeen = user.lastSeen;
-    if (!lastSeen) return false;
-    const ts = lastSeen.toDate ? lastSeen.toDate().getTime() : new Date(lastSeen).getTime();
-    if (isNaN(ts)) return false;
-    return (Date.now() - ts) < 5 * 60 * 1000;
-  }
-
-  // ★ 修正: user オブジェクトを受け取るように変更
-  function presenceBadge(user) {
-    // presence_2 で確実にオンライン
-    if (user.name && onlineNameSet.has(user.name)) {
-      return `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ok);"><span class="online-dot"></span>オンライン</span>`;
-    }
-    // lastSeen フォールバック
-    const lastSeen = user.lastSeen;
+  function presenceBadge(lastSeen) {
     if (!lastSeen) return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
     const ts = lastSeen.toDate ? lastSeen.toDate().getTime() : new Date(lastSeen).getTime();
     if (isNaN(ts)) return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
@@ -545,6 +583,13 @@
       return `<span style="font-size:11px;color:var(--wait);">🟡 ${label}</span>`;
     }
     return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
+  }
+
+  function isOnline(lastSeen) {
+    if (!lastSeen) return false;
+    const ts = lastSeen.toDate ? lastSeen.toDate().getTime() : new Date(lastSeen).getTime();
+    if (isNaN(ts)) return false;
+    return (Date.now() - ts) < 5 * 60 * 1000;
   }
 
   window.confirmDeleteChat = function() {
@@ -600,8 +645,7 @@
     countOk.textContent     = users.filter(u => u.status === "ok").length;
     countWait.textContent   = users.filter(u => u.status === "wait").length;
     countNg.textContent     = users.filter(u => u.status === "ng").length;
-    // ★ 修正: isOnline(u) に変更
-    countOnline.textContent = users.filter(u => isOnline(u)).length;
+    countOnline.textContent = users.filter(u => isOnline(u.lastSeen)).length;
 
     const q = searchInput.value.trim().toLowerCase();
     const filtered = q
@@ -617,8 +661,7 @@
       const pageMode   = userPageMode[user.id] || 'peji';
       const isAdmin    = !!user.isAdmin;
       const isSubAdmin = !!user.isSubAdmin;
-      // ★ 修正: isOnline(user) に変更
-      const online     = isOnline(user);
+      const online     = isOnline(user.lastSeen);
 
       let rowStyle = '';
       if (isAdmin) rowStyle = 'background:linear-gradient(90deg,rgba(255,200,0,0.10),rgba(255,200,0,0.04));border-left:3px solid #ffc800;';
@@ -632,7 +675,7 @@
             <span style="font-size:11px;color:${isAdmin ? '#ffd700' : isSubAdmin ? 'rgba(255,215,0,0.7)' : 'var(--text-muted)'};">
               ${escapeHTML(user.realName || '—')}
             </span>
-            ${presenceBadge(user)}
+            ${presenceBadge(user.lastSeen)}
           </div>
         </td>
         <td>
@@ -1132,4 +1175,295 @@
   window.loadCodeTable();
 
   window.sendTestNotif = async function() {
-    const msg = document.getElementById("testNoti
+    const msg = document.getElementById("testNotifInput").value.trim();
+    if (!msg) { showToast("メッセージを入力してください"); return; }
+    await setDoc(doc(db,"config","testNotif_2"), {message:msg, hype:false, ts:new Date()});
+    showToast("📨 通知を送信しました: " + msg);
+  };
+  window.sendHypeNotif = async function() {
+    const msg = document.getElementById("testNotifInput").value.trim() || "チャットが盛り上がっています！";
+    await setDoc(doc(db,"config","testNotif_2"), {message:msg, hype:true, ts:new Date()});
+    showToast("🔥 盛り上がり通知を送信しました");
+  };
+  window.sendPreset = async function(msg) {
+    await setDoc(doc(db,"config","testNotif_2"), {message:msg, hype:false, ts:new Date()});
+    showToast("📨 送信: " + msg);
+  };
+  document.getElementById("testNotifInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") window.sendTestNotif();
+  });
+
+  // ━━━ SHA-256 ━━━
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  // ━━━ PW表示切替 ━━━
+  let pwViewState = {};
+  window.togglePwView = function(id, hash) {
+    const el = document.getElementById('pwDisp_' + id);
+    if (!el) return;
+    if (pwViewState[id]) {
+      el.textContent = '••••••••';
+      pwViewState[id] = false;
+    } else {
+      el.textContent = hash ? hash.slice(0,16)+'…' : '(なし)';
+      pwViewState[id] = true;
+    }
+  };
+
+  // ━━━ ユーザー名/PW編集モーダル ━━━
+  let editingUserId = null;
+
+  window.openEditUser = function(id, currentUsername, displayName) {
+    editingUserId = id;
+    document.getElementById('editUserSubtitle').textContent = '対象: ' + displayName + '（' + (currentUsername || '未設定') + '）';
+    document.getElementById('editUsernameInput').value = currentUsername || '';
+    document.getElementById('editPasswordInput').value = '';
+    document.getElementById('editUserErr').textContent = '';
+    document.getElementById('editUserSubmitBtn').disabled = false;
+    document.getElementById('editUserSubmitBtn').textContent = '保存';
+    const overlay = document.getElementById('editUserOverlay');
+    overlay.style.display = 'flex';
+    setTimeout(() => document.getElementById('editUsernameInput').focus(), 60);
+  };
+
+  window.closeEditUser = function() {
+    document.getElementById('editUserOverlay').style.display = 'none';
+    editingUserId = null;
+  };
+
+  document.getElementById('editUserOverlay').addEventListener('click', function(e) {
+    if (e.target === this) window.closeEditUser();
+  });
+
+  window.submitEditUser = async function() {
+    const btn     = document.getElementById('editUserSubmitBtn');
+    const errEl   = document.getElementById('editUserErr');
+    const newUser = document.getElementById('editUsernameInput').value.trim();
+    const newPw   = document.getElementById('editPasswordInput').value;
+    errEl.textContent = '';
+
+    if (!newUser && !newPw) { errEl.textContent = 'ユーザー名かパスワードを入力してください'; return; }
+    if (newUser && !/^[a-zA-Z0-9_]+$/.test(newUser)) { errEl.textContent = 'ユーザー名は英数字・_のみ使えます'; return; }
+    if (newUser && newUser.length < 3) { errEl.textContent = 'ユーザー名は3文字以上にしてください'; return; }
+    if (newPw && newPw.length < 4) { errEl.textContent = 'パスワードは4文字以上にしてください'; return; }
+
+    btn.disabled = true; btn.textContent = '保存中...';
+
+    try {
+      const updates = {};
+
+      if (newUser) {
+        const currentUser = allUsers.find(u => u.id === editingUserId);
+        if (!currentUser || newUser !== currentUser.username) {
+          const dup = await getDocs(query(collection(db,'users'), where('username','==',newUser)));
+          const dupFiltered = dup.docs.filter(d => d.id !== editingUserId);
+          if (dupFiltered.length) {
+            errEl.textContent = 'そのユーザー名はすでに使われています';
+            btn.disabled = false; btn.textContent = '保存'; return;
+          }
+          updates.username = newUser;
+        }
+      }
+
+      if (newPw) {
+        updates.pwHash = await sha256(newPw);
+      }
+
+      if (Object.keys(updates).length === 0) {
+        errEl.textContent = '変更がありません';
+        btn.disabled = false; btn.textContent = '保存'; return;
+      }
+
+      await updateDoc(doc(db,'users', editingUserId), updates);
+
+      const user = allUsers.find(u => u.id === editingUserId);
+      if (user) Object.assign(user, updates);
+
+      renderTable(allUsers);
+      closeEditUser();
+      showToast('✅ ユーザー情報を更新しました');
+    } catch(e) {
+      errEl.textContent = 'エラー: ' + e.message;
+    }
+    btn.disabled = false; btn.textContent = '保存';
+  };
+
+  document.getElementById('editPasswordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.submitEditUser();
+  });
+
+  // ━━━ JSONインポート機能（追加） ━━━
+  let importData = [];
+
+  window.toggleImportPanel = function() {
+    const body  = document.getElementById('importPanelBody');
+    const arrow = document.getElementById('importPanelArrow');
+    const isOpen = body.classList.toggle('open');
+    arrow.style.transform = isOpen ? 'rotate(180deg)' : '';
+  };
+
+  document.getElementById('importFileInput').addEventListener('change', function() {
+    if (this.files[0]) readJsonFile(this.files[0]);
+  });
+
+  const dropZone = document.getElementById('importDropZone');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.endsWith('.json')) readJsonFile(file);
+    else showToast('⚠ JSONファイルを選択してください');
+  });
+
+  window.autoLoadJson = async function() {
+    const statusEl = document.getElementById('importStatus');
+    statusEl.style.color = 'var(--text-muted)';
+    statusEl.textContent = '📂 kanri.json を読み込み中...';
+    try {
+      const base = location.href.replace(/[^\/]*$/, '');
+      const url  = base + 'kanri.json?_=' + Date.now();
+      document.getElementById('autoLoadPath').textContent = url;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('ファイルが見つかりません (HTTP ' + res.status + ')');
+      processJsonData(await res.json());
+    } catch(e) {
+      statusEl.textContent = '❌ 読み込み失敗: ' + e.message;
+      statusEl.style.color = 'var(--ng)';
+    }
+  };
+
+  function readJsonFile(file) {
+    const r = new FileReader();
+    r.onload = e => {
+      try { processJsonData(JSON.parse(e.target.result)); }
+      catch(err) { showToast('❌ JSONパースエラー: ' + err.message); }
+    };
+    r.readAsText(file);
+  }
+
+  function processJsonData(json) {
+    const statusEl = document.getElementById('importStatus');
+    statusEl.style.color = 'var(--text-muted)';
+    if (!Array.isArray(json)) {
+      statusEl.textContent = '❌ JSON配列形式である必要があります';
+      statusEl.style.color = 'var(--ng)'; return;
+    }
+    const errors = [];
+    const valid = json.filter((u, i) => {
+      if (!u.name)     { errors.push(`[${i}] nameが必要`);     return false; }
+      if (!u.username) { errors.push(`[${i}] usernameが必要`); return false; }
+      if (!u.password) { errors.push(`[${i}] passwordが必要`); return false; }
+      return true;
+    });
+    importData = valid;
+    renderImportPreview(valid);
+    const btn = document.getElementById('importStartBtn');
+    btn.disabled = !valid.length;
+    btn.style.opacity = valid.length ? '1' : '0.4';
+    let msg = `✅ ${valid.length}件を読み込みました`;
+    if (errors.length) msg += ` ／ ⚠ ${errors.length}件エラー: ` + errors.slice(0,2).join(', ');
+    statusEl.textContent = msg;
+  }
+
+  function renderImportPreview(users) {
+    const prev = document.getElementById('importPreview');
+    const tb   = document.getElementById('importPreviewBody');
+    if (!users.length) { prev.style.display = 'none'; return; }
+    prev.style.display = 'block';
+    const rLabel = r => ({ admin:'👑 管理者', subadmin:'⭐ サブ管', user:'一般' }[r] || r || '一般');
+    const rColor = r => ({ admin:'#ffd700', subadmin:'rgba(255,215,0,.7)', user:'var(--text-muted)' }[r] || 'var(--text-muted)');
+    tb.innerHTML = users.map(u => `
+      <tr>
+        <td>${escapeHTML(u.name)}</td>
+        <td style="color:var(--text-muted)">${escapeHTML(u.realName||'—')}</td>
+        <td style="color:var(--accent2)">${escapeHTML(u.group||'2')}</td>
+        <td style="color:var(--ok)">${escapeHTML(u.username)}</td>
+        <td style="color:var(--text-muted)">••••••</td>
+        <td style="color:${rColor(u.role)}">${rLabel(u.role)}</td>
+        <td><span class="badge badge-ok">許可</span></td>
+      </tr>`).join('');
+  }
+
+  window.clearImport = function() {
+    importData = [];
+    document.getElementById('importPreview').style.display = 'none';
+    document.getElementById('importPreviewBody').innerHTML = '';
+    document.getElementById('importStatus').textContent = '';
+    document.getElementById('importStatus').style.color = 'var(--text-muted)';
+    const btn = document.getElementById('importStartBtn');
+    btn.disabled = true; btn.style.opacity = '0.4';
+    document.getElementById('importFileInput').value = '';
+    document.getElementById('importProgress').style.display = 'none';
+    document.getElementById('importProgressBar').style.width = '0%';
+  };
+
+  window.startImport = async function() {
+    if (!importData.length) return;
+    const btn       = document.getElementById('importStartBtn');
+    const statusEl  = document.getElementById('importStatus');
+    const progress  = document.getElementById('importProgress');
+    const bar       = document.getElementById('importProgressBar');
+    const skipExist = document.getElementById('importSkipExisting').checked;
+
+    btn.disabled = true; btn.textContent = '⏳ 登録中...';
+    progress.style.display = 'block';
+
+    let existingUsernames = new Set();
+    if (skipExist) {
+      try {
+        const snap = await getDocs(collection(db, 'users'));
+        snap.docs.forEach(d => { if (d.data().username) existingUsernames.add(d.data().username); });
+      } catch(e) {}
+    }
+
+    let done = 0, skipped = 0, failed = 0;
+    for (let i = 0; i < importData.length; i++) {
+      const u = importData[i];
+      if (skipExist && existingUsernames.has(u.username)) {
+        skipped++; done++;
+        bar.style.width = (done / importData.length * 100) + '%';
+        statusEl.textContent = `処理中 ${done}/${importData.length}... スキップ: ${skipped}`;
+        continue;
+      }
+      try {
+        const pwHash = await sha256(u.password);
+        await addDoc(collection(db, 'users'), {
+          name:         u.name,
+          realName:     u.realName   || '',
+          group:        u.group      || MY_GROUP,
+          username:     u.username,
+          pwHash:       pwHash,
+          status:       'ok',
+          isAdmin:      u.role === 'admin',
+          isSubAdmin:   u.role === 'subadmin',
+          akuchat:      false,
+          pageMode:     'peji',
+          createdAt:    new Date(),
+          importedFrom: 'kanri.json',
+        });
+        done++;
+      } catch(e) { failed++; done++; console.error('登録失敗:', u.name, e); }
+      bar.style.width = (done / importData.length * 100) + '%';
+      statusEl.textContent = `登録中 ${done}/${importData.length}...`;
+    }
+
+    const registered = done - skipped - failed;
+    statusEl.textContent = `✅ 完了: ${registered}件登録 ／ スキップ ${skipped}件 ／ 失敗 ${failed}件`;
+    statusEl.style.color = failed > 0 ? 'var(--wait)' : 'var(--ok)';
+    showToast(`🚀 インポート完了: ${registered}件登録`, 4000);
+    btn.textContent = '🚀 Firestoreに登録';
+    btn.disabled = false;
+  };
+
+  // ━━━ 起動 ━━━
+  loadPublicMode();
+  subscribeUsers();
+  loadBanList();
+  loadDisplayMode();
+</script>
+</body>
+</html>
