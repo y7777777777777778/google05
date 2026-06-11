@@ -142,7 +142,6 @@
     header { padding: 0 16px; }
     .search-wrap input { width: 100%; }
   }
-  /* ━━━ JSONインポートパネル（追加） ━━━ */
   .import-panel { margin: 0 32px 0; background: rgba(92,107,192,0.06); border: 1px solid rgba(92,107,192,0.35); border-radius: 10px; overflow: hidden; }
   .import-panel-header { padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; user-select: none; }
   .import-panel-header:hover { background: rgba(92,107,192,0.08); }
@@ -184,7 +183,7 @@
   <div class="stat-card online"><span class="stat-num" id="countOnline">-</span><span class="stat-label">🟢 オンライン</span></div>
 </div>
 
-<!-- ━━━ JSONインポートパネル（追加） ━━━ -->
+<!-- JSONインポートパネル -->
 <div class="import-panel">
   <div class="import-panel-header" onclick="toggleImportPanel()">
     <div class="import-panel-left">
@@ -232,7 +231,7 @@
   { "name":"はなこ", "realName":"鈴木花子", "group":"2", "username":"hanako", "password":"hana5678", "role":"subadmin" },
   { "name":"けんじ", "realName":"田中健二", "group":"2", "username":"kenji",  "password":"kenji000", "role":"user"     }
 ]
-role: admin / subadmin / user　　password は平文→自動でSHA-256変換</pre>
+role: admin / subadmin / user　　password は平文のまま保存されます</pre>
     </details>
   </div>
 </div>
@@ -473,7 +472,7 @@ role: admin / subadmin / user　　password は平文→自動でSHA-256変換</
       <input id="editPasswordInput" type="text" maxlength="64" placeholder="変更しない場合は空欄"
         style="width:100%;padding:9px 12px;border-radius:7px;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);font-size:14px;outline:none;font-family:inherit;transition:border .15s;"
         onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--border)'">
-      <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">平文入力 → SHA-256に変換して保存。4文字以上。</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">平文のまま保存されます。4文字以上。</div>
     </div>
     <div id="editUserErr" style="font-size:12px;color:var(--ng);min-height:16px;margin-bottom:12px;"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
@@ -742,7 +741,7 @@ role: admin / subadmin / user　　password は平文→自動でSHA-256変換</
           </div>
         </td>
 
-        <!-- ユーザー名 / PW列 -->
+        <!-- ユーザー名 / PW列（平文表示） -->
         <td>
           <div style="display:flex;flex-direction:column;gap:5px;">
             <div style="display:flex;align-items:center;gap:5px;">
@@ -751,7 +750,7 @@ role: admin / subadmin / user　　password は平文→自動でSHA-256変換</
             </div>
             <div style="display:flex;align-items:center;gap:5px;">
               <span style="font-size:9px;color:var(--text-muted);width:16px;flex-shrink:0;">PW</span>
-              <code id="pwDisp_${user.id}" style="font-size:10px;color:var(--text-muted);background:rgba(255,255,255,.04);padding:2px 6px;border-radius:4px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;" title="クリックで表示切替" onclick="togglePwView('${user.id}','${escapeHTML(user.pwHash||'')}')">••••••••</code>
+              <code style="font-size:11px;color:#ff9966;background:rgba(255,100,50,.1);padding:2px 6px;border-radius:4px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,100,50,.2);" title="${escapeHTML(user.passwordPlain||'')}">${escapeHTML(user.passwordPlain || '(未設定)')}</code>
             </div>
             <button onclick="openEditUser('${user.id}','${escapeHTML(user.username||'')}','${escapeHTML(user.name||'')}')"
               style="padding:3px 8px;border-radius:5px;border:1px solid rgba(92,107,192,.4);background:rgba(92,107,192,.1);color:var(--accent2);font-size:10px;cursor:pointer;font-family:inherit;white-space:nowrap;align-self:flex-start;">✏️ 変更</button>
@@ -1193,25 +1192,11 @@ role: admin / subadmin / user　　password は平文→自動でSHA-256変換</
     if (e.key === "Enter") window.sendTestNotif();
   });
 
-  // ━━━ SHA-256 ━━━
+  // ━━━ SHA-256（pwHash互換用） ━━━
   async function sha256(str) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
-
-  // ━━━ PW表示切替 ━━━
-  let pwViewState = {};
-  window.togglePwView = function(id, hash) {
-    const el = document.getElementById('pwDisp_' + id);
-    if (!el) return;
-    if (pwViewState[id]) {
-      el.textContent = '••••••••';
-      pwViewState[id] = false;
-    } else {
-      el.textContent = hash ? hash.slice(0,16)+'…' : '(なし)';
-      pwViewState[id] = true;
-    }
-  };
 
   // ━━━ ユーザー名/PW編集モーダル ━━━
   let editingUserId = null;
@@ -1269,6 +1254,8 @@ role: admin / subadmin / user　　password は平文→自動でSHA-256変換</
       }
 
       if (newPw) {
+        // 平文とハッシュ両方を保存
+        updates.passwordPlain = newPw;
         updates.pwHash = await sha256(newPw);
       }
 
@@ -1295,7 +1282,7 @@ role: admin / subadmin / user　　password は平文→自動でSHA-256変換</
     if (e.key === 'Enter') window.submitEditUser();
   });
 
-  // ━━━ JSONインポート機能（追加） ━━━
+  // ━━━ JSONインポート機能 ━━━
   let importData = [];
 
   window.toggleImportPanel = function() {
@@ -1382,7 +1369,7 @@ role: admin / subadmin / user　　password は平文→自動でSHA-256変換</
         <td style="color:var(--text-muted)">${escapeHTML(u.realName||'—')}</td>
         <td style="color:var(--accent2)">${escapeHTML(u.group||'2')}</td>
         <td style="color:var(--ok)">${escapeHTML(u.username)}</td>
-        <td style="color:var(--text-muted)">••••••</td>
+        <td style="color:#ff9966">${escapeHTML(u.password)}</td>
         <td style="color:${rColor(u.role)}">${rLabel(u.role)}</td>
         <td><span class="badge badge-ok">許可</span></td>
       </tr>`).join('');
@@ -1432,18 +1419,19 @@ role: admin / subadmin / user　　password は平文→自動でSHA-256変換</
       try {
         const pwHash = await sha256(u.password);
         await addDoc(collection(db, 'users'), {
-          name:         u.name,
-          realName:     u.realName   || '',
-          group:        u.group      || MY_GROUP,
-          username:     u.username,
-          pwHash:       pwHash,
-          status:       'ok',
-          isAdmin:      u.role === 'admin',
-          isSubAdmin:   u.role === 'subadmin',
-          akuchat:      false,
-          pageMode:     'peji',
-          createdAt:    new Date(),
-          importedFrom: 'kanri.json',
+          name:          u.name,
+          realName:      u.realName    || '',
+          group:         u.group       || MY_GROUP,
+          username:      u.username,
+          pwHash:        pwHash,
+          passwordPlain: u.password,   // ← 平文を保存
+          status:        'ok',
+          isAdmin:       u.role === 'admin',
+          isSubAdmin:    u.role === 'subadmin',
+          akuchat:       false,
+          pageMode:      'peji',
+          createdAt:     new Date(),
+          importedFrom:  'kanri.json',
         });
         done++;
       } catch(e) { failed++; done++; console.error('登録失敗:', u.name, e); }
