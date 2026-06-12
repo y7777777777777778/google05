@@ -1,4 +1,4 @@
-<!-- グループ2用 kanri.html -->
+<!-- グループ2用 kanri2.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -77,6 +77,11 @@
   .btn-star { background: rgba(255,215,0,0.08); border-color: rgba(255,215,0,0.3); color: var(--star); padding: 5px 10px; }
   .btn-star:hover:not(:disabled) { background: rgba(255,215,0,0.22); border-color: var(--star); }
   .btn-star.active { background: rgba(255,215,0,0.2); border-color: var(--star); color: var(--star); text-shadow: 0 0 8px rgba(255,215,0,0.6); }
+  /* 再入力ボタン */
+  .btn-relogin { background: rgba(255,120,0,0.10); border-color: rgba(255,120,0,0.35); color: #ff8c42; }
+  .btn-relogin:hover:not(:disabled) { background: rgba(255,120,0,0.22); border-color: #ff8c42; }
+  .btn-relogin.active { background: rgba(255,120,0,0.22); border-color: #ff8c42; color: #fff; animation: reloginPulse 1.6s ease infinite; }
+  @keyframes reloginPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,120,0,0.5);} 50%{box-shadow:0 0 0 4px rgba(255,120,0,0);} }
   .loading-row td, .empty-row td { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 13px; }
   .spinner { display: inline-block; width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent2); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -91,15 +96,6 @@
   #confirmBox .confirm-btns { display: flex; gap: 10px; justify-content: center; }
   #confirmBox .btn-confirm-cancel { padding: 10px 20px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); font-size: 13px; cursor: pointer; font-family: inherit; }
   #confirmBox .btn-confirm-ok { padding: 10px 20px; border-radius: 6px; background: rgba(255,82,82,0.18); border: 1px solid var(--ng); color: var(--ng); font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 700; }
-  .mode-bar { margin: 0 32px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .mode-bar-left { display: flex; align-items: center; gap: 14px; }
-  .mode-bar-icon { font-size: 22px; }
-  .mode-bar-title { font-size: 14px; font-weight: 700; color: var(--text); }
-  .mode-bar-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .mode-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-  .mode-btn { padding: 8px 18px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--text-muted); font-size: 13px; cursor: pointer; font-family: inherit; transition: all .15s; font-weight: 500; }
-  .mode-btn:hover { border-color: #1a73e8; color: #1a73e8; background: rgba(26,115,232,0.06); }
-  .mode-btn.active { border-color: #1a73e8; color: #1a73e8; background: rgba(26,115,232,0.1); font-weight: 700; }
   .public-mode-bar { margin: 0 32px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: border 0.2s, background 0.2s; }
   .public-mode-bar.active { border-color: var(--ok); background: rgba(0,230,118,0.05); }
   .public-mode-left { display: flex; align-items: center; gap: 14px; }
@@ -133,15 +129,6 @@
   .ban-add-row input::placeholder { color: var(--text-muted); opacity: .6; }
   .ban-add-btn { padding: 8px 16px; border-radius: 6px; border: 1px solid rgba(255,68,102,0.4); background: rgba(255,68,102,0.1); color: #ff4466; font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 600; transition: all .15s; }
   .ban-add-btn:hover { background: rgba(255,68,102,0.2); }
-  .danger-btn { padding: 8px 18px; border-radius: 6px; border: 1px solid rgba(255,82,82,0.4); background: rgba(255,82,82,0.08); color: var(--ng); font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 600; transition: all .15s; display: flex; align-items: center; gap: 6px; }
-  .danger-btn:hover { background: rgba(255,82,82,0.2); border-color: var(--ng); }
-  .danger-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  @media (max-width: 600px) {
-    .table-wrap { margin: 0 16px 24px; }
-    .stats-bar, .toolbar { padding: 16px; }
-    header { padding: 0 16px; }
-    .search-wrap input { width: 100%; }
-  }
   .import-panel { margin: 0 32px 0; background: rgba(92,107,192,0.06); border: 1px solid rgba(92,107,192,0.35); border-radius: 10px; overflow: hidden; }
   .import-panel-header { padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; user-select: none; }
   .import-panel-header:hover { background: rgba(92,107,192,0.08); }
@@ -161,6 +148,22 @@
   .import-preview tr:last-child td { border-bottom: none; }
   .import-progress { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 12px; overflow: hidden; display: none; }
   .import-progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--ok)); border-radius: 2px; width: 0%; transition: width 0.3s; }
+  @media (max-width: 600px) {
+    .table-wrap { margin: 0 16px 24px; }
+    .stats-bar, .toolbar { padding: 16px; }
+    header { padding: 0 16px; }
+    .search-wrap input { width: 100%; }
+  }
+  /* 再入力モーダル */
+  #reloginOverlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:300; justify-content:center; align-items:center; }
+  #reloginOverlay.active { display:flex; }
+  #reloginBox { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px 24px; width:min(380px,calc(100vw - 32px)); box-shadow:0 24px 60px rgba(0,0,0,.7); animation:modalIn .18s ease; }
+  #reloginBox h3 { font-size:16px; font-weight:700; color:#ff8c42; margin-bottom:6px; }
+  #reloginBox p { font-size:12px; color:var(--text-muted); margin-bottom:20px; line-height:1.6; }
+  #reloginBox .rl-btns { display:flex; gap:10px; justify-content:flex-end; }
+  .btn-rl-cancel { padding:9px 18px; border-radius:6px; background:var(--surface2); border:1px solid var(--border); color:var(--text-muted); font-size:13px; cursor:pointer; font-family:inherit; }
+  .btn-rl-ok { padding:9px 20px; border-radius:6px; border:none; background:rgba(255,120,0,0.18); border:1px solid #ff8c42; color:#ff8c42; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .12s; }
+  .btn-rl-ok:hover { background:rgba(255,120,0,0.3); }
 </style>
 </head>
 <body>
@@ -236,22 +239,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   </div>
 </div>
 
-<div class="mode-bar">
-  <div class="mode-bar-left">
-    <span class="mode-bar-icon">📺</span>
-    <div>
-      <div class="mode-bar-title">Ctrl+U の表示先</div>
-      <div class="mode-bar-desc" id="modeDesc">読み込み中...</div>
-    </div>
-  </div>
-  <div class="mode-btns">
-    <button class="mode-btn" id="modeBtn1" onclick="setDisplayMode('iframe')">🖼 iframeで表示</button>
-    <button class="mode-btn" id="modeBtn2" onclick="setDisplayMode('kanri2')">📋 kanri2.html</button>
-    <button class="mode-btn" id="modeBtn3" onclick="setDisplayMode('peji')">🔓 peji.html</button>
-  </div>
-</div>
-
-<div class="public-mode-bar" id="publicModeBar">
+<div class="public-mode-bar" id="publicModeBar" style="margin-top:16px;">
   <div class="public-mode-left">
     <span class="public-mode-icon">🌐</span>
     <div>
@@ -265,7 +253,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   </label>
 </div>
 
-<div class="ban-panel" id="banPanel">
+<div class="ban-panel" id="banPanel" style="margin-top:16px;">
   <div class="ban-panel-left">
     <span class="ban-panel-icon">🚫</span>
     <div>
@@ -285,130 +273,6 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   </div>
 </div>
 
-<!-- チャット管理 -->
-<div style="margin:16px 32px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:stretch;">
-  <div style="flex:1;min-width:280px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-      <span style="font-size:20px;">💬</span>
-      <div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);">チャット部屋管理</div>
-        <div style="font-size:12px;color:var(--text-muted);">部屋の追加・削除（全体は固定）</div>
-      </div>
-    </div>
-    <div id="roomTagsWrap" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;min-height:28px;">
-      <span style="font-size:12px;color:var(--text-muted);">読み込み中...</span>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <input id="newRoomInput" type="text" placeholder="部屋名を入力..." maxlength="20"
-        style="flex:1;padding:8px 12px;border-radius:6px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border .15s;"
-        onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--border)'">
-      <button onclick="addRoom()" style="padding:8px 16px;border-radius:6px;border:1px solid rgba(92,107,192,.4);background:rgba(92,107,192,.1);color:var(--accent2);font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;">+ 追加</button>
-    </div>
-  </div>
-  <div style="min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:20px;">🔒</span>
-      <div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);">チャット閉鎖</div>
-        <div style="font-size:12px;color:var(--text-muted);" id="chatCloseDesc">状態を読み込み中...</div>
-      </div>
-    </div>
-    <label class="toggle-switch"><input type="checkbox" id="chatCloseToggle"><span class="toggle-slider"></span></label>
-  </div>
-  <div style="min-width:240px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:20px;">🔔</span>
-      <div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);">通知テスト</div>
-        <div style="font-size:12px;color:var(--text-muted);">peji.htmlに通知を送信</div>
-      </div>
-    </div>
-    <input id="testNotifInput" type="text" placeholder="通知メッセージを入力..." maxlength="60"
-      style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-size:13px;outline:none;font-family:inherit;"
-      onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--border)'">
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button onclick="sendTestNotif()" style="flex:1;padding:8px 14px;border-radius:6px;border:1px solid rgba(92,107,192,.4);background:rgba(92,107,192,.1);color:var(--accent2);font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;white-space:nowrap;">📨 送信</button>
-      <button onclick="sendHypeNotif()" style="flex:1;padding:8px 14px;border-radius:6px;border:1px solid rgba(0,230,118,.3);background:rgba(0,230,118,.08);color:var(--ok);font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;white-space:nowrap;">🔥 盛り上がり</button>
-    </div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button onclick="sendPreset('チャットが盛り上がっています！')" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:11px;cursor:pointer;font-family:inherit;">盛り上がり</button>
-      <button onclick="sendPreset('みんな集まれ！')" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:11px;cursor:pointer;font-family:inherit;">集まれ</button>
-      <button onclick="sendPreset('お知らせがあります')" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:11px;cursor:pointer;font-family:inherit;">お知らせ</button>
-    </div>
-  </div>
-  <div style="flex:1;min-width:280px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-      <span style="font-size:20px;">🚫</span>
-      <div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);">NGワード</div>
-        <div style="font-size:12px;color:var(--text-muted);">chat.htmlのメッセージをフィルタ</div>
-      </div>
-    </div>
-    <div id="ngWordTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;min-height:24px;">
-      <span style="font-size:12px;color:var(--text-muted);">読み込み中...</span>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <input id="ngWordInput" type="text" placeholder="NGワードを追加..." maxlength="30"
-        style="flex:1;padding:8px 12px;border-radius:6px;border:1px solid rgba(255,82,82,.3);background:rgba(255,82,82,.05);color:var(--text);font-size:13px;outline:none;font-family:inherit;"
-        onfocus="this.style.borderColor='var(--ng)'" onblur="this.style.borderColor='rgba(255,82,82,.3)'">
-      <button onclick="addNgWord()" style="padding:8px 16px;border-radius:6px;border:1px solid rgba(255,82,82,.4);background:rgba(255,82,82,.1);color:var(--ng);font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;">+ 追加</button>
-    </div>
-  </div>
-</div>
-
-<!-- チャット全削除・通知全削除 -->
-<div style="margin:16px 32px 0;display:flex;gap:12px;flex-wrap:wrap;">
-  <div style="flex:1;min-width:260px;background:rgba(255,82,82,0.05);border:1px solid rgba(255,82,82,0.25);border-radius:10px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <span style="font-size:22px;">🗑️</span>
-      <div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);">チャット全削除</div>
-        <div style="font-size:12px;color:var(--text-muted);">chat_2 コレクションを全消去</div>
-      </div>
-    </div>
-    <button class="danger-btn" id="deleteChatBtn" onclick="confirmDeleteChat()">🗑 全削除</button>
-  </div>
-  <div style="flex:1;min-width:260px;background:rgba(255,82,82,0.05);border:1px solid rgba(255,82,82,0.25);border-radius:10px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <span style="font-size:22px;">🔕</span>
-      <div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);">通知履歴全削除</div>
-        <div style="font-size:12px;color:var(--text-muted);">testNotif_2 をリセット</div>
-      </div>
-    </div>
-    <button class="danger-btn" id="deleteNotifBtn" onclick="confirmDeleteNotif()">🔕 全削除</button>
-  </div>
-</div>
-
-<!-- ユーザーコード確認テーブル -->
-<div style="margin:16px 32px 0;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-  <div style="padding:12px 20px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:18px;">🔢</span>
-      <div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);">ユーザー番号一覧</div>
-        <div style="font-size:12px;color:var(--text-muted);">chat.htmlで名前の横に表示される4桁番号</div>
-      </div>
-    </div>
-    <button onclick="loadCodeTable()" style="padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:12px;cursor:pointer;font-family:inherit;">🔄 更新</button>
-  </div>
-  <div style="overflow-x:auto;">
-    <table style="width:100%;border-collapse:collapse;font-size:13px;">
-      <thead>
-        <tr style="background:var(--surface2);border-bottom:1px solid var(--border);">
-          <th style="padding:10px 20px;text-align:left;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;">本名</th>
-          <th style="padding:10px 20px;text-align:left;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;">表示名</th>
-          <th style="padding:10px 20px;text-align:left;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;">番号 (#)</th>
-          <th style="padding:10px 20px;text-align:left;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;">操作</th>
-        </tr>
-      </thead>
-      <tbody id="codeTableBody">
-        <tr><td colspan="4" style="padding:24px;text-align:center;color:var(--text-muted);">読み込み中...</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
 <div class="toolbar" style="margin-top:16px;">
   <div class="search-wrap">
     <input type="text" id="searchInput" placeholder="名前で絞り込み...">
@@ -421,22 +285,21 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   <table>
     <thead>
       <tr>
-        <th style="width:9%">本名 / 状態</th>
-        <th style="width:10%">表示名</th>
-        <th style="width:6%">Status</th>
+        <th style="width:10%">本名 / 状態</th>
+        <th style="width:11%">表示名</th>
+        <th style="width:7%">Status</th>
         <th style="width:6%">グループ</th>
         <th style="width:6%">管理者</th>
-        <th style="width:6%">⭐ サブ管</th>
-        <th style="width:5%">芥chat</th>
-        <th style="width:7%">表示先</th>
-        <th style="width:8%">名前変更</th>
-        <th style="width:13%">ユーザー名 / PW</th>
+        <th style="width:7%">⭐ サブ管</th>
+        <th style="width:12%">ユーザー名 / PW</th>
+        <th style="width:9%">名前変更</th>
+        <th style="width:6%">🔁 再入力</th>
         <th style="width:14%">操作</th>
       </tr>
     </thead>
     <tbody id="userTableBody">
       <tr class="loading-row">
-        <td colspan="11"><div class="spinner"></div><br>読み込み中...</td>
+        <td colspan="10"><div class="spinner"></div><br>読み込み中...</td>
       </tr>
     </tbody>
   </table>
@@ -483,11 +346,23 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   </div>
 </div>
 
+<!-- 再入力確認モーダル -->
+<div id="reloginOverlay">
+  <div id="reloginBox">
+    <h3>🔁 再入力を要求</h3>
+    <p id="reloginMsg">このユーザーに再ログインを要求します。<br>次回Ctrl+Uを押したときにログイン画面が表示されます。</p>
+    <div class="rl-btns">
+      <button class="btn-rl-cancel" onclick="closeReloginModal()">キャンセル</button>
+      <button class="btn-rl-ok" id="reloginOkBtn">要求する</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
   import {
     getFirestore, collection, getDocs, doc, updateDoc,
-    deleteDoc, orderBy, query, where, setDoc, getDoc, onSnapshot, writeBatch,
+    deleteDoc, query, where, setDoc, getDoc, onSnapshot, writeBatch,
     addDoc
   } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
@@ -591,46 +466,6 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     return (Date.now() - ts) < 5 * 60 * 1000;
   }
 
-  window.confirmDeleteChat = function() {
-    openConfirm("🗑️ チャット全削除",
-      "chat_2 コレクションのメッセージを<br><strong style='color:var(--ng)'>全て削除</strong>します。",
-      "全削除する",
-      async () => {
-        const btn = document.getElementById("deleteChatBtn");
-        btn.disabled = true; btn.textContent = "削除中...";
-        try {
-          let deleted = 0;
-          while(true) {
-            const snap = await getDocs(collection(db,"chat_2"));
-            if (snap.empty) break;
-            const batch = writeBatch(db);
-            snap.docs.forEach(d => batch.delete(d.ref));
-            await batch.commit();
-            deleted += snap.docs.length;
-          }
-          showToast(`🗑️ チャットを ${deleted} 件削除しました`);
-        } catch(e) { showToast("エラー: " + e.message, 5000); }
-        btn.disabled = false; btn.textContent = "🗑 全削除";
-      }
-    );
-  };
-
-  window.confirmDeleteNotif = function() {
-    openConfirm("🔕 通知履歴全削除",
-      "testNotif_2 ドキュメントを削除します。",
-      "全削除する",
-      async () => {
-        const btn = document.getElementById("deleteNotifBtn");
-        btn.disabled = true; btn.textContent = "削除中...";
-        try {
-          await deleteDoc(doc(db,"config","testNotif_2"));
-          showToast("🔕 通知履歴を削除しました");
-        } catch(e) { showToast("エラー: " + e.message, 5000); }
-        btn.disabled = false; btn.textContent = "🔕 全削除";
-      }
-    );
-  };
-
   function getInitial(name) { return name ? name.charAt(0).toUpperCase() : "?"; }
 
   function badgeHTML(status) {
@@ -652,15 +487,15 @@ role: admin / subadmin / user　　password は平文のまま保存されます
       : users;
 
     if (!filtered.length) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="11">ユーザーが見つかりません</td></tr>`;
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="10">ユーザーが見つかりません</td></tr>`;
       return;
     }
 
     tbody.innerHTML = filtered.map(user => {
-      const pageMode   = userPageMode[user.id] || 'peji';
       const isAdmin    = !!user.isAdmin;
       const isSubAdmin = !!user.isSubAdmin;
       const online     = isOnline(user.lastSeen);
+      const needsRelogin = !!user.requireRelogin;
 
       let rowStyle = '';
       if (isAdmin) rowStyle = 'background:linear-gradient(90deg,rgba(255,200,0,0.10),rgba(255,200,0,0.04));border-left:3px solid #ffc800;';
@@ -709,22 +544,22 @@ role: admin / subadmin / user　　password は平文のまま保存されます
             onclick="toggleSubAdmin('${user.id}','${escapeHTML(user.name)}')"
           >${user.isSubAdmin ? '⭐ サブ' : '⭐'}</button>
         </td>
+        <!-- ユーザー名 / PW列 -->
         <td>
-          <button class="btn ${user.akuchat ? 'btn-ok' : ''}"
-            onclick="toggleAkuchat('${user.id}','${escapeHTML(user.name)}')"
-            style="${user.akuchat ? '' : 'opacity:0.4'}"
-          >🌐</button>
-        </td>
-        <td>
-          <div class="action-btns">
-            <button class="btn ${pageMode === 'peji' ? 'btn-ok' : ''}"
-              onclick="setUserPageMode('${user.id}','${escapeHTML(user.name)}','peji')"
-              style="${pageMode === 'peji' ? '' : 'opacity:0.4'}">🔓</button>
-            <button class="btn ${pageMode === 'pej' ? 'btn-ok' : ''}"
-              onclick="setUserPageMode('${user.id}','${escapeHTML(user.name)}','pej')"
-              style="${pageMode === 'pej' ? '' : 'opacity:0.4'}">📋</button>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span style="font-size:9px;color:var(--text-muted);width:16px;flex-shrink:0;">ID</span>
+              <code style="font-size:11px;color:var(--accent2);background:rgba(92,107,192,.12);padding:2px 6px;border-radius:4px;letter-spacing:.02em;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHTML(user.username||'')}">${escapeHTML(user.username||'未設定')}</code>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span style="font-size:9px;color:var(--text-muted);width:16px;flex-shrink:0;">PW</span>
+              <code style="font-size:11px;color:#ff9966;background:rgba(255,100,50,.1);padding:2px 6px;border-radius:4px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,100,50,.2);" title="${escapeHTML(user.passwordPlain||'')}">${escapeHTML(user.passwordPlain || '(未設定)')}</code>
+            </div>
+            <button onclick="openEditUser('${user.id}','${escapeHTML(user.username||'')}','${escapeHTML(user.name||'')}')"
+              style="padding:3px 8px;border-radius:5px;border:1px solid rgba(92,107,192,.4);background:rgba(92,107,192,.1);color:var(--accent2);font-size:10px;cursor:pointer;font-family:inherit;white-space:nowrap;align-self:flex-start;">✏️ 変更</button>
           </div>
         </td>
+        <!-- 名前変更制限 -->
         <td>
           <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
             <span style="font-size:10px;color:var(--text-muted);">
@@ -740,23 +575,15 @@ role: admin / subadmin / user　　password は平文のまま保存されます
               ).join('') + '</details>' : ''}
           </div>
         </td>
-
-        <!-- ユーザー名 / PW列（平文表示） -->
+        <!-- 再入力ボタン -->
         <td>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <div style="display:flex;align-items:center;gap:5px;">
-              <span style="font-size:9px;color:var(--text-muted);width:16px;flex-shrink:0;">ID</span>
-              <code style="font-size:11px;color:var(--accent2);background:rgba(92,107,192,.12);padding:2px 6px;border-radius:4px;letter-spacing:.02em;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHTML(user.username||'')}">${escapeHTML(user.username||'未設定')}</code>
-            </div>
-            <div style="display:flex;align-items:center;gap:5px;">
-              <span style="font-size:9px;color:var(--text-muted);width:16px;flex-shrink:0;">PW</span>
-              <code style="font-size:11px;color:#ff9966;background:rgba(255,100,50,.1);padding:2px 6px;border-radius:4px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,100,50,.2);" title="${escapeHTML(user.passwordPlain||'')}">${escapeHTML(user.passwordPlain || '(未設定)')}</code>
-            </div>
-            <button onclick="openEditUser('${user.id}','${escapeHTML(user.username||'')}','${escapeHTML(user.name||'')}')"
-              style="padding:3px 8px;border-radius:5px;border:1px solid rgba(92,107,192,.4);background:rgba(92,107,192,.1);color:var(--accent2);font-size:10px;cursor:pointer;font-family:inherit;white-space:nowrap;align-self:flex-start;">✏️ 変更</button>
-          </div>
+          <button
+            class="btn btn-relogin ${needsRelogin ? 'active' : ''}"
+            onclick="handleReloginBtn('${user.id}','${escapeHTML(user.name)}',${needsRelogin})"
+            title="${needsRelogin ? '再入力要求中（クリックで解除）' : 'ログイン再入力を要求'}"
+          >${needsRelogin ? '⏳ 要求中' : '🔁 再入力'}</button>
         </td>
-
+        <!-- 操作 -->
         <td>
           <div class="action-btns">
             <button class="btn btn-ok"
@@ -778,52 +605,86 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     return String(str||'').replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
   }
 
-  let userPageMode = {};
-
   function subscribeUsers() {
-    tbody.innerHTML = `<tr class="loading-row"><td colspan="11"><div class="spinner"></div><br>読み込み中...</td></tr>`;
+    tbody.innerHTML = `<tr class="loading-row"><td colspan="10"><div class="spinner"></div><br>読み込み中...</td></tr>`;
     try {
       const q = query(collection(db,"users"), where("group","==",MY_GROUP));
       onSnapshot(q, (snapshot) => {
         allUsers = snapshot.docs.map(d => ({id:d.id,...d.data()}));
-        snapshot.docs.forEach(d => { userPageMode[d.id] = d.data().pageMode || 'peji'; });
         renderTable(allUsers);
       }, (e) => {
-        tbody.innerHTML = `<tr class="empty-row"><td colspan="11">⚠ データ取得に失敗しました<br><small>${e.message}</small></td></tr>`;
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="10">⚠ データ取得に失敗しました<br><small>${e.message}</small></td></tr>`;
         showToast("エラー: " + e.message, 6000);
       });
     } catch(e) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="11">⚠ 初期化エラー<br><small>${e.message}</small></td></tr>`;
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="10">⚠ 初期化エラー<br><small>${e.message}</small></td></tr>`;
     }
   }
 
-  window.setUserPageMode = async function(id, name, mode) {
+  // ━━━ 再入力ボタン ━━━
+  let reloginTargetId   = null;
+  let reloginTargetName = null;
+  let reloginCurrentVal = false;
+
+  window.handleReloginBtn = function(id, name, isActive) {
+    reloginTargetId   = id;
+    reloginTargetName = name;
+    reloginCurrentVal = isActive;
+
+    const msgEl = document.getElementById('reloginMsg');
+    const okBtn = document.getElementById('reloginOkBtn');
+    const overlay = document.getElementById('reloginOverlay');
+
+    if (isActive) {
+      // すでに要求中 → 解除確認
+      msgEl.textContent = `「${name}」への再入力要求を解除します。`;
+      okBtn.textContent = '解除する';
+      okBtn.style.background = 'rgba(0,230,118,0.15)';
+      okBtn.style.borderColor = 'var(--ok)';
+      okBtn.style.color = 'var(--ok)';
+    } else {
+      // 新規要求
+      msgEl.innerHTML = `「<strong style="color:var(--text)">${name}</strong>」に再ログインを要求します。<br>次回 Ctrl+U を押したときにログイン画面が表示されます。`;
+      okBtn.textContent = '要求する';
+      okBtn.style.background = 'rgba(255,120,0,0.18)';
+      okBtn.style.borderColor = '#ff8c42';
+      okBtn.style.color = '#ff8c42';
+    }
+    overlay.classList.add('active');
+  };
+
+  window.closeReloginModal = function() {
+    document.getElementById('reloginOverlay').classList.remove('active');
+    reloginTargetId = null;
+  };
+
+  document.getElementById('reloginOkBtn').addEventListener('click', async () => {
+    if (!reloginTargetId) return;
+    const id   = reloginTargetId;
+    const name = reloginTargetName;
+    const newVal = !reloginCurrentVal;
+    window.closeReloginModal();
     try {
-      await updateDoc(doc(db,"users",id), {pageMode: mode});
-      userPageMode[id] = mode;
+      await updateDoc(doc(db,'users', id), { requireRelogin: newVal });
       const user = allUsers.find(u => u.id === id);
-      if (user) user.pageMode = mode;
+      if (user) user.requireRelogin = newVal;
       renderTable(allUsers);
-      showToast('✅ 「' + name + '」の表示先: ' + (mode === 'peji' ? 'peji.html' : 'pej.html'));
+      showToast(newVal
+        ? `🔁 「${name}」に再入力を要求しました`
+        : `✅ 「${name}」の再入力要求を解除しました`
+      );
     } catch(e) { showToast('エラー: ' + e.message); }
-  };
+  });
 
-  window.toggleAkuchat = async function(id, name) {
-    const user = allUsers.find(u => u.id === id); if (!user) return;
-    const newVal = !user.akuchat;
-    try {
-      await updateDoc(doc(db,"users",id), {akuchat: newVal});
-      user.akuchat = newVal;
-      renderTable(allUsers);
-      showToast(newVal ? '🌐 「' + name + '」の芥chatを有効' : '「' + name + '」の芥chatを無効');
-    } catch(e) { showToast('エラー: ' + e.message); }
-  };
+  document.getElementById('reloginOverlay').addEventListener('click', function(e) {
+    if (e.target === this) window.closeReloginModal();
+  });
 
+  // ━━━ グループ・管理者・サブ管 ━━━
   window.setUserGroup = async function(id, name, group) {
     try {
-      await updateDoc(doc(db,"users",id), {group: group});
-      const user = allUsers.find(u => u.id === id);
-      if (user) user.group = group;
+      await updateDoc(doc(db,"users",id), {group});
+      const user = allUsers.find(u => u.id === id); if (user) user.group = group;
       renderTable(allUsers);
       showToast('✅ 「' + name + '」のグループ: ' + group);
     } catch(e) { showToast('エラー: ' + e.message); }
@@ -834,8 +695,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     const newVal = !user.isAdmin;
     try {
       await updateDoc(doc(db,"users",id), {isAdmin: newVal});
-      user.isAdmin = newVal;
-      renderTable(allUsers);
+      user.isAdmin = newVal; renderTable(allUsers);
       showToast(newVal ? '👑 「' + name + '」を管理者に指定' : '「' + name + '」の管理者を解除');
     } catch(e) { showToast('エラー: ' + e.message); }
   };
@@ -845,8 +705,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     const newVal = !user.isSubAdmin;
     try {
       await updateDoc(doc(db,"users",id), {isSubAdmin: newVal});
-      user.isSubAdmin = newVal;
-      renderTable(allUsers);
+      user.isSubAdmin = newVal; renderTable(allUsers);
       showToast(newVal ? '⭐ 「' + name + '」をサブ管理者に指定' : '「' + name + '」のサブ管理者を解除');
     } catch(e) { showToast('エラー: ' + e.message); }
   };
@@ -855,8 +714,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     try {
       await updateDoc(doc(db,"users",id), {status:"ok"});
       const user = allUsers.find(u => u.id === id); if (user) user.status = "ok";
-      renderTable(allUsers);
-      showToast(`✅ 「${name}」を許可しました`);
+      renderTable(allUsers); showToast(`✅ 「${name}」を許可しました`);
     } catch(e) { showToast("更新に失敗しました"); }
   };
 
@@ -864,8 +722,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     try {
       await updateDoc(doc(db,"users",id), {status:"ng"});
       const user = allUsers.find(u => u.id === id); if (user) user.status = "ng";
-      renderTable(allUsers);
-      showToast(`🚫 「${name}」を拒否しました`);
+      renderTable(allUsers); showToast(`🚫 「${name}」を拒否しました`);
     } catch(e) { showToast("更新に失敗しました"); }
   };
 
@@ -901,8 +758,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     try {
       const snap = await getDoc(doc(db,"config","publicMode"));
       const val = snap.exists() ? snap.data().value === true : false;
-      publicToggle.checked = val;
-      updatePublicModeUI(val);
+      publicToggle.checked = val; updatePublicModeUI(val);
     } catch(e) {}
     finally { publicModeLoading = false; }
   }
@@ -984,215 +840,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     if (e.key === "Enter") window.addBanName();
   });
 
-  // ━━━ 表示モード管理 ━━━
-  const modeLabels = { iframe:'iframeで表示', kanri2:'kanri2.html を開く', peji:'peji.html を開く' };
-
-  async function loadDisplayMode() {
-    try {
-      const snap = await getDoc(doc(db,"config","displayMode"));
-      const mode = snap.exists() ? (snap.data().mode || "iframe") : "iframe";
-      updateModeBtns(mode);
-    } catch(e) { updateModeBtns("iframe"); }
-  }
-
-  function updateModeBtns(mode) {
-    document.getElementById("modeBtn1").classList.toggle("active", mode === "iframe");
-    document.getElementById("modeBtn2").classList.toggle("active", mode === "kanri2");
-    document.getElementById("modeBtn3").classList.toggle("active", mode === "peji");
-    document.getElementById("modeDesc").textContent = "現在: " + (modeLabels[mode] || mode);
-  }
-
-  window.setDisplayMode = async function(mode) {
-    try {
-      await setDoc(doc(db,"config","displayMode"), {mode});
-      updateModeBtns(mode);
-      showToast("✅ 表示モードを変更しました: " + (modeLabels[mode] || mode));
-    } catch(e) { showToast("エラー: " + e.message); }
-  };
-
-  // ━━━ チャット管理 ━━━
-  let roomList = [];
-
-  onSnapshot(doc(db,"config","chatRooms_2"), snap => {
-    roomList = (snap.exists() && Array.isArray(snap.data().rooms)) ? snap.data().rooms : [];
-    renderRoomTags();
-  });
-
-  function renderRoomTags() {
-    const el = document.getElementById("roomTagsWrap");
-    const fixed = '<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(92,107,192,.15);border:1px solid rgba(92,107,192,.3);border-radius:16px;padding:3px 12px;font-size:12px;color:var(--accent2);"># 全体（固定）</span>';
-    if (!roomList.length) { el.innerHTML = fixed + '<span style="font-size:12px;color:var(--text-muted);">追加された部屋なし</span>'; return; }
-    el.innerHTML = fixed + roomList.map((r,i) =>
-      `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(92,107,192,.1);border:1px solid rgba(92,107,192,.25);border-radius:16px;padding:3px 10px;font-size:12px;color:var(--accent2);">
-        # ${escapeHTML(r.name)}
-        <button onclick="removeRoom(${i})" style="background:none;border:none;cursor:pointer;color:rgba(121,134,203,.6);font-size:13px;line-height:1;padding:0;">×</button>
-      </span>`
-    ).join('');
-  }
-
-  window.addRoom = async function() {
-    const inp = document.getElementById("newRoomInput");
-    const name = inp.value.trim();
-    if (!name) return;
-    if (name === "全体" || name === "general") { showToast("「全体」は追加できません"); return; }
-    if (roomList.some(r => r.name === name)) { showToast("同名の部屋が既にあります"); return; }
-    roomList.push({id:"room_"+Date.now(), name}); inp.value = '';
-    await setDoc(doc(db,"config","chatRooms_2"), {rooms:roomList}, {merge:true});
-    showToast("✅ 部屋「" + name + "」を追加しました");
-  };
-
-  window.removeRoom = async function(i) {
-    const name = roomList[i]?.name; roomList.splice(i, 1);
-    await setDoc(doc(db,"config","chatRooms_2"), {rooms:roomList}, {merge:true});
-    showToast("🗑 部屋「" + name + "」を削除しました");
-  };
-
-  document.getElementById("newRoomInput").addEventListener("keydown", e => {
-    if (e.key === "Enter") window.addRoom();
-  });
-
-  const chatCloseToggle = document.getElementById("chatCloseToggle");
-  let chatCloseLoading = true;
-
-  onSnapshot(doc(db,"config","chatSettings_2"), snap => {
-    const closed = snap.exists() ? (snap.data().closed===true) : false;
-    chatCloseLoading = true;
-    chatCloseToggle.checked = closed;
-    document.getElementById("chatCloseDesc").textContent = closed ? "閉鎖中：メッセージ送信不可" : "開放中：誰でも送信できます";
-    chatCloseLoading = false;
-  });
-
-  chatCloseToggle.addEventListener("change", async function() {
-    if (chatCloseLoading) return;
-    const closed = chatCloseToggle.checked;
-    document.getElementById("chatCloseDesc").textContent = closed ? "閉鎖中：メッセージ送信不可" : "開放中：誰でも送信できます";
-    await setDoc(doc(db,"config","chatSettings_2"), {closed}, {merge:true});
-    showToast(closed ? "🔒 チャットを閉鎖しました" : "✅ チャットを開放しました");
-  });
-
-  let ngWords = [];
-
-  onSnapshot(doc(db,"config","ngWords_2"), snap => {
-    ngWords = snap.exists() ? (snap.data().words||[]) : [];
-    renderNgTags();
-  });
-
-  function renderNgTags() {
-    const el = document.getElementById("ngWordTags");
-    if (!ngWords.length) { el.innerHTML = '<span style="font-size:12px;color:var(--text-muted);">NGワードなし</span>'; return; }
-    el.innerHTML = ngWords.map((w,i) =>
-      `<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,82,82,.1);border:1px solid rgba(255,82,82,.25);border-radius:16px;padding:3px 10px;font-size:12px;color:var(--ng);">
-        ${escapeHTML(w)}
-        <button onclick="removeNgWord(${i})" style="background:none;border:none;cursor:pointer;color:rgba(255,82,82,.5);font-size:13px;line-height:1;padding:0;">×</button>
-      </span>`
-    ).join('');
-  }
-
-  window.addNgWord = async function() {
-    const inp = document.getElementById("ngWordInput");
-    const w = inp.value.trim();
-    if (!w) return;
-    if (ngWords.includes(w)) { showToast("既に登録済みです"); return; }
-    ngWords.push(w); inp.value = '';
-    await setDoc(doc(db,"config","ngWords_2"), {words:ngWords}, {merge:true});
-    showToast("🚫 NGワード「" + w + "」を追加しました");
-  };
-
-  window.removeNgWord = async function(i) {
-    const w = ngWords[i]; ngWords.splice(i, 1);
-    await setDoc(doc(db,"config","ngWords_2"), {words:ngWords}, {merge:true});
-    showToast("✅ NGワード「" + w + "」を解除しました");
-  };
-
-  document.getElementById("ngWordInput").addEventListener("keydown", e => {
-    if (e.key === "Enter") window.addNgWord();
-  });
-
-  // ━━━ ユーザーコード一覧 ━━━
-  window.loadCodeTable = async function() {
-    const tbody = document.getElementById("codeTableBody");
-    tbody.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--text-muted);">読み込み中...</td></tr>';
-    try {
-      const snap = await getDocs(query(collection(db,"users"), where("group","==",MY_GROUP)));
-      const users = snap.docs.map(d=>({id:d.id,...d.data()}));
-      if (!users.length) { tbody.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--text-muted);">ユーザーなし</td></tr>'; return; }
-      tbody.innerHTML = users.map(u =>
-        `<tr style="border-bottom:1px solid var(--border);" id="coderow_${u.id}">
-          <td style="padding:10px 20px;font-size:12px;color:var(--text-muted);">${escapeHTML(u.realName||'—')}</td>
-          <td style="padding:10px 20px;font-weight:500;">${escapeHTML(u.name||'—')}</td>
-          <td style="padding:10px 20px;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span id="codeDisp_${u.id}" style="font-size:14px;font-weight:700;color:#409CFF;letter-spacing:.08em;background:rgba(10,132,255,.12);padding:3px 10px;border-radius:6px;min-width:52px;text-align:center;">
-                ${u.userCode ? '#'+escapeHTML(u.userCode) : '未割当'}
-              </span>
-              <input id="codeInput_${u.id}" type="text" maxlength="10" value="${escapeHTML(u.userCode||'')}"
-                placeholder="番号を入力"
-                style="width:110px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);font-size:13px;outline:none;font-family:inherit;"
-                onkeydown="if(event.key==='Enter')saveCode('${u.id}','${escapeHTML(u.name)}')"
-              >
-              <button onclick="saveCode('${u.id}','${escapeHTML(u.name)}')" style="padding:5px 12px;border-radius:5px;border:1px solid rgba(92,107,192,.4);background:rgba(92,107,192,.1);color:var(--accent2);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap;">保存</button>
-            </div>
-          </td>
-          <td style="padding:10px 20px;">
-            <button onclick="resetCode('${u.id}','${escapeHTML(u.name)}')" style="padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:11px;cursor:pointer;font-family:inherit;">🎲 再発行</button>
-          </td>
-        </tr>`
-      ).join('');
-    } catch(e) {
-      tbody.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--ng);">取得エラー: ' + e.message + '</td></tr>';
-    }
-  };
-
-  window.saveCode = async function(id, name) {
-    const inp = document.getElementById("codeInput_" + id);
-    const val = inp.value.trim();
-    if (!val) { showToast("番号を入力してください"); return; }
-    try {
-      await updateDoc(doc(db,"users",id), {userCode: val});
-      const disp = document.getElementById("codeDisp_" + id);
-      if (disp) disp.textContent = '#' + val;
-      showToast(`✅ 「${name}」の番号を #${val} に変更しました`);
-    } catch(e) { showToast("保存エラー: " + e.message); }
-  };
-
-  window.resetCode = async function(id, name) {
-    let code;
-    for (let i=0; i<30; i++) {
-      const c = String(Math.floor(1000+Math.random()*9000));
-      const dup = await getDocs(query(collection(db,"users"), where("userCode","==",c)));
-      if (dup.empty) { code=c; break; }
-    }
-    if (!code) { showToast("番号生成に失敗しました"); return; }
-    await updateDoc(doc(db,"users",id), {userCode:code});
-    const inp  = document.getElementById("codeInput_" + id);
-    const disp = document.getElementById("codeDisp_" + id);
-    if (inp)  inp.value = code;
-    if (disp) disp.textContent = '#' + code;
-    showToast(`🎲 「${name}」の番号を #${code} に再発行しました`);
-  };
-
-  window.loadCodeTable();
-
-  window.sendTestNotif = async function() {
-    const msg = document.getElementById("testNotifInput").value.trim();
-    if (!msg) { showToast("メッセージを入力してください"); return; }
-    await setDoc(doc(db,"config","testNotif_2"), {message:msg, hype:false, ts:new Date()});
-    showToast("📨 通知を送信しました: " + msg);
-  };
-  window.sendHypeNotif = async function() {
-    const msg = document.getElementById("testNotifInput").value.trim() || "チャットが盛り上がっています！";
-    await setDoc(doc(db,"config","testNotif_2"), {message:msg, hype:true, ts:new Date()});
-    showToast("🔥 盛り上がり通知を送信しました");
-  };
-  window.sendPreset = async function(msg) {
-    await setDoc(doc(db,"config","testNotif_2"), {message:msg, hype:false, ts:new Date()});
-    showToast("📨 送信: " + msg);
-  };
-  document.getElementById("testNotifInput").addEventListener("keydown", e => {
-    if (e.key === "Enter") window.sendTestNotif();
-  });
-
-  // ━━━ SHA-256（pwHash互換用） ━━━
+  // ━━━ SHA-256 ━━━
   async function sha256(str) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
@@ -1209,8 +857,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     document.getElementById('editUserErr').textContent = '';
     document.getElementById('editUserSubmitBtn').disabled = false;
     document.getElementById('editUserSubmitBtn').textContent = '保存';
-    const overlay = document.getElementById('editUserOverlay');
-    overlay.style.display = 'flex';
+    document.getElementById('editUserOverlay').style.display = 'flex';
     setTimeout(() => document.getElementById('editUsernameInput').focus(), 60);
   };
 
@@ -1229,52 +876,32 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     const newUser = document.getElementById('editUsernameInput').value.trim();
     const newPw   = document.getElementById('editPasswordInput').value;
     errEl.textContent = '';
-
     if (!newUser && !newPw) { errEl.textContent = 'ユーザー名かパスワードを入力してください'; return; }
     if (newUser && !/^[a-zA-Z0-9_]+$/.test(newUser)) { errEl.textContent = 'ユーザー名は英数字・_のみ使えます'; return; }
     if (newUser && newUser.length < 3) { errEl.textContent = 'ユーザー名は3文字以上にしてください'; return; }
     if (newPw && newPw.length < 4) { errEl.textContent = 'パスワードは4文字以上にしてください'; return; }
-
     btn.disabled = true; btn.textContent = '保存中...';
-
     try {
       const updates = {};
-
       if (newUser) {
         const currentUser = allUsers.find(u => u.id === editingUserId);
         if (!currentUser || newUser !== currentUser.username) {
           const dup = await getDocs(query(collection(db,'users'), where('username','==',newUser)));
-          const dupFiltered = dup.docs.filter(d => d.id !== editingUserId);
-          if (dupFiltered.length) {
+          if (dup.docs.filter(d => d.id !== editingUserId).length) {
             errEl.textContent = 'そのユーザー名はすでに使われています';
             btn.disabled = false; btn.textContent = '保存'; return;
           }
           updates.username = newUser;
         }
       }
-
-      if (newPw) {
-        // 平文とハッシュ両方を保存
-        updates.passwordPlain = newPw;
-        updates.pwHash = await sha256(newPw);
-      }
-
-      if (Object.keys(updates).length === 0) {
-        errEl.textContent = '変更がありません';
-        btn.disabled = false; btn.textContent = '保存'; return;
-      }
-
+      if (newPw) { updates.passwordPlain = newPw; updates.pwHash = await sha256(newPw); }
+      if (!Object.keys(updates).length) { errEl.textContent = '変更がありません'; btn.disabled = false; btn.textContent = '保存'; return; }
       await updateDoc(doc(db,'users', editingUserId), updates);
-
       const user = allUsers.find(u => u.id === editingUserId);
       if (user) Object.assign(user, updates);
-
-      renderTable(allUsers);
-      closeEditUser();
+      renderTable(allUsers); closeEditUser();
       showToast('✅ ユーザー情報を更新しました');
-    } catch(e) {
-      errEl.textContent = 'エラー: ' + e.message;
-    }
+    } catch(e) { errEl.textContent = 'エラー: ' + e.message; }
     btn.disabled = false; btn.textContent = '保存';
   };
 
@@ -1335,10 +962,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   function processJsonData(json) {
     const statusEl = document.getElementById('importStatus');
     statusEl.style.color = 'var(--text-muted)';
-    if (!Array.isArray(json)) {
-      statusEl.textContent = '❌ JSON配列形式である必要があります';
-      statusEl.style.color = 'var(--ng)'; return;
-    }
+    if (!Array.isArray(json)) { statusEl.textContent = '❌ JSON配列形式である必要があります'; statusEl.style.color = 'var(--ng)'; return; }
     const errors = [];
     const valid = json.filter((u, i) => {
       if (!u.name)     { errors.push(`[${i}] nameが必要`);     return false; }
@@ -1349,8 +973,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     importData = valid;
     renderImportPreview(valid);
     const btn = document.getElementById('importStartBtn');
-    btn.disabled = !valid.length;
-    btn.style.opacity = valid.length ? '1' : '0.4';
+    btn.disabled = !valid.length; btn.style.opacity = valid.length ? '1' : '0.4';
     let msg = `✅ ${valid.length}件を読み込みました`;
     if (errors.length) msg += ` ／ ⚠ ${errors.length}件エラー: ` + errors.slice(0,2).join(', ');
     statusEl.textContent = msg;
@@ -1395,10 +1018,8 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     const progress  = document.getElementById('importProgress');
     const bar       = document.getElementById('importProgressBar');
     const skipExist = document.getElementById('importSkipExisting').checked;
-
     btn.disabled = true; btn.textContent = '⏳ 登録中...';
     progress.style.display = 'block';
-
     let existingUsernames = new Set();
     if (skipExist) {
       try {
@@ -1406,7 +1027,6 @@ role: admin / subadmin / user　　password は平文のまま保存されます
         snap.docs.forEach(d => { if (d.data().username) existingUsernames.add(d.data().username); });
       } catch(e) {}
     }
-
     let done = 0, skipped = 0, failed = 0;
     for (let i = 0; i < importData.length; i++) {
       const u = importData[i];
@@ -1419,39 +1039,28 @@ role: admin / subadmin / user　　password は平文のまま保存されます
       try {
         const pwHash = await sha256(u.password);
         await addDoc(collection(db, 'users'), {
-          name:          u.name,
-          realName:      u.realName    || '',
-          group:         u.group       || MY_GROUP,
-          username:      u.username,
-          pwHash:        pwHash,
-          passwordPlain: u.password,   // ← 平文を保存
-          status:        'ok',
-          isAdmin:       u.role === 'admin',
-          isSubAdmin:    u.role === 'subadmin',
-          akuchat:       false,
-          pageMode:      'peji',
-          createdAt:     new Date(),
-          importedFrom:  'kanri.json',
+          name: u.name, realName: u.realName||'', group: u.group||MY_GROUP,
+          username: u.username, pwHash, passwordPlain: u.password,
+          status: 'ok', isAdmin: u.role==='admin', isSubAdmin: u.role==='subadmin',
+          akuchat: false, pageMode: 'peji', requireRelogin: false,
+          createdAt: new Date(), importedFrom: 'kanri.json',
         });
         done++;
       } catch(e) { failed++; done++; console.error('登録失敗:', u.name, e); }
       bar.style.width = (done / importData.length * 100) + '%';
       statusEl.textContent = `登録中 ${done}/${importData.length}...`;
     }
-
     const registered = done - skipped - failed;
     statusEl.textContent = `✅ 完了: ${registered}件登録 ／ スキップ ${skipped}件 ／ 失敗 ${failed}件`;
     statusEl.style.color = failed > 0 ? 'var(--wait)' : 'var(--ok)';
     showToast(`🚀 インポート完了: ${registered}件登録`, 4000);
-    btn.textContent = '🚀 Firestoreに登録';
-    btn.disabled = false;
+    btn.textContent = '🚀 Firestoreに登録'; btn.disabled = false;
   };
 
   // ━━━ 起動 ━━━
   loadPublicMode();
   subscribeUsers();
   loadBanList();
-  loadDisplayMode();
 </script>
 </body>
 </html>
