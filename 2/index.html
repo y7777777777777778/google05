@@ -322,7 +322,6 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     setTimeout(() => toast.classList.remove('show'), d);
   }
 
-  // SHA-256（pwHash互換のため継続使用）
   async function sha256(str) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
@@ -386,6 +385,19 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     window.switchTab(tab);
   }
 
+  // ━━━ requireRelogin チェック ━━━
+  async function checkRelogin(user) {
+    if (user.requireRelogin === true) {
+      // Firestore のフラグをリセット
+      try { await updateDoc(doc(db,'users', user.id), { requireRelogin: false }); } catch(e) {}
+      clearLocal();
+      openAuthModal('login');
+      showToast('🔁 管理者により再ログインが必要です');
+      return true; // 再入力が必要 = 処理を止める
+    }
+    return false;
+  }
+
   async function tryAutoLogin() {
     const savedUser = localStorage.getItem(LS_USERNAME);
     const savedHash = localStorage.getItem(LS_PWHASH);
@@ -396,6 +408,8 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
       if (user.pwHash !== savedHash)   { clearLocal(); return false; }
       if (user.status === 'ng')        { clearLocal(); return false; }
       if (user.group  !== MY_GROUP)    { clearLocal(); return false; }
+      // ★ 再入力チェック
+      if (await checkRelogin(user))    { return false; }
       return true;
     } catch(e) { return false; }
   }
@@ -428,6 +442,15 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
       const d = snap.docs[0].data();
       if (d.status === 'ng' || d.group !== MY_GROUP) {
         clearLocal(); location.replace('https://www.google.com');
+      }
+      // ★ リアルタイムで requireRelogin を監視
+      if (d.requireRelogin === true) {
+        stopRealtimeCheck();
+        updateDoc(doc(db,'users', snap.docs[0].id), { requireRelogin: false }).catch(()=>{});
+        clearLocal();
+        closePeji();
+        openAuthModal('login');
+        showToast('🔁 管理者により再ログインが必要です');
       }
     }, err => { console.warn('user onSnapshot error:', err); });
 
@@ -469,7 +492,6 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
         btn.disabled = false; btn.textContent = 'ログイン'; return;
       }
 
-      // パスワード照合：平文フィールドがあれば平文で、なければpwHashで
       const pwOk = (user.passwordPlain && user.passwordPlain === password)
                 || (user.pwHash && user.pwHash === pwHash);
 
@@ -494,7 +516,11 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
         btn.disabled = false; btn.textContent = 'ログイン'; return;
       }
 
-      // ログイン成功
+      // ログイン成功 → requireRelogin をリセット
+      if (user.requireRelogin) {
+        try { await updateDoc(doc(db,'users', user.id), { requireRelogin: false }); } catch(e) {}
+      }
+
       localStorage.setItem(LS_USERNAME, username);
       localStorage.setItem(LS_PWHASH,   pwHash);
       window.closeAuthModal();
@@ -549,9 +575,10 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
         class:         classRaw + '組',
         username:      username,
         pwHash:        pwHash,
-        passwordPlain: password,  // ← 平文を保存
+        passwordPlain: password,
         status:        pubMode ? 'ok' : 'wait',
         group:         MY_GROUP,
+        requireRelogin: false,
         createdAt:     new Date()
       });
 
@@ -604,6 +631,8 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
       if (user.status === 'wait')    { showToast('⏳ まだ承認待ちです'); return; }
       if (user.status === 'ng')      { clearLocal(); showToast('🚫 アクセスが拒否されています'); return; }
       if (user.group  !== MY_GROUP)  { clearLocal(); return; }
+      // ★ 再入力チェック
+      if (await checkRelogin(user))  { return; }
       openDest(user);
     } catch(err) {
       console.error('Firestore エラー:', err);
