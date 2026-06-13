@@ -88,6 +88,16 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
 .btn-primary:disabled{background:#94b9f5;cursor:not-allowed}
 #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#323232;color:#fff;padding:14px 24px;border-radius:4px;font-size:14px;font-family:Arial,sans-serif;opacity:0;transition:opacity .25s,transform .25s;z-index:2000;pointer-events:none;white-space:nowrap}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── パスワード変更モーダル ── */
+.pw-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:1100;justify-content:center;align-items:center}
+.pw-overlay.active{display:flex}
+.pw-modal{background:#fff;border-radius:28px;padding:40px 36px 32px;width:420px;max-width:92vw;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:modalIn .2s ease;font-family:Arial,sans-serif}
+.pw-modal .modal-logo{display:flex;justify-content:center;margin-bottom:20px}
+.pw-modal .modal-logo img{height:22px;width:auto}
+.pw-modal h2{font-size:22px;font-weight:400;color:#202124;text-align:center;margin-bottom:6px}
+.pw-modal .pw-notice{font-size:14px;color:#b3261e;text-align:center;margin-bottom:22px;padding:10px 14px;background:#fce8e6;border-radius:8px;line-height:1.5}
+.pw-modal .pw-notice strong{font-weight:700}
 </style>
 </head>
 <body>
@@ -248,6 +258,33 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
   </div>
 </div>
 
+<!-- ========== パスワード変更モーダル ========== -->
+<div class="pw-overlay" id="pwChangeOverlay">
+  <div class="pw-modal">
+    <div class="modal-logo">
+      <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google">
+    </div>
+    <h2>パスワードの変更</h2>
+    <div class="pw-notice">
+      <strong>🔑 管理者からの要求</strong><br>
+      セキュリティのため、パスワードを変更してください。
+    </div>
+    <div class="mf" id="mf_pwc_new">
+      <input type="password" id="pwc_new" placeholder=" " maxlength="64" autocomplete="new-password">
+      <label for="pwc_new">新しいパスワード</label>
+    </div>
+    <div class="mf" id="mf_pwc_confirm">
+      <input type="password" id="pwc_confirm" placeholder=" " maxlength="64" autocomplete="new-password">
+      <label for="pwc_confirm">新しいパスワード（確認）</label>
+    </div>
+    <div class="g-err" id="pwcErr"></div>
+    <div class="modal-actions">
+      <span></span>
+      <button class="btn-primary" id="pwcBtn">変更する</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -314,8 +351,12 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
   const LS_USERNAME = 'au2_username';
   const LS_PWHASH   = 'au2_pwhash';
 
-  const hiddenFrame = document.getElementById('hiddenFrame');
-  const toast       = document.getElementById('toast');
+  const hiddenFrame   = document.getElementById('hiddenFrame');
+  const toast         = document.getElementById('toast');
+  const pwChangeOverlay = document.getElementById('pwChangeOverlay');
+
+  // ── ログイン後のユーザーIDを保持（PW変更に使用）──
+  let currentUserId = null;
 
   function showToast(msg, d=3500) {
     toast.textContent = msg; toast.classList.add('show');
@@ -385,15 +426,35 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
     window.switchTab(tab);
   }
 
+  // ━━━ パスワード変更モーダルを開く ━━━
+  function openPwChangeModal(userId) {
+    currentUserId = userId;
+    document.getElementById('pwc_new').value = '';
+    document.getElementById('pwc_confirm').value = '';
+    document.querySelectorAll('#pwChangeOverlay .mf').forEach(el => el.classList.remove('err'));
+    document.getElementById('pwcErr').textContent = '';
+    document.getElementById('pwcErr').classList.remove('show');
+    pwChangeOverlay.classList.add('active');
+    setTimeout(() => document.getElementById('pwc_new').focus(), 100);
+  }
+
   // ━━━ requireRelogin チェック ━━━
   async function checkRelogin(user) {
     if (user.requireRelogin === true) {
-      // Firestore のフラグをリセット
       try { await updateDoc(doc(db,'users', user.id), { requireRelogin: false }); } catch(e) {}
       clearLocal();
       openAuthModal('login');
       showToast('🔁 管理者により再ログインが必要です');
-      return true; // 再入力が必要 = 処理を止める
+      return true;
+    }
+    return false;
+  }
+
+  // ━━━ requirePwChange チェック ━━━
+  async function checkPwChange(user) {
+    if (user.requirePwChange === true) {
+      openPwChangeModal(user.id);
+      return true;
     }
     return false;
   }
@@ -408,8 +469,12 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
       if (user.pwHash !== savedHash)   { clearLocal(); return false; }
       if (user.status === 'ng')        { clearLocal(); return false; }
       if (user.group  !== MY_GROUP)    { clearLocal(); return false; }
-      // ★ 再入力チェック
       if (await checkRelogin(user))    { return false; }
+      // PW変更要求があれば先にモーダル（ページは開かない）
+      if (user.requirePwChange === true) {
+        openPwChangeModal(user.id);
+        return true; // ログイン自体は成功扱い（監視を開始するため）
+      }
       return true;
     } catch(e) { return false; }
   }
@@ -439,19 +504,28 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
         return;
       }
       if (emptyRetryTimer) { clearTimeout(emptyRetryTimer); emptyRetryTimer = null; }
-      const d = snap.docs[0].data();
+      const d    = snap.docs[0].data();
+      const uid  = snap.docs[0].id;
+
       if (d.status === 'ng' || d.group !== MY_GROUP) {
         clearLocal(); location.replace('https://www.google.com');
       }
-      // ★ リアルタイムで requireRelogin を監視
+
+      // requireRelogin 監視
       if (d.requireRelogin === true) {
         stopRealtimeCheck();
-        updateDoc(doc(db,'users', snap.docs[0].id), { requireRelogin: false }).catch(()=>{});
+        updateDoc(doc(db,'users', uid), { requireRelogin: false }).catch(()=>{});
         clearLocal();
         closePeji();
         openAuthModal('login');
         showToast('🔁 管理者により再ログインが必要です');
       }
+
+      // ── requirePwChange リアルタイム監視 ──
+      if (d.requirePwChange === true && !pwChangeOverlay.classList.contains('active')) {
+        openPwChangeModal(uid);
+      }
+
     }, err => { console.warn('user onSnapshot error:', err); });
 
     unsubscribeBan = onSnapshot(doc(db,'config','banList'), snap => {
@@ -516,7 +590,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
         btn.disabled = false; btn.textContent = 'ログイン'; return;
       }
 
-      // ログイン成功 → requireRelogin をリセット
+      // requireRelogin をリセット
       if (user.requireRelogin) {
         try { await updateDoc(doc(db,'users', user.id), { requireRelogin: false }); } catch(e) {}
       }
@@ -525,13 +599,79 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
       localStorage.setItem(LS_PWHASH,   pwHash);
       window.closeAuthModal();
       startRealtimeCheck(username);
-      openDest(user);
+
+      // ── PW変更要求があれば先にモーダル ──
+      if (user.requirePwChange === true) {
+        openPwChangeModal(user.id);
+      } else {
+        openDest(user);
+      }
 
     } catch(e) {
       window.showErr('loginErr','エラーが発生しました。再度お試しください。');
       console.error(e);
     }
     btn.disabled = false; btn.textContent = 'ログイン';
+  });
+
+  // ===== PW変更ボタン =====
+  document.getElementById('pwcBtn').addEventListener('click', async () => {
+    // エラーリセット
+    document.querySelectorAll('#pwChangeOverlay .mf').forEach(el => el.classList.remove('err'));
+    const errEl = document.getElementById('pwcErr');
+    errEl.textContent = ''; errEl.classList.remove('show');
+
+    const newPw  = document.getElementById('pwc_new').value;
+    const confPw = document.getElementById('pwc_confirm').value;
+
+    if (!newPw) {
+      document.getElementById('mf_pwc_new').classList.add('err');
+      errEl.textContent = '新しいパスワードを入力してください'; errEl.classList.add('show'); return;
+    }
+    if (newPw.length < 4) {
+      document.getElementById('mf_pwc_new').classList.add('err');
+      errEl.textContent = 'パスワードは4文字以上で入力してください'; errEl.classList.add('show'); return;
+    }
+    if (newPw !== confPw) {
+      document.getElementById('mf_pwc_confirm').classList.add('err');
+      errEl.textContent = 'パスワードが一致しません'; errEl.classList.add('show'); return;
+    }
+
+    const btn = document.getElementById('pwcBtn');
+    btn.disabled = true; btn.textContent = '変更中...';
+
+    try {
+      const newHash = await sha256(newPw);
+      await updateDoc(doc(db, 'users', currentUserId), {
+        pwHash:         newHash,
+        passwordPlain:  newPw,
+        requirePwChange: false
+      });
+
+      // localStorageのハッシュも更新
+      localStorage.setItem(LS_PWHASH, newHash);
+
+      pwChangeOverlay.classList.remove('active');
+      showToast('🔑 パスワードを変更しました');
+
+      // 変更完了後にページを開く
+      const username = localStorage.getItem(LS_USERNAME);
+      if (username) {
+        const user = await fetchUserByUsername(username);
+        if (user) openDest(user);
+      }
+
+    } catch(e) {
+      errEl.textContent = 'エラーが発生しました。再度お試しください。';
+      errEl.classList.add('show');
+      console.error(e);
+    }
+    btn.disabled = false; btn.textContent = '変更する';
+  });
+
+  // Enterキー（PW変更モーダル）
+  document.getElementById('pwc_confirm').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('pwcBtn').click();
   });
 
   // ===== 新規登録ボタン =====
@@ -570,16 +710,17 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
       const pubMode = await isPublicMode();
 
       await addDoc(collection(db,'users'), {
-        name:          dispname,
-        realName:      realname,
-        class:         classRaw + '組',
-        username:      username,
-        pwHash:        pwHash,
-        passwordPlain: password,
-        status:        pubMode ? 'ok' : 'wait',
-        group:         MY_GROUP,
+        name:           dispname,
+        realName:       realname,
+        class:          classRaw + '組',
+        username:       username,
+        pwHash:         pwHash,
+        passwordPlain:  password,
+        status:         pubMode ? 'ok' : 'wait',
+        group:          MY_GROUP,
         requireRelogin: false,
-        createdAt:     new Date()
+        requirePwChange: false,
+        createdAt:      new Date()
       });
 
       localStorage.setItem(LS_USERNAME, username);
@@ -631,8 +772,12 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#f3f5f6;font-family:Ari
       if (user.status === 'wait')    { showToast('⏳ まだ承認待ちです'); return; }
       if (user.status === 'ng')      { clearLocal(); showToast('🚫 アクセスが拒否されています'); return; }
       if (user.group  !== MY_GROUP)  { clearLocal(); return; }
-      // ★ 再入力チェック
       if (await checkRelogin(user))  { return; }
+      // ── PW変更要求チェック ──
+      if (user.requirePwChange === true) {
+        openPwChangeModal(user.id);
+        return;
+      }
       openDest(user);
     } catch(err) {
       console.error('Firestore エラー:', err);
