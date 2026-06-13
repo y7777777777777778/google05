@@ -20,6 +20,7 @@
     --accent:     #5c6bc0;
     --accent2:    #7986cb;
     --star:       #ffd700;
+    --pw:         #ce93d8;
   }
   body { background: var(--bg); color: var(--text); font-family: 'Courier New', 'Consolas', monospace; min-height: 100vh; }
   header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; }
@@ -82,6 +83,11 @@
   .btn-relogin:hover:not(:disabled) { background: rgba(255,120,0,0.22); border-color: #ff8c42; }
   .btn-relogin.active { background: rgba(255,120,0,0.22); border-color: #ff8c42; color: #fff; animation: reloginPulse 1.6s ease infinite; }
   @keyframes reloginPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,120,0,0.5);} 50%{box-shadow:0 0 0 4px rgba(255,120,0,0);} }
+  /* PW変更ボタン */
+  .btn-pwreq { background: rgba(206,147,216,0.10); border-color: rgba(206,147,216,0.35); color: var(--pw); }
+  .btn-pwreq:hover:not(:disabled) { background: rgba(206,147,216,0.22); border-color: var(--pw); }
+  .btn-pwreq.active { background: rgba(206,147,216,0.22); border-color: var(--pw); color: #fff; animation: pwreqPulse 1.6s ease infinite; }
+  @keyframes pwreqPulse { 0%,100%{box-shadow:0 0 0 0 rgba(206,147,216,0.5);} 50%{box-shadow:0 0 0 4px rgba(206,147,216,0);} }
   .loading-row td, .empty-row td { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 13px; }
   .spinner { display: inline-block; width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent2); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -164,6 +170,16 @@
   .btn-rl-cancel { padding:9px 18px; border-radius:6px; background:var(--surface2); border:1px solid var(--border); color:var(--text-muted); font-size:13px; cursor:pointer; font-family:inherit; }
   .btn-rl-ok { padding:9px 20px; border-radius:6px; border:none; background:rgba(255,120,0,0.18); border:1px solid #ff8c42; color:#ff8c42; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .12s; }
   .btn-rl-ok:hover { background:rgba(255,120,0,0.3); }
+  /* PW変更要求モーダル */
+  #pwreqOverlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:300; justify-content:center; align-items:center; }
+  #pwreqOverlay.active { display:flex; }
+  #pwreqBox { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px 24px; width:min(380px,calc(100vw - 32px)); box-shadow:0 24px 60px rgba(0,0,0,.7); animation:modalIn .18s ease; }
+  #pwreqBox h3 { font-size:16px; font-weight:700; color:var(--pw); margin-bottom:6px; }
+  #pwreqBox p { font-size:12px; color:var(--text-muted); margin-bottom:20px; line-height:1.6; }
+  #pwreqBox .pw-btns { display:flex; gap:10px; justify-content:flex-end; }
+  .btn-pw-cancel { padding:9px 18px; border-radius:6px; background:var(--surface2); border:1px solid var(--border); color:var(--text-muted); font-size:13px; cursor:pointer; font-family:inherit; }
+  .btn-pw-ok { padding:9px 20px; border-radius:6px; background:rgba(206,147,216,0.18); border:1px solid var(--pw); color:var(--pw); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .12s; }
+  .btn-pw-ok:hover { background:rgba(206,147,216,0.3); }
 </style>
 </head>
 <body>
@@ -285,21 +301,22 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   <table>
     <thead>
       <tr>
-        <th style="width:10%">本名 / 状態</th>
-        <th style="width:11%">表示名</th>
-        <th style="width:7%">Status</th>
-        <th style="width:6%">グループ</th>
-        <th style="width:6%">管理者</th>
-        <th style="width:7%">⭐ サブ管</th>
-        <th style="width:12%">ユーザー名 / PW</th>
-        <th style="width:9%">名前変更</th>
+        <th style="width:9%">本名 / 状態</th>
+        <th style="width:10%">表示名</th>
+        <th style="width:6%">Status</th>
+        <th style="width:5%">グループ</th>
+        <th style="width:5%">管理者</th>
+        <th style="width:6%">⭐ サブ管</th>
+        <th style="width:11%">ユーザー名 / PW</th>
+        <th style="width:8%">名前変更</th>
         <th style="width:6%">🔁 再入力</th>
-        <th style="width:14%">操作</th>
+        <th style="width:7%">🔑 PW変更</th>
+        <th style="width:13%">操作</th>
       </tr>
     </thead>
     <tbody id="userTableBody">
       <tr class="loading-row">
-        <td colspan="10"><div class="spinner"></div><br>読み込み中...</td>
+        <td colspan="11"><div class="spinner"></div><br>読み込み中...</td>
       </tr>
     </tbody>
   </table>
@@ -358,6 +375,18 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   </div>
 </div>
 
+<!-- PW変更要求モーダル -->
+<div id="pwreqOverlay">
+  <div id="pwreqBox">
+    <h3>🔑 パスワード変更を要求</h3>
+    <p id="pwreqMsg">このユーザーにパスワードの変更を要求します。<br>次回ログイン時またはCtrl+U時に変更画面が表示されます。</p>
+    <div class="pw-btns">
+      <button class="btn-pw-cancel" onclick="closePwreqModal()">キャンセル</button>
+      <button class="btn-pw-ok" id="pwreqOkBtn">要求する</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
   import {
@@ -402,15 +431,6 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     toast.textContent = msg;
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), duration);
-  }
-
-  function openConfirm(title, msg, okLabel, cb) {
-    confirmTitle.textContent = title;
-    confirmMsg.innerHTML = msg;
-    confirmOkBtn.textContent = okLabel || "削除する";
-    confirmCallback = cb;
-    pendingDeleteId = null;
-    confirmOverlay.classList.add("active");
   }
 
   confirmOkBtn.addEventListener("click", async function() {
@@ -487,15 +507,16 @@ role: admin / subadmin / user　　password は平文のまま保存されます
       : users;
 
     if (!filtered.length) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="10">ユーザーが見つかりません</td></tr>`;
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="11">ユーザーが見つかりません</td></tr>`;
       return;
     }
 
     tbody.innerHTML = filtered.map(user => {
-      const isAdmin    = !!user.isAdmin;
-      const isSubAdmin = !!user.isSubAdmin;
-      const online     = isOnline(user.lastSeen);
+      const isAdmin      = !!user.isAdmin;
+      const isSubAdmin   = !!user.isSubAdmin;
+      const online       = isOnline(user.lastSeen);
       const needsRelogin = !!user.requireRelogin;
+      const needsPwChange = !!user.requirePwChange;
 
       let rowStyle = '';
       if (isAdmin) rowStyle = 'background:linear-gradient(90deg,rgba(255,200,0,0.10),rgba(255,200,0,0.04));border-left:3px solid #ffc800;';
@@ -544,7 +565,6 @@ role: admin / subadmin / user　　password は平文のまま保存されます
             onclick="toggleSubAdmin('${user.id}','${escapeHTML(user.name)}')"
           >${user.isSubAdmin ? '⭐ サブ' : '⭐'}</button>
         </td>
-        <!-- ユーザー名 / PW列 -->
         <td>
           <div style="display:flex;flex-direction:column;gap:5px;">
             <div style="display:flex;align-items:center;gap:5px;">
@@ -559,7 +579,6 @@ role: admin / subadmin / user　　password は平文のまま保存されます
               style="padding:3px 8px;border-radius:5px;border:1px solid rgba(92,107,192,.4);background:rgba(92,107,192,.1);color:var(--accent2);font-size:10px;cursor:pointer;font-family:inherit;white-space:nowrap;align-self:flex-start;">✏️ 変更</button>
           </div>
         </td>
-        <!-- 名前変更制限 -->
         <td>
           <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
             <span style="font-size:10px;color:var(--text-muted);">
@@ -582,6 +601,14 @@ role: admin / subadmin / user　　password は平文のまま保存されます
             onclick="handleReloginBtn('${user.id}','${escapeHTML(user.name)}',${needsRelogin})"
             title="${needsRelogin ? '再入力要求中（クリックで解除）' : 'ログイン再入力を要求'}"
           >${needsRelogin ? '⏳ 要求中' : '🔁 再入力'}</button>
+        </td>
+        <!-- PW変更要求ボタン -->
+        <td>
+          <button
+            class="btn btn-pwreq ${needsPwChange ? 'active' : ''}"
+            onclick="handlePwreqBtn('${user.id}','${escapeHTML(user.name)}',${needsPwChange})"
+            title="${needsPwChange ? 'PW変更要求中（クリックで解除）' : 'パスワード変更を要求'}"
+          >${needsPwChange ? '⏳ 要求中' : '🔑 PW変更'}</button>
         </td>
         <!-- 操作 -->
         <td>
@@ -606,18 +633,18 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   }
 
   function subscribeUsers() {
-    tbody.innerHTML = `<tr class="loading-row"><td colspan="10"><div class="spinner"></div><br>読み込み中...</td></tr>`;
+    tbody.innerHTML = `<tr class="loading-row"><td colspan="11"><div class="spinner"></div><br>読み込み中...</td></tr>`;
     try {
       const q = query(collection(db,"users"), where("group","==",MY_GROUP));
       onSnapshot(q, (snapshot) => {
         allUsers = snapshot.docs.map(d => ({id:d.id,...d.data()}));
         renderTable(allUsers);
       }, (e) => {
-        tbody.innerHTML = `<tr class="empty-row"><td colspan="10">⚠ データ取得に失敗しました<br><small>${e.message}</small></td></tr>`;
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="11">⚠ データ取得に失敗しました<br><small>${e.message}</small></td></tr>`;
         showToast("エラー: " + e.message, 6000);
       });
     } catch(e) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="10">⚠ 初期化エラー<br><small>${e.message}</small></td></tr>`;
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="11">⚠ 初期化エラー<br><small>${e.message}</small></td></tr>`;
     }
   }
 
@@ -630,20 +657,16 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     reloginTargetId   = id;
     reloginTargetName = name;
     reloginCurrentVal = isActive;
-
-    const msgEl = document.getElementById('reloginMsg');
-    const okBtn = document.getElementById('reloginOkBtn');
+    const msgEl  = document.getElementById('reloginMsg');
+    const okBtn  = document.getElementById('reloginOkBtn');
     const overlay = document.getElementById('reloginOverlay');
-
     if (isActive) {
-      // すでに要求中 → 解除確認
       msgEl.textContent = `「${name}」への再入力要求を解除します。`;
       okBtn.textContent = '解除する';
       okBtn.style.background = 'rgba(0,230,118,0.15)';
       okBtn.style.borderColor = 'var(--ok)';
       okBtn.style.color = 'var(--ok)';
     } else {
-      // 新規要求
       msgEl.innerHTML = `「<strong style="color:var(--text)">${name}</strong>」に再ログインを要求します。<br>次回 Ctrl+U を押したときにログイン画面が表示されます。`;
       okBtn.textContent = '要求する';
       okBtn.style.background = 'rgba(255,120,0,0.18)';
@@ -678,6 +701,61 @@ role: admin / subadmin / user　　password は平文のまま保存されます
 
   document.getElementById('reloginOverlay').addEventListener('click', function(e) {
     if (e.target === this) window.closeReloginModal();
+  });
+
+  // ━━━ PW変更要求ボタン ━━━
+  let pwreqTargetId   = null;
+  let pwreqTargetName = null;
+  let pwreqCurrentVal = false;
+
+  window.handlePwreqBtn = function(id, name, isActive) {
+    pwreqTargetId   = id;
+    pwreqTargetName = name;
+    pwreqCurrentVal = isActive;
+    const msgEl  = document.getElementById('pwreqMsg');
+    const okBtn  = document.getElementById('pwreqOkBtn');
+    const overlay = document.getElementById('pwreqOverlay');
+    if (isActive) {
+      msgEl.textContent = `「${name}」へのパスワード変更要求を解除します。`;
+      okBtn.textContent = '解除する';
+      okBtn.style.background = 'rgba(0,230,118,0.15)';
+      okBtn.style.borderColor = 'var(--ok)';
+      okBtn.style.color = 'var(--ok)';
+    } else {
+      msgEl.innerHTML = `「<strong style="color:var(--text)">${name}</strong>」にパスワードの変更を要求します。<br>次回ログイン時または Ctrl+U 時に変更画面が表示されます。`;
+      okBtn.textContent = '要求する';
+      okBtn.style.background = 'rgba(206,147,216,0.18)';
+      okBtn.style.borderColor = 'var(--pw)';
+      okBtn.style.color = 'var(--pw)';
+    }
+    overlay.classList.add('active');
+  };
+
+  window.closePwreqModal = function() {
+    document.getElementById('pwreqOverlay').classList.remove('active');
+    pwreqTargetId = null;
+  };
+
+  document.getElementById('pwreqOkBtn').addEventListener('click', async () => {
+    if (!pwreqTargetId) return;
+    const id   = pwreqTargetId;
+    const name = pwreqTargetName;
+    const newVal = !pwreqCurrentVal;
+    window.closePwreqModal();
+    try {
+      await updateDoc(doc(db,'users', id), { requirePwChange: newVal });
+      const user = allUsers.find(u => u.id === id);
+      if (user) user.requirePwChange = newVal;
+      renderTable(allUsers);
+      showToast(newVal
+        ? `🔑 「${name}」にパスワード変更を要求しました`
+        : `✅ 「${name}」のパスワード変更要求を解除しました`
+      );
+    } catch(e) { showToast('エラー: ' + e.message); }
+  });
+
+  document.getElementById('pwreqOverlay').addEventListener('click', function(e) {
+    if (e.target === this) window.closePwreqModal();
   });
 
   // ━━━ グループ・管理者・サブ管 ━━━
@@ -1042,7 +1120,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
           name: u.name, realName: u.realName||'', group: u.group||MY_GROUP,
           username: u.username, pwHash, passwordPlain: u.password,
           status: 'ok', isAdmin: u.role==='admin', isSubAdmin: u.role==='subadmin',
-          akuchat: false, pageMode: 'peji', requireRelogin: false,
+          akuchat: false, pageMode: 'peji', requireRelogin: false, requirePwChange: false,
           createdAt: new Date(), importedFrom: 'kanri.json',
         });
         done++;
