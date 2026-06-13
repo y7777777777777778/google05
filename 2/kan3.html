@@ -7,16 +7,19 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg:      #0f1117;
-    --surface: #1a1d27;
-    --surface2:#22263a;
-    --border:  #2e3354;
-    --text:    #e8eaf6;
-    --muted:   #8b92b8;
-    --ok:      #00e676;
-    --wait:    #ffb300;
-    --ng:      #ff5252;
-    --accent:  #7986cb;
+    --bg:        #0f1117;
+    --surface:   #1a1d27;
+    --surface2:  #22263a;
+    --border:    #2e3354;
+    --text:      #e8eaf6;
+    --muted:     #8b92b8;
+    --ok:        #00e676;
+    --wait:      #ffb300;
+    --ng:        #ff5252;
+    --accent:    #7986cb;
+    --memo-bg:   rgba(255,235,120,0.07);
+    --memo-bdr:  rgba(255,220,80,0.25);
+    --memo-text: #ffe082;
   }
   body {
     background: var(--bg);
@@ -37,7 +40,7 @@
     gap: 8px;
   }
 
-  /* ステータスカード */
+  /* ── 統計カード ── */
   .stats {
     display: flex;
     gap: 10px;
@@ -55,16 +58,12 @@
   .stat-num { font-size: 22px; font-weight: 700; }
   .stat-lbl { font-size: 10px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-top: 2px; }
   .c-total { color: var(--accent); }
-  .c-wait  { color: var(--wait); }
-  .c-ok    { color: var(--ok); }
-  .c-ng    { color: var(--ng); }
+  .c-wait  { color: var(--wait);   }
+  .c-ok    { color: var(--ok);     }
+  .c-ng    { color: var(--ng);     }
 
-  /* リスト */
-  .list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+  /* ── リスト ── */
+  .list { display: flex; flex-direction: column; gap: 8px; }
 
   .card {
     background: var(--surface);
@@ -72,14 +71,14 @@
     border-radius: 12px;
     padding: 12px 14px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     transition: background .12s;
   }
-  .card:hover { background: var(--surface2); }
+  .card:hover  { background: var(--surface2); }
   .card.is-wait { border-left: 3px solid var(--wait); }
-  .card.is-ok   { border-left: 3px solid var(--ok);   opacity: .6; }
-  .card.is-ng   { border-left: 3px solid var(--ng);   opacity: .6; }
+  .card.is-ok   { border-left: 3px solid var(--ok);  opacity: .6; }
+  .card.is-ng   { border-left: 3px solid var(--ng);  opacity: .6; }
 
   /* アバター */
   .avatar {
@@ -89,25 +88,33 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 15px; font-weight: 700;
     color: #fff; flex-shrink: 0;
+    margin-top: 2px;
   }
 
-  /* 名前 */
+  /* ユーザー情報 */
   .info { flex: 1; min-width: 0; }
-  .name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .name     { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .realname { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
   /* バッジ */
   .badge {
     font-size: 10px; font-weight: 700;
     padding: 3px 9px; border-radius: 20px;
-    letter-spacing: .05em; flex-shrink: 0;
+    letter-spacing: .05em; flex-shrink: 0; margin-top: 4px;
   }
   .badge-wait { background: rgba(255,179,0,.15); color: var(--wait); border: 1px solid rgba(255,179,0,.3); }
   .badge-ok   { background: rgba(0,230,118,.12); color: var(--ok);   border: 1px solid rgba(0,230,118,.25); }
-  .badge-ng   { background: rgba(255,82,82,.12);  color: var(--ng);   border: 1px solid rgba(255,82,82,.25); }
+  .badge-ng   { background: rgba(255,82,82,.12);  color: var(--ng);  border: 1px solid rgba(255,82,82,.25); }
 
-  /* 操作ボタン */
-  .btns { display: flex; gap: 6px; flex-shrink: 0; }
+  /* 右カラム（バッジ＋ボタン） */
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .btns { display: flex; gap: 6px; }
   .btn {
     padding: 7px 14px;
     border-radius: 8px;
@@ -130,20 +137,86 @@
   }
   .btn-ng:hover:not(:disabled) { background: rgba(255,82,82,.22); border-color: var(--ng); }
 
-  /* 空 / ローディング */
-  .empty {
-    text-align: center; padding: 48px 16px;
-    color: var(--muted); font-size: 13px;
-  }
-  .spinner {
-    display: inline-block; width: 24px; height: 24px;
-    border: 3px solid var(--border); border-top-color: var(--accent);
-    border-radius: 50%; animation: spin .8s linear infinite;
-    margin-bottom: 10px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  /* ── 管理者メモ ── */
+  .memo-row { margin-top: 7px; display: flex; align-items: center; gap: 6px; }
 
-  /* オンライン状態 */
+  .memo-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--memo-bg);
+    border: 1px solid var(--memo-bdr);
+    border-radius: 7px;
+    padding: 4px 9px;
+    font-size: 11px;
+    color: var(--memo-text);
+    cursor: pointer;
+    max-width: 280px;
+    transition: border-color .12s, background .12s;
+  }
+  .memo-display:hover { border-color: rgba(255,220,80,.5); background: rgba(255,235,120,.12); }
+  .memo-display .memo-text {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .memo-empty {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    border: 1px dashed transparent;
+    transition: border-color .12s, color .12s;
+  }
+  .memo-empty:hover { border-color: var(--border); color: var(--text); }
+
+  .memo-edit-wrap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+  }
+  .memo-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 7px;
+    color: var(--text);
+    font-size: 12px;
+    font-family: inherit;
+    padding: 5px 10px;
+    outline: none;
+    min-width: 0;
+  }
+  .memo-input:focus { border-color: #9fa8da; box-shadow: 0 0 0 2px rgba(121,134,203,.2); }
+  .memo-save {
+    padding: 5px 11px;
+    border-radius: 7px;
+    border: 1px solid rgba(121,134,203,.4);
+    background: rgba(121,134,203,.1);
+    color: var(--accent);
+    font-size: 11px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    white-space: nowrap;
+    transition: all .12s;
+  }
+  .memo-save:hover { background: rgba(121,134,203,.22); border-color: var(--accent); }
+  .memo-cancel {
+    padding: 5px 8px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: pointer; font-family: inherit;
+    transition: all .12s;
+  }
+  .memo-cancel:hover { color: var(--text); border-color: var(--muted); }
+
+  /* ── プレゼンス ── */
   .presence {
     font-size: 10px;
     display: flex; align-items: center; gap: 4px;
@@ -156,16 +229,14 @@
   }
   @keyframes pulse {
     0%,100%{ box-shadow: 0 0 0 0 rgba(0,230,118,.6); }
-    50%{ box-shadow: 0 0 0 4px rgba(0,230,118,0); }
+    50%    { box-shadow: 0 0 0 4px rgba(0,230,118,0); }
   }
-  .presence-online { color: var(--ok); }
+  .presence-online { color: var(--ok);   }
   .presence-today  { color: var(--wait); }
-  .presence-off    { color: var(--muted); }
+  .presence-off    { color: var(--muted);}
 
-  /* タブ（全員 / 待機のみ） */
-  .tabs {
-    display: flex; gap: 6px; margin-bottom: 14px;
-  }
+  /* ── タブ ── */
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
   .tab-btn {
     padding: 6px 16px; border-radius: 8px;
     border: 1px solid var(--border);
@@ -173,12 +244,22 @@
     color: var(--muted); font-size: 12px; font-weight: 600;
     cursor: pointer; font-family: inherit; transition: all .13s;
   }
-  .tab-btn.active {
-    border-color: var(--accent); color: var(--accent);
-    background: rgba(121,134,203,.1);
-  }
+  .tab-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(121,134,203,.1); }
 
-  /* トースト */
+  /* ── 空 / スピナー ── */
+  .empty {
+    text-align: center; padding: 48px 16px;
+    color: var(--muted); font-size: 13px;
+  }
+  .spinner {
+    display: inline-block; width: 24px; height: 24px;
+    border: 3px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin .8s linear infinite;
+    margin-bottom: 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── トースト ── */
   #toast {
     position: fixed; bottom: 20px; left: 50%;
     transform: translateX(-50%) translateY(12px);
@@ -190,7 +271,7 @@
   }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* 更新ボタン */
+  /* ── 更新ボタン ── */
   .refresh {
     margin-left: auto;
     padding: 5px 12px; border-radius: 7px;
@@ -246,10 +327,11 @@ const db = getFirestore(initializeApp({
 }));
 
 const MY_GROUP = '2';
-let allUsers = [];
-let curFilter = 'all';
+let allUsers   = [];
+let curFilter  = 'all';
+let editingMemo = {}; // { [userId]: draftText }
 
-// ─── トースト ───
+// ── トースト ──
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -257,7 +339,7 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
-// ─── プレゼンスバッジ ───
+// ── プレゼンス ──
 function presenceHTML(lastSeen) {
   if (!lastSeen) return '<span class="presence presence-off">⚫ オフライン</span>';
   const ts = lastSeen.toDate ? lastSeen.toDate().getTime() : new Date(lastSeen).getTime();
@@ -268,14 +350,45 @@ function presenceHTML(lastSeen) {
   if (min < 5) {
     return '<span class="presence presence-online"><span class="dot-online"></span>オンライン</span>';
   }
-  const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+  const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
   if (ts >= todayStart.getTime()) {
-    return `<span class="presence presence-today">🟡 ${hr >= 1 ? hr+'時間前' : min+'分前'}</span>`;
+    return `<span class="presence presence-today">🟡 ${hr >= 1 ? hr + '時間前' : min + '分前'}</span>`;
   }
   return '<span class="presence presence-off">⚫ オフライン</span>';
 }
 
-// ─── 描画 ───
+// ── メモ部分HTML ──
+function memoHTML(u) {
+  if (editingMemo[u.id] !== undefined) {
+    // 編集モード
+    const draft = esc(editingMemo[u.id]);
+    return `<div class="memo-row">
+      <div class="memo-edit-wrap">
+        <input class="memo-input" id="memo-input-${u.id}"
+          type="text" maxlength="80" placeholder="管理者メモ（80文字以内）"
+          value="${draft}"
+          oninput="draftMemo('${u.id}', this.value)"
+          onkeydown="memoKey(event, '${u.id}')">
+        <button class="memo-save"   onclick="saveMemo('${u.id}')">保存</button>
+        <button class="memo-cancel" onclick="cancelMemo('${u.id}')">✕</button>
+      </div>
+    </div>`;
+  }
+  const memo = u.adminMemo || '';
+  if (memo) {
+    return `<div class="memo-row">
+      <span class="memo-display" title="${esc(memo)}" onclick="startEdit('${u.id}')">
+        <span>📝</span>
+        <span class="memo-text">${esc(memo)}</span>
+      </span>
+    </div>`;
+  }
+  return `<div class="memo-row">
+    <span class="memo-empty" onclick="startEdit('${u.id}')">＋ メモ追加</span>
+  </div>`;
+}
+
+// ── 描画 ──
 function render() {
   const users = curFilter === 'wait'
     ? allUsers.filter(u => u.status === 'wait')
@@ -287,9 +400,10 @@ function render() {
   document.getElementById('cNg').textContent    = allUsers.filter(u => u.status === 'ng').length;
 
   const list = document.getElementById('list');
-
   if (users.length === 0) {
-    list.innerHTML = `<div class="empty">${curFilter === 'wait' ? '待機中のユーザーはいません ✅' : 'ユーザーがいません'}</div>`;
+    list.innerHTML = `<div class="empty">${
+      curFilter === 'wait' ? '待機中のユーザーはいません ✅' : 'ユーザーがいません'
+    }</div>`;
     return;
   }
 
@@ -308,23 +422,37 @@ function render() {
         <div class="name">${esc(u.name || '—')}</div>
         ${u.realName ? `<div class="realname">${esc(u.realName)}</div>` : ''}
         ${presenceHTML(u.lastSeen)}
+        ${memoHTML(u)}
       </div>
-      ${badge}
-      <div class="btns">
-        <button class="btn btn-ok" onclick="allow('${u.id}','${esc(u.name)}')"
-          ${u.status === 'ok' ? 'disabled' : ''}>✓</button>
-        <button class="btn btn-ng" onclick="deny('${u.id}','${esc(u.name)}')"
-          ${u.status === 'ng' ? 'disabled' : ''}>✕</button>
+      <div class="right-col">
+        ${badge}
+        <div class="btns">
+          <button class="btn btn-ok" onclick="allow('${u.id}', '${esc(u.name)}')"
+            ${u.status === 'ok' ? 'disabled' : ''}>✓</button>
+          <button class="btn btn-ng" onclick="deny('${u.id}', '${esc(u.name)}')"
+            ${u.status === 'ng' ? 'disabled' : ''}>✕</button>
+        </div>
       </div>
     </div>`;
   }).join('');
+
+  // 編集中の入力欄にフォーカスを戻す
+  for (const uid of Object.keys(editingMemo)) {
+    const el = document.getElementById(`memo-input-${uid}`);
+    if (el) {
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+    }
+  }
 }
 
 function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(s || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-// ─── フィルター切替 ───
+// ── タブ切替 ──
 window.setFilter = function(f) {
   curFilter = f;
   document.getElementById('tabAll').classList.toggle('active', f === 'all');
@@ -332,7 +460,7 @@ window.setFilter = function(f) {
   render();
 };
 
-// ─── 許可 / 拒否 ───
+// ── 許可 / 拒否 ──
 window.allow = async function(id, name) {
   try {
     await updateDoc(doc(db, 'users', id), { status: 'ok' });
@@ -353,11 +481,52 @@ window.deny = async function(id, name) {
   } catch(e) { toast('エラー: ' + e.message); }
 };
 
-// ─── リアルタイム監視 ───
+// ── メモ操作 ──
+window.startEdit = function(id) {
+  const u = allUsers.find(u => u.id === id);
+  editingMemo[id] = u ? (u.adminMemo || '') : '';
+  render();
+};
+
+window.draftMemo = function(id, val) {
+  editingMemo[id] = val;
+};
+
+window.cancelMemo = function(id) {
+  delete editingMemo[id];
+  render();
+};
+
+window.memoKey = function(e, id) {
+  if (e.key === 'Enter')  { e.preventDefault(); saveMemo(id); }
+  if (e.key === 'Escape') { cancelMemo(id); }
+};
+
+window.saveMemo = async function(id) {
+  const text = (editingMemo[id] || '').trim();
+  const u    = allUsers.find(u => u.id === id);
+  const name = u ? (u.name || id) : id;
+  try {
+    await updateDoc(doc(db, 'users', id), { adminMemo: text });
+    if (u) u.adminMemo = text;
+    delete editingMemo[id];
+    render();
+    toast('📝 ' + name + ' のメモを保存しました');
+  } catch(e) { toast('エラー: ' + e.message); }
+};
+
+// ── リアルタイム監視 ──
 const q = query(collection(db, 'users'), where('group', '==', MY_GROUP));
 onSnapshot(q, snap => {
-  allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  // 待機中を先頭に
+  const prev = Object.fromEntries(allUsers.map(u => [u.id, u]));
+  allUsers = snap.docs.map(d => {
+    const data = { id: d.id, ...d.data() };
+    // 編集中のユーザーは外部更新でメモを上書きしない
+    if (editingMemo[d.id] !== undefined && prev[d.id]) {
+      data.adminMemo = prev[d.id].adminMemo;
+    }
+    return data;
+  });
   allUsers.sort((a, b) => {
     const order = { wait: 0, ok: 1, ng: 2 };
     return (order[a.status] ?? 1) - (order[b.status] ?? 1);
