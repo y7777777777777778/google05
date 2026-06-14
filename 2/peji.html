@@ -1104,16 +1104,23 @@ async function findMyDocId() {
   return null;
 }
 
-/* ━━━ ★ 修正: presence_2 + users.lastSeen を一括更新するハートビート ━━━ */
-const presenceId = myName + '_' + Math.random().toString(36).slice(2,7);
+/* ━━━ ★ 修正: presence_2 ハートビート ━━━
+   presenceId を 'u_' + myName 固定にすることで
+   リロードのたびに増殖しなくなる。
+   localTs（ミリ秒）を一緒に保存して null 問題を回避。
+*/
+const presenceId  = 'u_' + myName;          // ★ 固定ID
 const presenceRef = doc(db, "presence_2", presenceId);
 
 async function heartbeatAll() {
-  // presence_2 を更新（オンライン人数カウント用）
   try {
-    await setDoc(presenceRef, { name: myName, ts: serverTimestamp() }, { merge: true });
+    await setDoc(presenceRef, {
+      name:    myName,
+      ts:      serverTimestamp(),  // サーバー側タイムスタンプ（バックアップ用）
+      localTs: Date.now()          // ★ ローカルミリ秒（フィルタのメイン）
+    }, { merge: true });
   } catch(e) {}
-  // users.lastSeen を更新（kanri.htmlのオンライン表示用）
+
   const id = await findMyDocId();
   if (id) {
     try { await updateDoc(doc(db, 'users', id), { lastSeen: serverTimestamp() }); } catch(e) {}
@@ -1129,14 +1136,20 @@ function leavePresence(){
 }
 document.addEventListener('visibilitychange', () => { heartbeatAll(); });
 window.addEventListener('beforeunload', leavePresence);
-window.addEventListener('pagehide', leavePresence);
+window.addEventListener('pagehide',     leavePresence);
 
-/* ━━━ ★ 修正: presence_2 のリアルタイム監視（オンライン人数） ━━━ */
-onSnapshot(collection(db,"presence_2"), snap=>{
-  const fiveMinAgo = Date.now() / 1000 - 300;
-  const online = snap.docs.filter(d=>{
-    const ts = d.data().ts?.seconds;
-    return ts && ts > fiveMinAgo;
+/* ━━━ ★ 修正: presence_2 リアルタイム監視（オンライン人数） ━━━
+   localTs（ミリ秒）を優先し、なければ serverTimestamp の seconds を使う。
+   5分以内のドキュメントだけをカウント。
+*/
+onSnapshot(collection(db, "presence_2"), snap => {
+  const fiveMinAgo = Date.now() - 5 * 60 * 1000;  // ★ ミリ秒で比較
+  const online = snap.docs.filter(d => {
+    const data = d.data();
+    const lt   = data.localTs;                                   // ★ ローカルms
+    const st   = data.ts?.seconds ? data.ts.seconds * 1000 : null; // serverTimestamp→ms
+    const t    = lt ?? st;                                       // localTs優先
+    return t && t > fiveMinAgo;
   });
   document.getElementById('onlineCnt').textContent = online.length || 0;
 });
