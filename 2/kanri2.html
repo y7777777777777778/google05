@@ -28,6 +28,8 @@
   .header-icon { width: 36px; height: 36px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
   header h1 { font-size: 16px; font-weight: 700; letter-spacing: 0.08em; color: var(--text); }
   header span.subtitle { font-size: 12px; color: var(--text-muted); letter-spacing: 0.04em; }
+  /* リアルタイムクロック */
+  #liveClock { font-size: 12px; color: var(--text-muted); letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
   .stats-bar { display: flex; gap: 20px; padding: 20px 32px; flex-wrap: wrap; }
   .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 24px; display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
   .stat-card .stat-num { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
@@ -64,8 +66,49 @@
   .badge-ng   { background: rgba(255,82,82,0.12); color: var(--ng); border: 1px solid rgba(255,82,82,0.3); }
   .badge-ng::before { background: var(--ng); }
   @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-  @keyframes pulse-online { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,230,118,0.6); } 50% { opacity: 0.8; box-shadow: 0 0 0 4px rgba(0,230,118,0); } }
-  .online-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); animation: pulse-online 1.6s ease-in-out infinite; flex-shrink: 0; }
+
+  /* ━━━ オンライン表示 ━━━ */
+  .presence-online {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--ok); font-weight: 600;
+  }
+  .presence-recent {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--wait);
+  }
+  .presence-today {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; color: #7986cb;
+  }
+  .presence-offline {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--text-muted);
+  }
+  /* パルスドット（オンライン用） */
+  .dot-online {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--ok); flex-shrink: 0;
+    animation: pulseOnline 1.6s ease-in-out infinite;
+  }
+  @keyframes pulseOnline {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,230,118,0.7); }
+    50%       { opacity: 0.85; box-shadow: 0 0 0 5px rgba(0,230,118,0); }
+  }
+  /* 点滅ドット（最近） */
+  .dot-recent {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--wait); flex-shrink: 0;
+    animation: blink 1.4s infinite;
+  }
+  .dot-today {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: #7986cb; flex-shrink: 0; opacity: 0.7;
+  }
+  .dot-offline {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-muted); flex-shrink: 0; opacity: 0.4;
+  }
+
   .action-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   .btn { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; border: 1px solid transparent; transition: all 0.15s; letter-spacing: 0.03em; }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -78,12 +121,10 @@
   .btn-star { background: rgba(255,215,0,0.08); border-color: rgba(255,215,0,0.3); color: var(--star); padding: 5px 10px; }
   .btn-star:hover:not(:disabled) { background: rgba(255,215,0,0.22); border-color: var(--star); }
   .btn-star.active { background: rgba(255,215,0,0.2); border-color: var(--star); color: var(--star); text-shadow: 0 0 8px rgba(255,215,0,0.6); }
-  /* 再入力ボタン */
   .btn-relogin { background: rgba(255,120,0,0.10); border-color: rgba(255,120,0,0.35); color: #ff8c42; }
   .btn-relogin:hover:not(:disabled) { background: rgba(255,120,0,0.22); border-color: #ff8c42; }
   .btn-relogin.active { background: rgba(255,120,0,0.22); border-color: #ff8c42; color: #fff; animation: reloginPulse 1.6s ease infinite; }
   @keyframes reloginPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,120,0,0.5);} 50%{box-shadow:0 0 0 4px rgba(255,120,0,0);} }
-  /* PW変更ボタン */
   .btn-pwreq { background: rgba(206,147,216,0.10); border-color: rgba(206,147,216,0.35); color: var(--pw); }
   .btn-pwreq:hover:not(:disabled) { background: rgba(206,147,216,0.22); border-color: var(--pw); }
   .btn-pwreq.active { background: rgba(206,147,216,0.22); border-color: var(--pw); color: #fff; animation: pwreqPulse 1.6s ease infinite; }
@@ -135,6 +176,8 @@
   .ban-add-row input::placeholder { color: var(--text-muted); opacity: .6; }
   .ban-add-btn { padding: 8px 16px; border-radius: 6px; border: 1px solid rgba(255,68,102,0.4); background: rgba(255,68,102,0.1); color: #ff4466; font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 600; transition: all .15s; }
   .ban-add-btn:hover { background: rgba(255,68,102,0.2); }
+
+  /* ━━━ インポートパネル ━━━ */
   .import-panel { margin: 0 32px 0; background: rgba(92,107,192,0.06); border: 1px solid rgba(92,107,192,0.35); border-radius: 10px; overflow: hidden; }
   .import-panel-header { padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; user-select: none; }
   .import-panel-header:hover { background: rgba(92,107,192,0.08); }
@@ -154,13 +197,7 @@
   .import-preview tr:last-child td { border-bottom: none; }
   .import-progress { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 12px; overflow: hidden; display: none; }
   .import-progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--ok)); border-radius: 2px; width: 0%; transition: width 0.3s; }
-  @media (max-width: 600px) {
-    .table-wrap { margin: 0 16px 24px; }
-    .stats-bar, .toolbar { padding: 16px; }
-    header { padding: 0 16px; }
-    .search-wrap input { width: 100%; }
-  }
-  /* 再入力モーダル */
+
   #reloginOverlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:300; justify-content:center; align-items:center; }
   #reloginOverlay.active { display:flex; }
   #reloginBox { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px 24px; width:min(380px,calc(100vw - 32px)); box-shadow:0 24px 60px rgba(0,0,0,.7); animation:modalIn .18s ease; }
@@ -170,7 +207,6 @@
   .btn-rl-cancel { padding:9px 18px; border-radius:6px; background:var(--surface2); border:1px solid var(--border); color:var(--text-muted); font-size:13px; cursor:pointer; font-family:inherit; }
   .btn-rl-ok { padding:9px 20px; border-radius:6px; border:none; background:rgba(255,120,0,0.18); border:1px solid #ff8c42; color:#ff8c42; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .12s; }
   .btn-rl-ok:hover { background:rgba(255,120,0,0.3); }
-  /* PW変更要求モーダル */
   #pwreqOverlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:300; justify-content:center; align-items:center; }
   #pwreqOverlay.active { display:flex; }
   #pwreqBox { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px 24px; width:min(380px,calc(100vw - 32px)); box-shadow:0 24px 60px rgba(0,0,0,.7); animation:modalIn .18s ease; }
@@ -180,6 +216,12 @@
   .btn-pw-cancel { padding:9px 18px; border-radius:6px; background:var(--surface2); border:1px solid var(--border); color:var(--text-muted); font-size:13px; cursor:pointer; font-family:inherit; }
   .btn-pw-ok { padding:9px 20px; border-radius:6px; background:rgba(206,147,216,0.18); border:1px solid var(--pw); color:var(--pw); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; transition:background .12s; }
   .btn-pw-ok:hover { background:rgba(206,147,216,0.3); }
+  @media (max-width: 600px) {
+    .table-wrap { margin: 0 16px 24px; }
+    .stats-bar, .toolbar { padding: 16px; }
+    header { padding: 0 16px; }
+    .search-wrap input { width: 100%; }
+  }
 </style>
 </head>
 <body>
@@ -192,6 +234,7 @@
       <span class="subtitle">ユーザーアクセス管理システム｜グループ2管理</span>
     </div>
   </div>
+  <span id="liveClock"></span>
 </header>
 
 <div class="stats-bar">
@@ -202,7 +245,7 @@
   <div class="stat-card online"><span class="stat-num" id="countOnline">-</span><span class="stat-label">🟢 オンライン</span></div>
 </div>
 
-<!-- JSONインポートパネル -->
+<!-- JSONインポートパネル（最初から開いた状態） -->
 <div class="import-panel">
   <div class="import-panel-header" onclick="toggleImportPanel()">
     <div class="import-panel-left">
@@ -212,9 +255,9 @@
         <div class="import-panel-desc">JSONファイルを読み込んでFirestoreに自動登録します</div>
       </div>
     </div>
-    <span id="importPanelArrow" style="font-size:16px;color:var(--text-muted);transition:transform .2s;">▼</span>
+    <span id="importPanelArrow" style="font-size:16px;color:var(--text-muted);transition:transform .2s;transform:rotate(180deg);">▼</span>
   </div>
-  <div class="import-panel-body" id="importPanelBody">
+  <div class="import-panel-body open" id="importPanelBody">
     <div class="import-drop-zone" id="importDropZone" onclick="document.getElementById('importFileInput').click()">
       <div style="font-size:32px;">📄</div>
       <p>クリックまたはドラッグ＆ドロップで <strong style="color:var(--accent2);">kanri.json</strong> を選択</p>
@@ -293,7 +336,13 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   <div class="search-wrap">
     <input type="text" id="searchInput" placeholder="名前で絞り込み...">
   </div>
-  <button class="refresh-btn" id="refreshBtn">🔄 更新</button>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <!-- オンライン更新インジケーター -->
+    <span id="presenceRefreshLabel" style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:5px;">
+      <span class="dot-online" style="animation:none;opacity:0.5;"></span>次回更新: <span id="presenceCountdown">30</span>秒後
+    </span>
+    <button class="refresh-btn" id="refreshBtn">🔄 更新</button>
+  </div>
 </div>
 
 <!-- メインユーザーテーブル -->
@@ -427,6 +476,30 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   let pendingDeleteId = null;
   let confirmCallback = null;
 
+  // ━━━ リアルタイムクロック ━━━
+  function updateClock() {
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    document.getElementById('liveClock').textContent =
+      `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} `+
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // ━━━ プレゼンス自動リフレッシュ（30秒ごとにオンライン表示を再計算） ━━━
+  let presenceCountdownVal = 30;
+  const presenceCountdownEl = document.getElementById('presenceCountdown');
+  setInterval(() => {
+    presenceCountdownVal--;
+    if (presenceCountdownVal <= 0) {
+      presenceCountdownVal = 30;
+      if (allUsers.length) renderTable(allUsers);
+    }
+    presenceCountdownEl.textContent = presenceCountdownVal;
+  }, 1000);
+
+  // ━━━ トースト ━━━
   function showToast(msg, duration = 3000) {
     toast.textContent = msg;
     toast.classList.add("show");
@@ -462,28 +535,63 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     }
   });
 
-  function presenceBadge(lastSeen) {
-    if (!lastSeen) return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
+  // ━━━ オンライン表示（改善版） ━━━
+  // lastSeen から経過時間を計算し、段階的に表示する
+  // ・5分以内   → 🟢 オンライン（パルスアニメ）
+  // ・5〜30分   → 🟡 XX分前（点滅）
+  // ・今日（30分〜）→ 🔵 今日 HH:mm
+  // ・昨日      → ⚫ 昨日 HH:mm
+  // ・それ以前  → ⚫ MM/DD HH:mm
+  // ・未取得    → ⚫ なし
+
+  function getLastSeenMs(lastSeen) {
+    if (!lastSeen) return null;
     const ts = lastSeen.toDate ? lastSeen.toDate().getTime() : new Date(lastSeen).getTime();
-    if (isNaN(ts)) return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
-    const now = Date.now();
-    const diffMs  = now - ts;
+    return isNaN(ts) ? null : ts;
+  }
+
+  function presenceBadge(lastSeen) {
+    const ts = getLastSeenMs(lastSeen);
+    if (ts === null) {
+      return `<span class="presence-offline"><span class="dot-offline"></span>未取得</span>`;
+    }
+    const now    = Date.now();
+    const diffMs = now - ts;
+    const diffSec = Math.floor(diffMs / 1000);
     const diffMin = Math.floor(diffMs / 60000);
     const diffHr  = Math.floor(diffMs / 3600000);
-    if (diffMin < 5) return `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ok);"><span class="online-dot"></span>オンライン</span>`;
+
+    const d = new Date(ts);
+    const pad = n => String(n).padStart(2,'0');
+    const timeStr = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+    if (diffMs < 5 * 60 * 1000) {
+      // 5分以内 → オンライン
+      const secLabel = diffSec < 60 ? `${diffSec}秒前` : `${diffMin}分前`;
+      return `<span class="presence-online" title="最終確認: ${secLabel}"><span class="dot-online"></span>オンライン</span>`;
+    }
+    if (diffMs < 30 * 60 * 1000) {
+      // 5〜30分 → 最近
+      return `<span class="presence-recent" title="最終確認: ${timeStr}"><span class="dot-recent"></span>${diffMin}分前</span>`;
+    }
+    // 今日かどうか
     const todayStart = new Date(); todayStart.setHours(0,0,0,0);
     if (ts >= todayStart.getTime()) {
-      const label = diffHr >= 1 ? `${diffHr}時間前` : `${diffMin}分前`;
-      return `<span style="font-size:11px;color:var(--wait);">🟡 ${label}</span>`;
+      return `<span class="presence-today" title="最終確認: 今日 ${timeStr}"><span class="dot-today"></span>今日 ${timeStr}</span>`;
     }
-    return `<span style="font-size:11px;color:var(--text-muted);">⚫ オフライン</span>`;
+    // 昨日かどうか
+    const yesterdayStart = new Date(todayStart); yesterdayStart.setDate(yesterdayStart.getDate()-1);
+    if (ts >= yesterdayStart.getTime()) {
+      return `<span class="presence-offline" title="最終確認: 昨日 ${timeStr}"><span class="dot-offline"></span>昨日 ${timeStr}</span>`;
+    }
+    // それ以前
+    const dateStr = `${pad(d.getMonth()+1)}/${pad(d.getDate())} ${timeStr}`;
+    return `<span class="presence-offline" title="最終確認: ${dateStr}"><span class="dot-offline"></span>${dateStr}</span>`;
   }
 
   function isOnline(lastSeen) {
-    if (!lastSeen) return false;
-    const ts = lastSeen.toDate ? lastSeen.toDate().getTime() : new Date(lastSeen).getTime();
-    if (isNaN(ts)) return false;
-    return (Date.now() - ts) < 5 * 60 * 1000;
+    const ts = getLastSeenMs(lastSeen);
+    return ts !== null && (Date.now() - ts) < 5 * 60 * 1000;
   }
 
   function getInitial(name) { return name ? name.charAt(0).toUpperCase() : "?"; }
@@ -499,7 +607,8 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     countOk.textContent     = users.filter(u => u.status === "ok").length;
     countWait.textContent   = users.filter(u => u.status === "wait").length;
     countNg.textContent     = users.filter(u => u.status === "ng").length;
-    countOnline.textContent = users.filter(u => isOnline(u.lastSeen)).length;
+    const onlineCount = users.filter(u => isOnline(u.lastSeen)).length;
+    countOnline.textContent = onlineCount;
 
     const q = searchInput.value.trim().toLowerCase();
     const filtered = q
@@ -512,10 +621,10 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     }
 
     tbody.innerHTML = filtered.map(user => {
-      const isAdmin      = !!user.isAdmin;
-      const isSubAdmin   = !!user.isSubAdmin;
-      const online       = isOnline(user.lastSeen);
-      const needsRelogin = !!user.requireRelogin;
+      const isAdmin       = !!user.isAdmin;
+      const isSubAdmin    = !!user.isSubAdmin;
+      const online        = isOnline(user.lastSeen);
+      const needsRelogin  = !!user.requireRelogin;
       const needsPwChange = !!user.requirePwChange;
 
       let rowStyle = '';
@@ -594,7 +703,6 @@ role: admin / subadmin / user　　password は平文のまま保存されます
               ).join('') + '</details>' : ''}
           </div>
         </td>
-        <!-- 再入力ボタン -->
         <td>
           <button
             class="btn btn-relogin ${needsRelogin ? 'active' : ''}"
@@ -602,7 +710,6 @@ role: admin / subadmin / user　　password は平文のまま保存されます
             title="${needsRelogin ? '再入力要求中（クリックで解除）' : 'ログイン再入力を要求'}"
           >${needsRelogin ? '⏳ 要求中' : '🔁 再入力'}</button>
         </td>
-        <!-- PW変更要求ボタン -->
         <td>
           <button
             class="btn btn-pwreq ${needsPwChange ? 'active' : ''}"
@@ -610,7 +717,6 @@ role: admin / subadmin / user　　password は平文のまま保存されます
             title="${needsPwChange ? 'PW変更要求中（クリックで解除）' : 'パスワード変更を要求'}"
           >${needsPwChange ? '⏳ 要求中' : '🔑 PW変更'}</button>
         </td>
-        <!-- 操作 -->
         <td>
           <div class="action-btns">
             <button class="btn btn-ok"
@@ -639,6 +745,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
       onSnapshot(q, (snapshot) => {
         allUsers = snapshot.docs.map(d => ({id:d.id,...d.data()}));
         renderTable(allUsers);
+        presenceCountdownVal = 30; // Firestoreから更新来たらカウントリセット
       }, (e) => {
         tbody.innerHTML = `<tr class="empty-row"><td colspan="11">⚠ データ取得に失敗しました<br><small>${e.message}</small></td></tr>`;
         showToast("エラー: " + e.message, 6000);
@@ -649,29 +756,21 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   }
 
   // ━━━ 再入力ボタン ━━━
-  let reloginTargetId   = null;
-  let reloginTargetName = null;
-  let reloginCurrentVal = false;
+  let reloginTargetId = null, reloginTargetName = null, reloginCurrentVal = false;
 
   window.handleReloginBtn = function(id, name, isActive) {
-    reloginTargetId   = id;
-    reloginTargetName = name;
-    reloginCurrentVal = isActive;
-    const msgEl  = document.getElementById('reloginMsg');
-    const okBtn  = document.getElementById('reloginOkBtn');
+    reloginTargetId = id; reloginTargetName = name; reloginCurrentVal = isActive;
+    const msgEl = document.getElementById('reloginMsg');
+    const okBtn = document.getElementById('reloginOkBtn');
     const overlay = document.getElementById('reloginOverlay');
     if (isActive) {
       msgEl.textContent = `「${name}」への再入力要求を解除します。`;
-      okBtn.textContent = '解除する';
-      okBtn.style.background = 'rgba(0,230,118,0.15)';
-      okBtn.style.borderColor = 'var(--ok)';
-      okBtn.style.color = 'var(--ok)';
+      okBtn.textContent = '解除する'; okBtn.style.background = 'rgba(0,230,118,0.15)';
+      okBtn.style.borderColor = 'var(--ok)'; okBtn.style.color = 'var(--ok)';
     } else {
       msgEl.innerHTML = `「<strong style="color:var(--text)">${name}</strong>」に再ログインを要求します。<br>次回 Ctrl+U を押したときにログイン画面が表示されます。`;
-      okBtn.textContent = '要求する';
-      okBtn.style.background = 'rgba(255,120,0,0.18)';
-      okBtn.style.borderColor = '#ff8c42';
-      okBtn.style.color = '#ff8c42';
+      okBtn.textContent = '要求する'; okBtn.style.background = 'rgba(255,120,0,0.18)';
+      okBtn.style.borderColor = '#ff8c42'; okBtn.style.color = '#ff8c42';
     }
     overlay.classList.add('active');
   };
@@ -683,50 +782,35 @@ role: admin / subadmin / user　　password は平文のまま保存されます
 
   document.getElementById('reloginOkBtn').addEventListener('click', async () => {
     if (!reloginTargetId) return;
-    const id   = reloginTargetId;
-    const name = reloginTargetName;
-    const newVal = !reloginCurrentVal;
+    const id = reloginTargetId, name = reloginTargetName, newVal = !reloginCurrentVal;
     window.closeReloginModal();
     try {
       await updateDoc(doc(db,'users', id), { requireRelogin: newVal });
       const user = allUsers.find(u => u.id === id);
       if (user) user.requireRelogin = newVal;
       renderTable(allUsers);
-      showToast(newVal
-        ? `🔁 「${name}」に再入力を要求しました`
-        : `✅ 「${name}」の再入力要求を解除しました`
-      );
+      showToast(newVal ? `🔁 「${name}」に再入力を要求しました` : `✅ 「${name}」の再入力要求を解除しました`);
     } catch(e) { showToast('エラー: ' + e.message); }
   });
 
-  document.getElementById('reloginOverlay').addEventListener('click', function(e) {
-    if (e.target === this) window.closeReloginModal();
-  });
+  document.getElementById('reloginOverlay').addEventListener('click', function(e) { if (e.target === this) window.closeReloginModal(); });
 
   // ━━━ PW変更要求ボタン ━━━
-  let pwreqTargetId   = null;
-  let pwreqTargetName = null;
-  let pwreqCurrentVal = false;
+  let pwreqTargetId = null, pwreqTargetName = null, pwreqCurrentVal = false;
 
   window.handlePwreqBtn = function(id, name, isActive) {
-    pwreqTargetId   = id;
-    pwreqTargetName = name;
-    pwreqCurrentVal = isActive;
-    const msgEl  = document.getElementById('pwreqMsg');
-    const okBtn  = document.getElementById('pwreqOkBtn');
+    pwreqTargetId = id; pwreqTargetName = name; pwreqCurrentVal = isActive;
+    const msgEl = document.getElementById('pwreqMsg');
+    const okBtn = document.getElementById('pwreqOkBtn');
     const overlay = document.getElementById('pwreqOverlay');
     if (isActive) {
       msgEl.textContent = `「${name}」へのパスワード変更要求を解除します。`;
-      okBtn.textContent = '解除する';
-      okBtn.style.background = 'rgba(0,230,118,0.15)';
-      okBtn.style.borderColor = 'var(--ok)';
-      okBtn.style.color = 'var(--ok)';
+      okBtn.textContent = '解除する'; okBtn.style.background = 'rgba(0,230,118,0.15)';
+      okBtn.style.borderColor = 'var(--ok)'; okBtn.style.color = 'var(--ok)';
     } else {
       msgEl.innerHTML = `「<strong style="color:var(--text)">${name}</strong>」にパスワードの変更を要求します。<br>次回ログイン時または Ctrl+U 時に変更画面が表示されます。`;
-      okBtn.textContent = '要求する';
-      okBtn.style.background = 'rgba(206,147,216,0.18)';
-      okBtn.style.borderColor = 'var(--pw)';
-      okBtn.style.color = 'var(--pw)';
+      okBtn.textContent = '要求する'; okBtn.style.background = 'rgba(206,147,216,0.18)';
+      okBtn.style.borderColor = 'var(--pw)'; okBtn.style.color = 'var(--pw)';
     }
     overlay.classList.add('active');
   };
@@ -738,33 +822,25 @@ role: admin / subadmin / user　　password は平文のまま保存されます
 
   document.getElementById('pwreqOkBtn').addEventListener('click', async () => {
     if (!pwreqTargetId) return;
-    const id   = pwreqTargetId;
-    const name = pwreqTargetName;
-    const newVal = !pwreqCurrentVal;
+    const id = pwreqTargetId, name = pwreqTargetName, newVal = !pwreqCurrentVal;
     window.closePwreqModal();
     try {
       await updateDoc(doc(db,'users', id), { requirePwChange: newVal });
       const user = allUsers.find(u => u.id === id);
       if (user) user.requirePwChange = newVal;
       renderTable(allUsers);
-      showToast(newVal
-        ? `🔑 「${name}」にパスワード変更を要求しました`
-        : `✅ 「${name}」のパスワード変更要求を解除しました`
-      );
+      showToast(newVal ? `🔑 「${name}」にパスワード変更を要求しました` : `✅ 「${name}」のパスワード変更要求を解除しました`);
     } catch(e) { showToast('エラー: ' + e.message); }
   });
 
-  document.getElementById('pwreqOverlay').addEventListener('click', function(e) {
-    if (e.target === this) window.closePwreqModal();
-  });
+  document.getElementById('pwreqOverlay').addEventListener('click', function(e) { if (e.target === this) window.closePwreqModal(); });
 
   // ━━━ グループ・管理者・サブ管 ━━━
   window.setUserGroup = async function(id, name, group) {
     try {
       await updateDoc(doc(db,"users",id), {group});
       const user = allUsers.find(u => u.id === id); if (user) user.group = group;
-      renderTable(allUsers);
-      showToast('✅ 「' + name + '」のグループ: ' + group);
+      renderTable(allUsers); showToast('✅ 「' + name + '」のグループ: ' + group);
     } catch(e) { showToast('エラー: ' + e.message); }
   };
 
@@ -805,8 +881,7 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   };
 
   window.handleDelete = function(id, name) {
-    confirmCallback = null;
-    pendingDeleteId = id;
+    confirmCallback = null; pendingDeleteId = id;
     confirmTitle.textContent = "⚠ ユーザーを削除しますか？";
     confirmMsg.innerHTML = `<strong style="color:var(--text)">${name}</strong> のデータを完全に削除します。`;
     confirmOkBtn.textContent = "削除する";
@@ -817,13 +892,16 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     try {
       await updateDoc(doc(db,"users",id), {nameChangedAt:""});
       const user = allUsers.find(u => u.id === id); if (user) user.nameChangedAt = "";
-      renderTable(allUsers);
-      showToast('🔓 「' + name + '」の表示名変更制限を解除しました');
+      renderTable(allUsers); showToast('🔓 「' + name + '」の表示名変更制限を解除しました');
     } catch(e) { showToast('エラー: ' + e.message); }
   };
 
   searchInput.addEventListener("input", () => renderTable(allUsers));
-  refreshBtn.addEventListener("click", () => { renderTable(allUsers); showToast("🔄 表示を更新しました", 1500); });
+  refreshBtn.addEventListener("click", () => {
+    presenceCountdownVal = 30;
+    renderTable(allUsers);
+    showToast("🔄 表示を更新しました", 1500);
+  });
 
   // ━━━ 一般公開モード ━━━
   const publicToggle = document.getElementById("publicModeToggle");
@@ -898,14 +976,12 @@ role: admin / subadmin / user　　password は平文のまま保存されます
     if (!name) return;
     if (banList.includes(name)) { showToast("既にアク禁済みです"); return; }
     banList.push(name); input.value = '';
-    await saveBanList(); renderBanList();
-    showToast("🚫 「" + name + "」をアク禁しました");
+    await saveBanList(); renderBanList(); showToast("🚫 「" + name + "」をアク禁しました");
   };
 
   window.removeBan = async function(i) {
     const name = banList[i]; banList.splice(i, 1);
-    await saveBanList(); renderBanList();
-    showToast("✅ 「" + name + "」のアク禁を解除しました");
+    await saveBanList(); renderBanList(); showToast("✅ 「" + name + "」のアク禁を解除しました");
   };
 
   window.toggleAllBan = async function() {
@@ -949,10 +1025,10 @@ role: admin / subadmin / user　　password は平文のまま保存されます
   });
 
   window.submitEditUser = async function() {
-    const btn     = document.getElementById('editUserSubmitBtn');
-    const errEl   = document.getElementById('editUserErr');
+    const btn = document.getElementById('editUserSubmitBtn');
+    const errEl = document.getElementById('editUserErr');
     const newUser = document.getElementById('editUsernameInput').value.trim();
-    const newPw   = document.getElementById('editPasswordInput').value;
+    const newPw = document.getElementById('editPasswordInput').value;
     errEl.textContent = '';
     if (!newUser && !newPw) { errEl.textContent = 'ユーザー名かパスワードを入力してください'; return; }
     if (newUser && !/^[a-zA-Z0-9_]+$/.test(newUser)) { errEl.textContent = 'ユーザー名は英数字・_のみ使えます'; return; }
