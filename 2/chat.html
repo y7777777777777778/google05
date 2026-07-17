@@ -193,6 +193,13 @@ body{ font-family:'Figtree',sans-serif; background:var(--bg); color:var(--t1); }
 .mbody{ font-size:13px; color:var(--t2); line-height:1.55; word-break:break-word; }
 .mreply{ font-size:10px; color:var(--t4); border-left:2px solid var(--sep); padding-left:6px; }
 
+.mbody-img{ margin-top:2px; }
+.mbody-img img{
+  max-width:220px; max-height:220px;
+  border-radius:10px; cursor:pointer;
+  display:block; border:.5px solid var(--sep2);
+}
+
 /* 入力フッター */
 #roomFoot{
   flex-shrink:0;
@@ -211,6 +218,22 @@ body{ font-family:'Figtree',sans-serif; background:var(--bg); color:var(--t1); }
 #replyTxt{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 #replyClear{ border:none; background:none; color:var(--t4); cursor:pointer; }
 
+.img-preview-bar{ display:none; margin-bottom:6px; }
+.img-preview-bar.on{ display:block; }
+.img-preview{
+  position:relative; display:inline-block;
+  border-radius:var(--r2); overflow:hidden;
+  border:.5px solid var(--sep2);
+}
+.img-preview img{ display:block; max-height:90px; max-width:140px; }
+.img-preview-remove{
+  position:absolute; top:3px; right:3px;
+  width:20px; height:20px; border-radius:50%;
+  border:none; background:rgba(0,0,0,.6); color:#fff;
+  font-size:11px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+
 .irow{ display:flex; align-items:center; gap:6px; }
 
 .minput{
@@ -228,6 +251,11 @@ body{ font-family:'Figtree',sans-serif; background:var(--bg); color:var(--t1); }
   display:flex; align-items:center; justify-content:center;
   flex-shrink:0;
 }
+
+.img-btn{
+  background:var(--fill2); color:var(--t2);
+}
+.img-btn:hover{ background:var(--fill); }
 
 /* DM */
 #dmPane{ display:none; flex:1; overflow:hidden; }
@@ -310,6 +338,12 @@ body{ font-family:'Figtree',sans-serif; background:var(--bg); color:var(--t1); }
 }
 .mine .dmb{ background:var(--blue); color:#fff; border-radius:var(--r2) var(--r2) 4px var(--r2); }
 .theirs .dmb{ background:var(--bg3); border-radius:var(--r2) var(--r2) var(--r2) 4px; }
+.dmb.has-image{ padding:5px; background:rgba(120,120,128,.18); }
+.dmb img{
+  max-width:200px; max-height:200px;
+  border-radius:8px; cursor:pointer; display:block;
+}
+.dmb img + div, .dmb div + img{ margin-top:5px; }
 .dmts{ font-size:9px; color:var(--t4); }
 
 .empty-hint{
@@ -357,6 +391,21 @@ body{ font-family:'Figtree',sans-serif; background:var(--bg); color:var(--t1); }
   cursor:pointer;
 }
 #namePromptBtn:hover{ background:#1a8fff; }
+
+/* ライトボックス（画像拡大表示） */
+#lightbox{
+  position:fixed; inset:0; z-index:99999;
+  background:rgba(0,0,0,.92);
+  display:none; align-items:center; justify-content:center;
+  padding:24px;
+  cursor:zoom-out;
+}
+#lightbox.on{ display:flex; }
+#lightbox img{
+  max-width:100%; max-height:100%;
+  border-radius:10px;
+  box-shadow:0 10px 40px rgba(0,0,0,.5);
+}
 
 @media(max-width:720px){
   #dmList{ width:100%; }
@@ -416,7 +465,15 @@ body{ font-family:'Figtree',sans-serif; background:var(--bg); color:var(--t1); }
           <span id="replyTxt"></span>
           <button id="replyClear" onclick="clearReply()">✕</button>
         </div>
+        <div id="imgPreviewBar" class="img-preview-bar"></div>
         <div class="irow">
+          <input type="file" id="roomImgInput" accept="image/*" style="display:none" onchange="handleImageFile(event,'room')">
+          <button class="sbtn img-btn" onclick="document.getElementById('roomImgInput').click()" title="画像を送信">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </button>
           <input class="minput" id="msgInput" placeholder="メッセージを入力..." maxlength="200">
           <button class="sbtn" onclick="sendMsg()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round">
@@ -444,7 +501,15 @@ body{ font-family:'Figtree',sans-serif; background:var(--bg); color:var(--t1); }
         </div>
         <div id="dmMsgList"></div>
         <div id="roomFoot" style="border-top:.5px solid var(--sep2);padding:8px 10px;background:var(--glass);flex-shrink:0;">
+          <div id="dmImgPreviewBar" class="img-preview-bar"></div>
           <div class="irow">
+            <input type="file" id="dmImgInput" accept="image/*" style="display:none" onchange="handleImageFile(event,'dm')">
+            <button class="sbtn img-btn" onclick="document.getElementById('dmImgInput').click()" title="画像を送信">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </button>
             <input class="minput" id="dmInput" placeholder="DMを送信..." maxlength="200">
             <button class="sbtn" onclick="sendDm()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round">
@@ -470,6 +535,11 @@ body{ font-family:'Figtree',sans-serif; background:var(--bg); color:var(--t1); }
     <div id="namePromptErr"></div>
     <button id="namePromptBtn" onclick="submitPromptName()">はじめる</button>
   </div>
+</div>
+
+<!-- 画像拡大ライトボックス -->
+<div id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="">
 </div>
 
 <script>
@@ -574,6 +644,102 @@ function clearReply(){
   document.getElementById('replyBar').classList.remove('on');
 }
 
+/* ━━━ 画像処理 ━━━ */
+let pendingImageRoom = null;
+let pendingImageDm = null;
+
+function compressImage(file, maxDim, quality){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w > h){ if(w > maxDim){ h = Math.round(h*maxDim/w); w = maxDim; } }
+        else { if(h > maxDim){ w = Math.round(w*maxDim/h); h = maxDim; } }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = ()=> reject(new Error('画像を読み込めませんでした'));
+      img.src = e.target.result;
+    };
+    reader.onerror = ()=> reject(new Error('ファイルを読み込めませんでした'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function getCompressedDataUrl(file){
+  let quality = 0.75, maxDim = 1000;
+  let dataUrl = await compressImage(file, maxDim, quality);
+  let tries = 0;
+  // Firestoreの1ドキュメント上限(約1MB)に収まるよう、大きすぎる場合は段階的に縮小
+  while(dataUrl.length > 700000 && tries < 6){
+    quality = Math.max(0.3, quality - 0.15);
+    maxDim = Math.max(300, maxDim - 200);
+    dataUrl = await compressImage(file, maxDim, quality);
+    tries++;
+  }
+  return dataUrl;
+}
+
+function renderImgPreview(barId, dataUrl, target){
+  const bar = document.getElementById(barId);
+  bar.innerHTML = `
+    <div class="img-preview">
+      <img src="${dataUrl}">
+      <button class="img-preview-remove" onclick="removePendingImage('${target}')">✕</button>
+    </div>
+  `;
+  bar.classList.add('on');
+}
+
+window.handleImageFile = async function(e, target){
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  if(!file.type || !file.type.startsWith('image/')){
+    alert('画像ファイルを選択してください');
+    return;
+  }
+  try{
+    const dataUrl = await getCompressedDataUrl(file);
+    if(target === 'room'){
+      pendingImageRoom = dataUrl;
+      renderImgPreview('imgPreviewBar', dataUrl, 'room');
+    } else {
+      pendingImageDm = dataUrl;
+      renderImgPreview('dmImgPreviewBar', dataUrl, 'dm');
+    }
+  }catch(err){
+    console.error(err);
+    alert('画像の処理に失敗しました');
+  }
+};
+
+window.removePendingImage = function(target){
+  if(target === 'room'){
+    pendingImageRoom = null;
+    const bar = document.getElementById('imgPreviewBar');
+    bar.innerHTML = ''; bar.classList.remove('on');
+  } else {
+    pendingImageDm = null;
+    const bar = document.getElementById('dmImgPreviewBar');
+    bar.innerHTML = ''; bar.classList.remove('on');
+  }
+};
+
+window.openLightboxFromImg = function(imgEl){
+  document.getElementById('lightboxImg').src = imgEl.src;
+  document.getElementById('lightbox').classList.add('on');
+};
+window.closeLightbox = function(){
+  document.getElementById('lightbox').classList.remove('on');
+  document.getElementById('lightboxImg').src = '';
+};
+
 /* ━━━ その他 ━━━ */
 function closeChat(){ window.close(); }
 
@@ -589,7 +755,7 @@ function openFullscreen(){
   }
 }
 
-document.addEventListener('keydown', e=>{ if(e.key==='Escape'){} });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeLightbox(); } });
 </script>
 
 <script type="module">
@@ -713,12 +879,13 @@ function renderRoomMsgs(msgs){
     return `
       <div class="mrow${isAdmin?' admin-row':''}">
         <div class="mmeta">
-          <span class="${cls}" onclick="setReply('${esc(m.name)}','${esc(m.text)}')">${esc(m.name)}</span>
+          <span class="${cls}" onclick="setReply('${esc(m.name)}','${esc(m.text||'')}')">${esc(m.name)}</span>
           <span class="mcode">#${esc(m.userCode||'----')}</span>
           <span class="mts">${fmt(m.ts)}</span>
         </div>
         ${m.replyTo ? `<div class="mreply">↩ ${esc(m.replyTo.name)}：${esc(m.replyTo.text)}</div>` : ''}
-        <div class="mbody">${esc(m.text)}</div>
+        ${m.text ? `<div class="mbody">${esc(m.text)}</div>` : ''}
+        ${m.image ? `<div class="mbody-img"><img src="${m.image}" onclick="openLightboxFromImg(this)"></div>` : ''}
       </div>
     `;
   }).join('');
@@ -730,8 +897,8 @@ window.sendMsg = async function(){
   if(!name){ alert('先に名前を入力してください'); return; }
   const el = document.getElementById('msgInput');
   const text = el.value.trim();
-  if(!text) return;
-  if(isNG(text)) return;
+  if(!text && !pendingImageRoom) return;
+  if(text && isNG(text)) return;
   el.value = '';
   const data = {
     name,
@@ -740,11 +907,18 @@ window.sendMsg = async function(){
     roomId: curRoom,
     ts: serverTimestamp()
   };
+  if(pendingImageRoom){ data.image = pendingImageRoom; }
   if(window._reply){
     data.replyTo = { name: window._reply.name, text: window._reply.text };
     clearReply();
   }
-  try{ await addDoc(collection(db,'chat_2'), data); }catch(e){ console.error(e); }
+  try{
+    await addDoc(collection(db,'chat_2'), data);
+    removePendingImage('room');
+  }catch(e){
+    console.error(e);
+    alert('送信に失敗しました（画像サイズが大きすぎる可能性があります）');
+  }
 };
 
 document.getElementById('msgInput').addEventListener('keydown', e=>{
@@ -824,7 +998,10 @@ function renderDmMsgs(msgs){
     const mine = m.from === name;
     return `
       <div class="dmbrow ${mine?'mine':'theirs'}">
-        <div class="dmb">${esc(m.text)}</div>
+        <div class="dmb${m.image?' has-image':''}">
+          ${m.text ? `<div>${esc(m.text)}</div>` : ''}
+          ${m.image ? `<img src="${m.image}" onclick="openLightboxFromImg(this)">` : ''}
+        </div>
         <span class="dmts">${fmt(m.ts)}</span>
       </div>
     `;
@@ -838,18 +1015,24 @@ window.sendDm = async function(){
   if(!name){ alert('先に名前を入力してください'); return; }
   const el = document.getElementById('dmInput');
   const text = el.value.trim();
-  if(!text) return;
-  if(isNG(text)) return;
+  if(!text && !pendingImageDm) return;
+  if(text && isNG(text)) return;
   el.value = '';
+  const data = {
+    from: name,
+    to: dmTarget.name,
+    dmKey: dmKey(name, dmTarget.name),
+    text,
+    ts: serverTimestamp()
+  };
+  if(pendingImageDm){ data.image = pendingImageDm; }
   try{
-    await addDoc(collection(db,'dm_2'), {
-      from: name,
-      to: dmTarget.name,
-      dmKey: dmKey(name, dmTarget.name),
-      text,
-      ts: serverTimestamp()
-    });
-  }catch(e){ console.error(e); }
+    await addDoc(collection(db,'dm_2'), data);
+    removePendingImage('dm');
+  }catch(e){
+    console.error(e);
+    alert('送信に失敗しました（画像サイズが大きすぎる可能性があります）');
+  }
 };
 
 document.getElementById('dmInput').addEventListener('keydown', e=>{
