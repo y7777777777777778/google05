@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube - Google 検索</title>
+    <style>
+        :root {
+            --blue: #1a0dab;
+            --visited: #681da8;
+            --black: #202124;
+            --grey: #4d5156;
+            --light-grey: #70757a;
+            --border: #dfe1e5;
+            --bg-hover: #f8f9fa;
+            --bg-active: #e8f0fe;
+            --focus-blue: #1a73e8;
+            --card-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+        }
+
+        body {
+            font-family: arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--black);
+            background-color: #fff;
+            font-size: 14px;
+            overflow-y: scroll;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--blue);
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        svg {
+            fill: currentColor;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 100;
+            padding: 24px 0 0 0;
+            min-width: 900px;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            margin-bottom: 24px;
+        }
+
+        .logo-container {
+            width: 120px;
+            display: flex;
+            justify-content: flex-start;
+            margin-right: 30px;
+        }
+
+        .logo {
+            width: 92px;
+            height: 30px;
+            cursor: pointer;
+        }
+
+        .search-form {
+            display: flex;
+            flex-grow: 1;
+            max-width: 692px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 46px;
+            background: #fff;
+            border: 1px solid var(--border);
+            box-shadow: none;
+            border-radius: 24px;
+            padding: 0 14px 0 14px;
+            transition: box-shadow 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .search-box:hover, .search-box:focus-within {
+            box-shadow: var(--card-shadow);
+            border-color: rgba(223,225,229,0);
+        }
+
+        .search-input {
+            flex: 1;
+            height: 34px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            padding: 0 10px;
+            color: var(--black);
+            background-color: transparent;
+        }
+
+        .search-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-right: 8px;
+        }
+
+        .icon-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .icon-clear { color: #70757a; border-right: 1px solid var(--border); padding-right: 12px; width: auto; height: 28px;}
+        .icon-btn svg { width: 24px; height: 24px; }
+        .icon-search-btn svg { fill: #4285f4; }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-left: auto;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: var(--grey);
+        }
+
+        .header-icon:hover { background-color: rgba(60,64,67,0.08); }
+        .header-icon svg { width: 24px; height: 24px; }
+        .profile-img { width: 32px; height: 32px; border-radius: 50%; background-color: #1a73e8; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: bold; }
+
+        /* --- ナビゲーション --- */
+        .nav-container {
+            border-bottom: 1px solid #ebebeb;
+            padding-left: 166px;
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 20px;
+            height: 42px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 2px 0 2px;
+            color: var(--grey);
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-item svg { width: 16px; height: 16px; fill: var(--grey); }
+        .nav-item.active { color: var(--focus-blue); font-weight: 500; }
+        .nav-item.active svg { fill: var(--focus-blue); }
+        .nav-item.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 3px; background-color: var(--focus-blue); border-top-left-radius: 3px; border-top-right-radius: 3px; }
+        .nav-item:hover:not(.active) { color: var(--black); }
+
+        /* --- メインレイアウト --- */
+        #main-container {
+            display: flex;
+            padding: 16px 0 0 166px;
+            min-height: 100vh;
+        }
+
+        #center_col {
+            width: 652px;
+            padding-right: 60px;
+            padding-bottom: 40px;
+        }
+
+        #rhs {
+            width: 369px;
+        }
+
+        /* --- 検索結果コンポーネント --- */
+        .g-card { margin-bottom: 30px; }
+        
+        .site-info { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; text-decoration: none; }
+        .site-info:hover .site-name { text-decoration: underline; }
+        .site-info:hover { text-decoration: none; }
+        
+        .favicon-wrapper { width: 28px; height: 28px; border-radius: 50%; background: #f1f3f4; display: flex; justify-content: center; align-items: center; border: 1px solid #ededed;}
+        .favicon-wrapper img { width: 18px; height: 18px; }
+        
+        .breadcrumb-container { display: flex; flex-direction: column; }
+        .site-name { font-size: 14px; color: var(--black); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .breadcrumb-url { font-size: 12px; color: var(--grey); display: flex; align-items: center; gap: 4px;}
+        .breadcrumb-url svg { width: 12px; height: 12px; fill: var(--grey); }
+
+        .result-title h3 { font-size: 20px; font-weight: 400; line-height: 1.3; margin: 4px 0 0 0; color: var(--blue); }
+        .result-title:visited h3 { color: var(--visited); }
+        
+        .snippet { color: var(--grey); font-size: 14px; line-height: 1.58; margin-top: 6px; word-wrap: break-word; }
+        .snippet em { font-weight: bold; font-style: normal; color: var(--black); }
+
+        /* サイトリンク */
+        .sitelinks-container { margin-top: 16px; padding-left: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+        .sitelink-title { font-size: 16px; color: var(--blue); margin: 0 0 4px 0; font-weight: 400; }
+        .sitelink-snippet { font-size: 14px; color: var(--grey); line-height: 1.4; }
+
+        /* --- People Also Ask (他の人はこちらも質問) --- */
+        .paa-box { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 30px 0; padding-top: 12px;}
+        .section-title { font-size: 22px; color: var(--black); font-weight: 400; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;}
+        .paa-item { border-top: 1px solid var(--border); padding: 14px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 16px; color: var(--black); }
+        .paa-item:first-child { border-top: none; }
+        .paa-icon { width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; }
+        .paa-icon svg { width: 16px; height: 16px; fill: var(--light-grey); transition: transform 0.2s;}
+
+        /* --- 動画カルーセル --- */
+        .video-section { margin-bottom: 40px; }
+        .carousel-container { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .carousel-container::-webkit-scrollbar { display: none; }
+        .video-card { min-width: 216px; width: 216px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer;}
+        .video-card:hover { box-shadow: var(--card-shadow); }
+        .thumb-box { position: relative; width: 100%; height: 121px; background-color: #202124; background-image: url('https://ssl.gstatic.com/youtube/img/branding/favicon/favicon_144x144.png'); background-size: cover; background-position: center;}
+        .duration-badge { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8); color: #fff; font-size: 12px; font-weight: 500; padding: 2px 6px; border-radius: 4px; }
+        .play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 36px; height: 36px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; justify-content: center; align-items: center;}
+        .play-icon svg { width: 20px; height: 20px; fill: #fff; margin-left: 2px;}
+        .video-details { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; }
+        .v-title { font-size: 16px; color: var(--blue); line-height: 1.3; max-height: 42px; overflow: hidden; margin-bottom: 6px; font-weight: 400;}
+        .v-meta { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--grey); margin-top: auto;}
+        .v-platform-icon { width: 16px; height: 16px; border-radius: 50%; background: #f1f3f4; display: flex; justify-content: center; align-items: center; }
+        .v-platform-icon svg { width: 10px; height: 10px; fill: #ff0000; }
+        .v-channel { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* --- 関連検索 --- */
+        .related-searches { margin: 40px 0; }
+        .related-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .related-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: #f1f3f4; border-radius: 100px; cursor: pointer; text-decoration: none; color: var(--black); font-size: 16px;}
+        .related-item:hover { background: #e8eaed; text-decoration: none; }
+        .related-item svg { width: 20px; height: 20px; fill: var(--grey); }
+
+        /* --- ページネーション --- */
+        .pagination { display: flex; flex-direction: column; align-items: center; margin: 40px 0 60px 0; }
+        .g-logo-nav { display: flex; align-items: flex-end; margin-bottom: 10px;}
+        .g-letter { font-size: 40px; font-weight: bold; font-family: 'Google Sans', arial, sans-serif; line-height: 1;}
+        .g-blue { color: #4285f4; }
+        .g-red { color: #ea4335; }
+        .g-yellow { color: #fbbc05; }
+        .g-green { color: #34a853; }
+        .page-numbers { display: flex; gap: 12px; }
+        .page-num { font-size: 14px; color: var(--blue); text-decoration: none; padding: 0 4px;}
+        .page-num.active { color: var(--black); font-weight: bold; cursor: default; }
+        .page-num:hover:not(.active) { text-decoration: underline; }
+
+        /* --- ナレッジパネル --- */
+        .kp-card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .kp-header-imgs { display: flex; gap: 2px; height: 160px; background: #fff;}
+        .kp-img-main { flex: 2; background: #f8f9fa url('https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png') center no-repeat; border-right: 2px solid #fff;}
+        .kp-img-sub { flex: 1; background: #f1f3f4; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--grey); cursor: pointer;}
+        .kp-img-sub:hover { background: #e8eaed; }
+        
+        .kp-content { padding: 20px; }
+        .kp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;}
+        .kp-title-wrapper h2 { font-size: 32px; font-weight: 400; margin: 0 0 4px 0; font-family: 'Google Sans', arial, sans-serif;}
+        .kp-subtitle { font-size: 14px; color: var(--light-grey); }
+        
+        .kp-actions { display: flex; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px;}
+        .kp-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; color: var(--black); font-size: 12px; font-family: 'Google Sans', arial, sans-serif; font-weight: 500;}
+        .kp-btn-icon { width: 36px; height: 36px; border-radius: 100px; border: 1px solid var(--border); display: flex; justify-content: center; align-items: center; transition: background 0.2s;}
+        .kp-btn:hover .kp-btn-icon { background: var(--bg-hover); }
+        .kp-btn-icon svg { width: 18px; height: 18px; fill: var(--blue); }
+
+        .kp-desc { font-size: 14px; line-height: 1.58; color: var(--black); margin-bottom: 16px;}
+        .kp-desc a { color: var(--blue); }
+        
+        .kp-fact { font-size: 14px; color: var(--black); margin-bottom: 10px; line-height: 1.4;}
+        .kp-fact span.lbl { font-weight: bold; color: var(--black); }
+        .kp-fact a { color: var(--blue); }
+
+        .kp-profiles { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px;}
+        .kp-profiles-title { font-size: 16px; margin-bottom: 12px; color: var(--black);}
+        .profiles-list { display: flex; gap: 16px; }
+        .profile-item { display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: var(--black); font-size: 12px;}
+        .profile-item:hover { text-decoration: underline; }
+        .p-icon { width: 32px; height: 32px; background: #f1f3f4; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+        .p-icon svg { width: 20px; height: 20px; fill: var(--grey); }
+
+        /* --- フッター --- */
+        footer { background: #f2f2f2; color: #70757a; font-size: 14px; display: flex; flex-direction: column; }
+        .footer-loc { padding: 14px 30px; border-bottom: 1px solid #dadce0; display: flex; align-items: center; gap: 8px;}
+        .footer-loc span { color: var(--black); font-weight: 500; }
+        .footer-loc::before { content: ''; display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #70757a; }
+        
+        .footer-links { padding: 14px 30px; display: flex; justify-content: space-between; }
+        .footer-links-left, .footer-links-right { display: flex; gap: 24px; }
+        .footer-links a { color: #70757a; text-decoration: none; }
+        .footer-links a:hover { color: var(--black); text-decoration: none; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-top">
+        <div class="logo-container">
+            <a href="#">
+                <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google" class="logo">
+            </a>
+        </div>
+        
+        <div class="search-form">
+            <div class="search-box">
+                <input type="text" class="search-input" value="YouTube" spellcheck="false" autocomplete="off">
+                <div class="search-actions">
+                    <!-- Clear Icon -->
+                    <div class="icon-btn icon-clear" aria-label="クリア">
+                        <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    </div>
+                    <!-- Mic Icon -->
+                    <div class="icon-btn" aria-label="音声検索">
+                        <svg focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#4285f4" d="m12 15c1.66 0 3-1.31 3-2.97v-7.02c0-1.66-1.34-3.01-3-3.01s-3 1.34-3 3.01v7.02c0 1.66 1.34 2.97 3 2.97z"/><path fill="#34a853" d="m11 18.08h2v3.92h-2z"/><path fill="#fbbc05" d="m7.05 16.87c-1.27-1.33-2.05-2.8-2.05-4.67h2c0 1.45.56 2.42 1.47 3.38v.32l-1.15 1.18z"/><path fill="#ea4335" d="m12 16.93a4.97 5.25 0 0 1 -3.54 -1.55l-1.41 1.49c1.26 1.34 3.02 2.13 4.95 2.13 3.87 0 6.99-2.92 6.99-7h-1.99c0 2.92-2.24 4.93-5 4.93z"/></svg>
+                    </div>
+                    <!-- Lens Icon -->
+                    <div class="icon-btn" aria-label="画像検索">
+                        <svg focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#ea4335" d="M5.5 6A2.5 2.5 0 0 0 3 8.5v3h2v-3a.5.5 0 0 1 .5-.5h3v-2h-3z"/><path fill="#4285f4" d="M3 12.5v3A2.5 2.5 0 0 0 5.5 18h3v-2h-3a.5.5 0 0 1-.5-.5v-3h-2z"/><path fill="#fbbc05" d="M18.5 18h-3v2h3A2.5 2.5 0 0 0 21 17.5v-3h-2v3a.5.5 0 0 1-.5.5z"/><path fill="#34a853" d="M21 8.5v-3A2.5 2.5 0 0 0 18.5 3h-3v2h3a.5.5 0 0 1 .5.5v3h2z"/><path fill="#4285f4" d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path fill="#34a853" d="M15.5 16.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>
+                    </div>
+                    <!-- Search Icon -->
+                    <div class="icon-btn icon-search-btn" aria-label="検索">
+                        <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <!-- Settings Icon -->
+            <div class="header-icon" title="クイック設定">
+                <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.85 22.25h-3.7c-.74 0-1.36-.54-1.45-1.27l-.27-1.89c-.27-.14-.53-.29-.79-.46l-1.8.72c-.7.26-1.47-.03-1.81-.65L2.2 15.53c-.35-.66-.2-1.44.36-1.88l1.53-1.19c-.01-.15-.02-.3-.02-.46 0-.15.01-.31.02-.46l-1.52-1.19c-.59-.45-.74-1.26-.37-1.88l1.85-3.19c.34-.62 1.11-.9 1.79-.63l1.81.73c.26-.17.52-.32.78-.46l.27-1.91c.09-.7.71-1.25 1.44-1.25h3.7c.74 0 1.36.54 1.45 1.27l.27 1.89c.27.14.53.29.79.46l1.8-.72c.71-.26 1.48.03 1.82.65l1.84 3.18c.36.66.2 1.44-.36 1.88l-1.52 1.19c.01.15.02.3.02.46s-.01.31-.02.46l1.52 1.19c.56.45.72 1.23.37 1.86l-1.86 3.22c-.34.62-1.11.9-1.8.63l-1.8-.72c-.26.17-.52.32-.78.46l-.27 1.91c-.1.68-.72 1.22-1.46 1.22zm-3.23-2h2.76l.37-2.55.53-.22c.44-.18.88-.44 1.34-.78l.45-.34 2.38.96 1.38-2.4-2.03-1.58.07-.56c.03-.26.06-.51.06-.78s-.03-.53-.06-.78l-.07-.56 2.03-1.58-1.39-2.4-2.39.96-.45-.35c-.46-.34-.89-.6-1.33-.77l-.53-.22-.38-2.55h-2.76l-.37 2.55-.53.21c-.44.19-.88.44-1.34.79l-.45.33-2.38-.95-1.39 2.39 2.03 1.58-.07.56a7.17 7.17 0 0 0-.06.79c0 .26.02.53.06.78l.07.56-2.03 1.58 1.38 2.4 2.39-.96.45.35c.46.34.89.6 1.33.77l.53.22.38 2.55z"/><circle cx="12" cy="12" r="3.5"/></svg>
+            </div>
+            <!-- Google Apps Icon -->
+            <div class="header-icon" title="Google アプリ">
+                <svg focusable="false" viewBox="0 0 24 24"><path d="M6,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM16,6c0,1.1 0.9,2 2,2s2,-0.9 2,-2 -0.9,-2 -2,-2 -2,0.9 -2,2zM12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2z"/></svg>
+            </div>
+            <!-- Profile -->
+            <div class="profile-img" title="Google アカウント">T</div>
+        </div>
+    </div>
+
+    <div class="nav-container">
+        <div class="nav-items">
+            <div class="nav-item active">
+                <svg focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                すべて
+            </div>
+            <div class="nav-item">
+                <svg focusable="false" viewBox="0 0 24 24"><path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                動画
+            </div>
+            <div class="nav-item">
+                <svg focusable="false" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                画像
+            </div>
+            <div class="nav-item">
+                <svg focusable="false" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h8v2H6zm0 4h12v2H6zm0-8h12v2H6z"/></svg>
+                ニュース
+            </div>
+            <div class="nav-item">
+                <svg focusable="false" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                地図
+            </div>
+            <div class="nav-item">
+                <svg focusable="false" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                もっと見る
+            </div>
+        </div>
+    </div>
+</header>
+
+<div id="main-container">
+    <div id="center_col">
+        
+        <!-- Result 1: YouTube Home -->
+        <div class="g-card">
+            <a href="https://www.youtube.com/" class="site-info">
+                <div class="favicon-wrapper">
+                    <img src="https://www.google.com/s2/favicons?sz=64&domain_url=youtube.com" alt="YouTube">
+                </div>
+                <div class="breadcrumb-container">
+                    <span class="site-name">YouTube</span>
+                    <span class="breadcrumb-url">https://www.youtube.com <svg viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" transform="rotate(180 12 12)"/></svg></span>
+                </div>
+            </a>
+            <a href="https://www.youtube.com/" class="result-title">
+                <h3>YouTube: Home</h3>
+            </a>
+            <div class="snippet">
+                Enjoy the videos and music you love, upload original content, and share it all with friends, family, and the world on <em>YouTube</em>.
+            </div>
+            
+            <!-- Sitelinks -->
+            <div class="sitelinks-container">
+                <div>
+                    <a href="https://www.youtube.com/feed/trending" class="result-title"><h4 class="sitelink-title">Trending</h4></a>
+                    <div class="sitelink-snippet">The pulse of what's trending on YouTube. Check out the latest...</div>
+                </div>
+                <div>
+                    <a href="https://music.youtube.com/" class="result-title"><h4 class="sitelink-title">YouTube Music</h4></a>
+                    <div class="sitelink-snippet">A new music service with official albums, singles, videos, remixes...</div>
+                </div>
+                <div>
+                    <a href="https://studio.youtube.com/" class="result-title"><h4 class="sitelink-title">YouTube Studio</h4></a>
+                    <div class="sitelink-snippet">Manage your channel, analyze your performance, and grow your...</div>
+                </div>
+                <div>
+                    <a href="https://www.youtube.com/premium" class="result-title"><h4 class="sitelink-title">YouTube Premium</h4></a>
+                    <div class="sitelink-snippet">YouTube and YouTube Music ad-free, offline, and in the background.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result 2: App Store -->
+        <div class="g-card">
+            <a href="https://apps.apple.com/jp/app/youtube/id544007664" class="site-info">
+                <div class="favicon-wrapper">
+                    <img src="https://www.google.com/s2/favicons?sz=64&domain_url=apple.com" alt="Apple">
+                </div>
+                <div class="breadcrumb-container">
+                    <span class="site-name">App Store</span>
+                    <span class="breadcrumb-url">https://apps.apple.com › app › youtube <svg viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" transform="rotate(180 12 12)"/></svg></span>
+                </div>
+            </a>
+            <a href="https://apps.apple.com/jp/app/youtube/id544007664" class="result-title">
+                <h3>「YouTube」をApp Storeで</h3>
+            </a>
+            <div class="snippet">
+                iPhone、iPad、iPod touchで「<em>YouTube</em>」のレビューを読み、カスタマー評価を比較し、スクリーンショットを確認し、詳細情報を入手します。
+            </div>
+        </div>
+
+        <!-- People Also Ask -->
+        <div class="paa-box">
+            <h3 class="section-title">他の人はこちらも質問</h3>
+            <div class="paa-item">
+                <span>YouTubeで一番再生されている動画は何ですか？</span>
+                <div class="paa-icon"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></div>
+            </div>
+            <div class="paa-item">
+                <span>YouTubeは無料で見れますか？</span>
+                <div class="paa-icon"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></div>
+            </div>
+            <div class="paa-item">
+                <span>YouTubeの収益化の条件は？</span>
+                <div class="paa-icon"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></div>
+            </div>
+            <div class="paa-item">
+                <span>YouTube Premiumの月額料金はいくらですか？</span>
+                <div class="paa-icon"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></div>
+            </div>
+        </div>
+
+        <!-- Video Carousel -->
+        <div class="video-section">
+            <h3 class="section-title">動画</h3>
+            <div class="carousel-container">
+                <!-- Video 1 -->
+                <div class="video-card">
+                    <div class="thumb-box" style="background-image: url('https://i.ytimg.com/vi/aqz-KE-bpKQ/mqdefault.jpg');">
+                        <div class="play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                        <span class="duration-badge">3:42</span>
+                    </div>
+                    <div class="video-details">
+                        <div class="v-title">YouTube Rewind 2019: For the Record | #YouTubeRewind</div>
+                        <div class="v-meta">
+                            <div class="v-platform-icon"><svg viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg></div>
+                            <div class="v-channel">YouTube · 4年前</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Video 2 -->
+                <div class="video-card">
+                    <div class="thumb-box" style="background-image: url('https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg');">
+                        <div class="play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                        <span class="duration-badge">4:23</span>
+                    </div>
+                    <div class="video-details">
+                        <div class="v-title">Luis Fonsi - Despacito ft. Daddy Yankee</div>
+                        <div class="v-meta">
+                            <div class="v-platform-icon"><svg viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg></div>
+                            <div class="v-channel">Luis Fonsi · 7年前</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Video 3 -->
+                <div class="video-card">
+                    <div class="thumb-box" style="background-image: url('https://i.ytimg.com/vi/jNQXAC9IVRw/mqdefault.jpg');">
+                        <div class="play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                        <span class="duration-badge">0:19</span>
+                    </div>
+                    <div class="video-details">
+                        <div class="v-title">Me at the zoo</div>
+                        <div class="v-meta">
+                            <div class="v-platform-icon"><svg viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385-8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg></div>
+                            <div class="v-channel">jawed · 18年前</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result 3: Wikipedia -->
+        <div class="g-card">
+            <a href="https://ja.wikipedia.org/wiki/YouTube" class="site-info">
+                <div class="favicon-wrapper">
+                    <img src="https://www.google.com/s2/favicons?sz=64&domain_url=wikipedia.org" alt="Wikipedia">
+                </div>
+                <div class="breadcrumb-container">
+                    <span class="site-name">Wikipedia</span>
+                    <span class="breadcrumb-url">https://ja.wikipedia.org › wiki › YouTube <svg viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" transform="rotate(180 12 12)"/></svg></span>
+                </div>
+            </a>
+            <a href="https://ja.wikipedia.org/wiki/YouTube" class="result-title">
+                <h3>YouTube - Wikipedia</h3>
+            </a>
+            <div class="snippet">
+                <em>YouTube</em>（ユーチューブ）は、アメリカ合衆国カリフォルニア州サンブルーノに本社を置くオンライン動画共有プラットフォームである。2005年2月14日にスティーブ・...
+            </div>
+        </div>
+
+        <!-- Result 4: Google Play -->
+        <div class="g-card">
+            <a href="https://play.google.com/store/apps/details?id=com.google.android.youtube&hl=ja&gl=US" class="site-info">
+                <div class="favicon-wrapper">
+                    <img src="https://www.google.com/s2/favicons?sz=64&domain_url=play.google.com" alt="Google Play">
+                </div>
+                <div class="breadcrumb-container">
+                    <span class="site-name">Google Play のアプリ</span>
+                    <span class="breadcrumb-url">https://play.google.com › store › apps › details <svg viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" transform="rotate(180 12 12)"/></svg></span>
+                </div>
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=com.google.android.youtube&hl=ja&gl=US" class="result-title">
+                <h3>YouTube - Google Play のアプリ</h3>
+            </a>
+            <div class="snippet">
+                Androidスマートフォンやタブレットで公式 <em>YouTube</em> アプリをダウンロードしましょう。大人気のミュージック ビデオから、ゲーム、フィットネス、映画、番組、ニュース、...
+            </div>
+        </div>
+
+        <!-- Related Searches -->
+        <div class="related-searches">
+            <h3 class="section-title">関連検索</h3>
+            <div class="related-grid">
+                <a href="#" class="related-item">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    YouTube ログイン
+                </a>
+                <a href="#" class="related-item">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    YouTube 音楽
+                </a>
+                <a href="#" class="related-item">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    YouTube アプリ
+                </a>
+                <a href="#" class="related-item">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    YouTube プレミアム
+                </a>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <div class="g-logo-nav">
+                <span class="g-letter g-blue">G</span>
+                <span class="g-letter g-red">o</span>
+                <span class="g-letter g-yellow">o</span>
+                <span class="g-letter g-yellow">o</span>
+                <span class="g-letter g-yellow">o</span>
+                <span class="g-letter g-yellow">o</span>
+                <span class="g-letter g-yellow">o</span>
+                <span class="g-letter g-blue">g</span>
+                <span class="g-letter g-green">l</span>
+                <span class="g-letter g-red">e</span>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#1a73e8" style="margin-bottom: 8px; margin-left: 5px;"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </div>
+            <div class="page-numbers">
+                <span class="page-num active">1</span>
+                <a href="#" class="page-num">2</a>
+                <a href="#" class="page-num">3</a>
+                <a href="#" class="page-num">4</a>
+                <a href="#" class="page-num">5</a>
+                <a href="#" class="page-num">6</a>
+                <a href="#" class="page-num">次へ</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column (Knowledge Panel) -->
+    <div id="rhs">
+        <div class="kp-card">
+            <!-- Images -->
+            <div class="kp-header-imgs">
+                <div class="kp-img-main"></div>
+                <div class="kp-img-sub">
+                    <svg viewBox="0 0 24 24" width="36" height="36"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                    <span>すべての画像</span>
+                </div>
+            </div>
+            <!-- Content -->
+            <div class="kp-content">
+                <div class="kp-header">
+                    <div class="kp-title-wrapper">
+                        <h2>YouTube</h2>
+                        <div class="kp-subtitle">動画共有プラットフォーム</div>
+                    </div>
+                    <div class="kp-icon-share" style="cursor: pointer;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="#70757a"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92zM18 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM6 13c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 7.02c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>
+                    </div>
+                </div>
+
+                <div class="kp-actions">
+                    <button class="kp-btn">
+                        <div class="kp-btn-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                        </div>
+                        ウェブサイト
+                    </button>
+                    <button class="kp-btn">
+                        <div class="kp-btn-icon">
+                            <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+                        </div>
+                        保存
+                    </button>
+                </div>
+
+                <div class="kp-desc">
+                    YouTubeは、アメリカ合衆国カリフォルニア州サンブルーノに本社を置く、世界最大の動画共有プラットフォームである。2005年に設立され、2006年にGoogleによって買収された。<br>
+                    <a href="https://ja.wikipedia.org/wiki/YouTube">Wikipedia</a>
+                </div>
+
+                <div class="kp-fact"><span class="lbl">設立：</span> 2005年2月14日</div>
+                <div class="kp-fact"><span class="lbl">親会社：</span> <a href="#">Google</a>、 <a href="#">Alphabet Inc.</a></div>
+                <div class="kp-fact"><span class="lbl">創業者：</span> <a href="#">スティーブ・チェン</a>、 <a href="#">チャド・ハーリー</a>、 <a href="#">ジョード・カリム</a></div>
+                <div class="kp-fact"><span class="lbl">CEO：</span> <a href="#">ニール・モーハン</a> (2023年2月16日〜)</div>
+                <div class="kp-fact"><span class="lbl">本部所在地：</span> アメリカ合衆国 カリフォルニア州 サンブルーノ</div>
+                <div class="kp-fact"><span class="lbl">ユーザー数：</span> 25億人以上</div>
+
+                <!-- Profiles -->
+                <div class="kp-profiles">
+                    <div class="kp-profiles-title">プロフィール</div>
+                    <div class="profiles-list">
+                        <a href="#" class="profile-item">
+                            <div class="p-icon">
+                                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                            </div>
+                            X
+                        </a>
+                        <a href="#" class="profile-item">
+                            <div class="p-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm3.98-10.105a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z"/></svg>
+                            </div>
+                            Instagram
+                        </a>
+                        <a href="#" class="profile-item">
+                            <div class="p-icon">
+                                <svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>
+                            </div>
+                            Facebook
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-loc">
+        <span>日本</span>
+        東京都- IPアドレスから
+    </div>
+    <div class="footer-links">
+        <div class="footer-links-left">
+            <a href="#">ヘルプ</a>
+            <a href="#">フィードバックを送信</a>
+            <a href="#">プライバシー</a>
+            <a href="#">規約</a>
+        </div>
+        <div class="footer-links-right">
+            <!-- Space for any right aligned links if necessary -->
+        </div>
+    </div>
+</footer>
+
+<script>
+    // 検索ボックスのフォーカスアニメーション用（簡単なJS）
+    const searchBox = document.querySelector('.search-box');
+    const searchInput = document.querySelector('.search-input');
+    const clearBtn = document.querySelector('.icon-clear');
+
+    searchInput.addEventListener('focus', () => {
+        searchBox.style.boxShadow = '0 1px 6px rgba(32, 33, 36, 0.28)';
+    });
+    searchInput.addEventListener('blur', () => {
+        searchBox.style.boxShadow = 'none';
+    });
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchInput.focus();
+    });
+</script>
+
+</body>
+</html>

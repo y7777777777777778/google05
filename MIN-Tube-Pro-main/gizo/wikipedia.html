@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja" dir="ltr" class="client-nojs">
+<head>
+<meta charset="UTF-8">
+<title>YouTube - Wikipedia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* Reset & Base Fonts */
+body, h1, h2, h3, p, ul, ol, li, table, th, td { margin: 0; padding: 0; }
+body {
+    font-family: sans-serif;
+    font-size: 14px;
+    background-color: #f6f6f6;
+    background-image: linear-gradient(to bottom, #f6f6f6 0%, #ffffff 50em);
+    background-repeat: no-repeat;
+    color: #202122;
+    min-height: 100vh;
+}
+a { text-decoration: none; color: #0645ad; }
+a:visited { color: #0b0080; }
+a:hover { text-decoration: underline; }
+
+/* Background pattern (Top Gradient overlay) */
+#mw-page-base {
+    height: 5em;
+    background-color: #f6f6f6;
+    background-image: linear-gradient(to bottom, #ffffff 50%, #f6f6f6 100%);
+    position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 0; height: 160px;
+}
+
+/* Layout Framework */
+#mw-panel { position: absolute; top: 0; left: 0; width: 11em; font-size: 1em; z-index: 2;}
+#mw-head { position: absolute; top: 0; right: 0; left: 0; height: 100px; z-index: 1;}
+#content {
+    position: relative; z-index: 2; margin-left: 11em; margin-top: -1px;
+    padding: 1.25em 1.5em 1.5em; background: #ffffff;
+    border: 1px solid #a7d7f9; border-right-width: 0; border-top-width: 1px;
+    line-height: 1.6;
+}
+
+/* Logo */
+.mw-wiki-logo {
+    display: block; width: 10em; height: 160px; margin-bottom: 1em;
+    background: url(https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Wikipedia-logo-v2-ja.svg/135px-Wikipedia-logo-v2-ja.svg.png) no-repeat center center;
+    background-size: 135px auto;
+}
+
+/* Navigation Panel (Left Menu) */
+.portal { margin: 0 0.6em 1em 0.7em; padding: 0.25em 0; direction: ltr; font-size: 0.75em; }
+.portal h3 { margin-bottom: 0.2em; padding-left: 0.5em; font-size: 1.1em; color: #54595d; font-weight: normal; border-bottom: 1px solid #c8ccd1; }
+.portal .body ul { list-style: none; margin: 0; padding-left: 0.5em; }
+.portal .body ul li { line-height: 1.5em; padding-bottom: 0.2em; }
+
+/* User Navigation & Search (Top Right) */
+#p-personal { position: absolute; right: 1em; top: 0.4em; font-size: 0.75em; }
+#p-personal ul { list-style: none; }
+#p-personal li { float: left; margin-left: 1em; color: #54595d;}
+#p-personal li a { color: #0645ad; font-weight: bold;}
+#p-personal li a:hover { text-decoration: underline; }
+
+#p-search { position: absolute; right: 1em; top: 3.2em; }
+#p-search input[type="search"] { width: 16em; padding: 0.4em; border: 1px solid #a2a9b1; border-radius: 2px; }
+
+/* Page Tabs (Page, Talk, Read, Edit...) */
+.left-nav, .right-nav { float: left; position: absolute; top: 3.4em; }
+.left-nav { left: 11em; }
+.right-nav { right: 19em; }
+
+.vectorTabs { list-style: none; float: left; height: 2.5em; margin: 0; padding: 0; }
+.vectorTabs li { float: left; display: block; margin: 0; padding: 0; border: 1px solid transparent; background: #f6f6f6; background-image: linear-gradient(to bottom, #f8f9fa, #e8eaea); }
+.vectorTabs li a { display: block; line-height: 2.5em; padding: 0 0.8em; font-size: 0.8em; color: #0645ad; text-decoration: none; }
+.vectorTabs li.selected { background: #ffffff; border: 1px solid #a7d7f9; border-bottom: none; font-weight: bold; border-top-left-radius: 2px; border-top-right-radius: 2px;}
+.vectorTabs li.selected a { color: #202122; }
+
+/* Headings & Typographic tweaks */
+.firstHeading {
+    font-family: 'Linux Libertine', 'Georgia', 'Times', serif;
+    font-weight: normal; margin-top: 0; margin-bottom: 0.25em; padding-top: 0;
+    padding-bottom: 0.17em; border-bottom: 1px solid #a2a9b1;
+    font-size: 1.8em; line-height: 1.3;
+}
+#siteSub { font-size: 0.8em; color: #54595d; margin-bottom: 1em; }
+
+h2 {
+    font-family: 'Linux Libertine', 'Georgia', 'Times', serif;
+    border-bottom: 1px solid #a2a9b1; margin: 1em 0 0.25em 0;
+    padding-bottom: 0.2em; font-weight: normal; font-size: 1.5em;
+}
+h3 { margin-top: 1.2em; font-weight: bold; font-size: 1.2em; padding-bottom: 0; }
+.mw-editsection { float: right; font-size: 12px; font-family: sans-serif; font-weight: normal; color: #54595d; }
+.mw-editsection a { color: #0645ad; }
+p { margin: 0.5em 0 0.8em 0; }
+
+/* Image and Thumbnail Frame */
+.thumb { float: right; margin: 0.5em 0 1.3em 1.4em; }
+.thumbinner { border: 1px solid #c8ccd1; padding: 4px; background-color: #f8f9fa; font-size: 94%; text-align: center; }
+.thumbimage { max-width: 100%; border: 1px solid #eaecf0; display: block; }
+.thumbcaption { text-align: left; padding: 0.3em; line-height: 1.4em; color: #202122; font-size: 0.9em; }
+
+/* Infobox (Company Table) */
+.infobox {
+    float: right; clear: right; width: 22em; border: 1px solid #a2a9b1; background-color: #f8f9fa;
+    padding: 0.2em; margin: 0.5em 0 1em 1em; font-size: 88%; border-spacing: 2px;
+}
+.infobox-title { text-align: center; font-size: 1.25em; font-weight: bold; background-color: #d1e4fa; }
+.infobox th { width: 35%; text-align: left; vertical-align: top; background-color: #f0f4fa; padding: 0.3em 0.5em; border-top: 1px solid #c8ccd1;}
+.infobox td { padding: 0.3em 0.5em; border-top: 1px solid #c8ccd1;}
+.infobox-image { text-align: center; padding: 0.5em 0; }
+
+/* TOC (Table of Contents) */
+.toc {
+    display: inline-table; padding: 7px 10px; margin: 1em 0; border: 1px solid #a2a9b1;
+    background-color: #f8f9fa; font-size: 95%; width: auto; max-width: 30em;
+}
+.toctitle { font-weight: bold; text-align: center; margin-bottom: 0.3em; display: flex; align-items: center; justify-content: center; }
+.toc ul { list-style: none; margin: 0; padding-left: 1.5em; line-height: 1.6; }
+.toc > ul { padding-left: 0; }
+.tocnumber { padding-right: 0.5em; color: #202122; font-size: 1em;}
+
+/* Lists inside articles */
+.mw-content-ltr ul { margin-top: 0.3em; margin-bottom: 0.3em; margin-left: 1.6em; list-style-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjEzIj4gPGNpcmNsZSBjeD0iMi41IiBjeT0iOS41IiByPSIyLjUiIGZpbGw9IiMwMDUyOGMiLz4gPC9zdmc+); }
+
+/* References / Footers */
+.references-wrap { font-size: 90%; color: #54595d; column-width: 30em; column-rule: 1px solid #a2a9b1; }
+ol.references { margin-left: 2.5em; }
+ol.references li { margin-bottom: 0.2em; }
+#footer { margin-left: 11em; padding: 1.25em; font-size: 0.75em; border-top: 1px solid #a7d7f9; }
+#footer ul { display: inline; list-style: none; }
+#footer ul li { display: inline; margin-right: 1.5em; }
+
+.mw-body-content { position: relative; }
+</style>
+</head>
+<body>
+
+<div id="mw-page-base"></div>
+
+<!-- Top Area -->
+<div id="mw-head">
+    <div id="p-personal">
+        <ul>
+            <li>未ログイン</li>
+            <li><a href="#">トーク</a></li>
+            <li><a href="#">投稿記録</a></li>
+            <li><a href="#">アカウント作成</a></li>
+            <li><a href="#">ログイン</a></li>
+        </ul>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="left-nav">
+        <ul class="vectorTabs">
+            <li class="selected"><a href="#">ページ</a></li>
+            <li><a href="#">ノート</a></li>
+        </ul>
+    </div>
+    <div class="right-nav">
+        <ul class="vectorTabs">
+            <li class="selected"><a href="#">閲覧</a></li>
+            <li><a href="#">編集</a></li>
+            <li><a href="#">履歴表示</a></li>
+        </ul>
+    </div>
+
+    <!-- Search Box -->
+    <div id="p-search">
+        <form action="#">
+            <input type="search" placeholder="ウィキペディア内を検索" aria-label="検索">
+        </form>
+    </div>
+</div>
+
+<!-- Left Side Menu -->
+<div id="mw-panel">
+    <a href="#" class="mw-wiki-logo" title="メインページに移動"></a>
+    
+    <div class="portal">
+        <h3>案内</h3>
+        <div class="body">
+            <ul>
+                <li><a href="#">メインページ</a></li>
+                <li><a href="#">コミュニティ・ポータル</a></li>
+                <li><a href="#">最近の出来事</a></li>
+                <li><a href="#">新しいページ</a></li>
+                <li><a href="#">最近の更新</a></li>
+                <li><a href="#">おまかせ表示</a></li>
+                <li><a href="#">練習用ページ</a></li>
+                <li><a href="#">アップロード (ウィキメディア・コモンズ)</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="portal">
+        <h3>ヘルプ</h3>
+        <div class="body">
+            <ul>
+                <li><a href="#">ヘルプ</a></li>
+                <li><a href="#">井戸端</a></li>
+                <li><a href="#">お知らせ</a></li>
+                <li><a href="#">バグの報告</a></li>
+                <li><a href="#">寄付</a></li>
+                <li><a href="#">ウィキペディアに関するお問い合わせ</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div id="content" class="mw-body-content">
+    <h1 class="firstHeading" lang="ja">YouTube</h1>
+    <div id="siteSub">出典: フリー百科事典『ウィキペディア（Wikipedia）』</div>
+
+    <!-- Infobox (Right side) -->
+    <table class="infobox">
+        <tbody>
+            <tr><th colspan="2" class="infobox-title">YouTube, LLC</th></tr>
+            <tr>
+                <td colspan="2" class="infobox-image">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/200px-YouTube_Logo_2017.svg.png" alt="YouTubeロゴ" width="200" height="45">
+                </td>
+            </tr>
+            <tr><th>種類</th><td><a href="#">動画共有サービス</a></td></tr>
+            <tr><th>営利性</th><td>営利</td></tr>
+            <tr><th>所有者</th><td><a href="#">Google</a>（<a href="#">Alphabet</a>の子会社）</td></tr>
+            <tr><th>本社所在地</th><td>アメリカ合衆国<br>カリフォルニア州サンブルーノ</td></tr>
+            <tr><th>設立日</th><td>2005年2月14日</td></tr>
+            <tr><th>設立者</th><td>チャド・ハーリー<br>スティーブ・チェン<br>ジョード・カリム</td></tr>
+            <tr><th>主要人物</th><td>ニール・モーハン（CEO）</td></tr>
+            <tr><th>ユーザー数</th><td>25億6,200万人以上（2022年現在）</td></tr>
+            <tr><th>URL</th><td><a href="https://www.youtube.com">www.youtube.com</a></td></tr>
+            <tr><th>現在の状況</th><td>運営中</td></tr>
+        </tbody>
+    </table>
+
+    <p><b>YouTube</b>（ユーチューブ）は、<a href="#">アメリカ合衆国</a>カリフォルニア州サンブルーノに本社を置くオンライン動画共有プラットフォーム。2005年2月にPayPalの元従業員であるチャド・ハーリー、スティーブ・チェン、ジョード・カリムの3人によって設立された。その後、2006年11月に16.5億米ドルで<a href="#">Google</a>に買収され、現在は同社の子会社の1つとして運営されている。</p>
+
+    <p>ユーザーが投稿した多岐にわたるジャンルの動画が数多く配信されており、ユーザー自身によるビデオブログ、実況、解説動画などのオリジナルコンテンツやミュージックビデオに加え、テレビ番組のダイジェスト映像といった多種多様な映像を無料で楽しむことができる。</p>
+
+    <!-- Content Right Side Image (Headquarters) -->
+    <div class="thumb" style="width:260px;">
+        <div class="thumbinner">
+            <a href="#">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/YouTube_headquarters_2.jpg/250px-YouTube_headquarters_2.jpg" alt="YouTubeの本社" class="thumbimage" width="250">
+            </a>
+            <div class="thumbcaption">
+                カリフォルニア州サンブルーノにあるYouTubeの本社
+            </div>
+        </div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <div class="toctitle">目次</div>
+        <ul>
+            <li><span class="tocnumber">1</span> <a href="#history"><span class="toctext">概要と歴史</span></a></li>
+            <li><span class="tocnumber">2</span> <a href="#features"><span class="toctext">主な機能とサービス</span></a>
+                <ul>
+                    <li><span class="tocnumber">2.1</span> <a href="#music"><span class="toctext">YouTube Music</span></a></li>
+                    <li><span class="tocnumber">2.2</span> <a href="#premium"><span class="toctext">YouTube Premium</span></a></li>
+                </ul>
+            </li>
+            <li><span class="tocnumber">3</span> <a href="#creators"><span class="toctext">YouTuber（クリエイター）</span></a></li>
+            <li><span class="tocnumber">4</span> <a href="#references"><span class="toctext">脚注</span></a></li>
+        </ul>
+    </div>
+
+    <h2 id="history">
+        <span class="mw-editsection">[<a href="#">編集</a>]</span>
+        概要と歴史
+    </h2>
+    <p>「YouTube」という名称は、「あなた (You) がテレビ (Tube) に向かって発信する」という意味合いが込められている。また長年使用されたスローガンである「<i>Broadcast Yourself.</i>（自分自身を放送しろ）」は、個人のための放送局という性質を如実に表している。</p>
+    <p>ドメインネーム <code>www.youtube.com</code> が有効となったのは2005年2月14日である。そしてサイト上で初めて公開された動画は、共同創立者であるジョード・カリムがカリフォルニア州のサンディエゴ動物園の象の前にいる様子を映したわずか19秒の『<b>Me at the zoo</b>（ミー・アット・ザ・ズー）』であった（2005年4月23日午後8時27分にアップロードされた）<sup class="reference"><a href="#">[1]</a></sup>。</p>
+
+    <h2 id="features">
+        <span class="mw-editsection">[<a href="#">編集</a>]</span>
+        主な機能とサービス
+    </h2>
+    <p>一般的な動画の再生や評価のほかに、Googleのネットワークを生かした多彩なシステムを有している。最新の規格では最大で「8K」の解像度による映像再生、ハイダイナミックレンジ（HDR）、高フレームレート、また360度の視野をもつVR（バーチャル・リアリティ）動画やライブ配信に幅広く対応している。</p>
+
+    <h3 id="music">YouTube Music</h3>
+    <p>音楽コンテンツの再生・検索に最適化された専用サービスである。広告つきの基本無料版と、月額課金によって広告が除かれバックグラウンド再生などが可能となる「Premium」プランが存在する。</p>
+
+    <h3 id="premium">YouTube Premium</h3>
+    <p>サブスクリプション型の有料メンバーシップであり、導入以前は「YouTube Red」と呼ばれていた。YouTube上で表示されるあらゆる広告がブロックされるだけでなく、デバイス内に動画を一時保存するオフライン再生機能などもサポートされている。</p>
+
+    <h2 id="creators">
+        <span class="mw-editsection">[<a href="#">編集</a>]</span>
+        YouTuber（クリエイター）
+    </h2>
+    <p>自らの作成した動画を投稿・発信する表現者は総じて「<b>YouTuber</b>（ユーチューバー）」と呼ばれ、パートナープログラムによって広告収入を得ることができる。チャンネル登録者数が数百万人に達するクリエイターは大きな影響力（マイクロセレブリティ）を持ち、各種アワードでの表彰を受ける対象となっている。例えば登録者数10万人・100万人・1000万人の到達時には、各色の再生ボタンを模した盾状の「<b>クリエイターアワード</b>（<i>YouTube Creator Awards</i>）」がYouTube運営チームより授与される。</p>
+
+    <h2 id="references">
+        <span class="mw-editsection">[<a href="#">編集</a>]</span>
+        脚注
+    </h2>
+    <div class="references-wrap">
+        <ol class="references">
+            <li>^ <i><a href="#">Me at the zoo</a></i> (ジョード・カリムの公式YouTubeチャンネルにて閲覧可能。 2005-04-23投稿)</li>
+            <li>^ 「<a href="#">GoogleによるYouTubeの16.5億ドルでの買収発表</a>」 （Reuters. 2006-11）</li>
+        </ol>
+    </div>
+</div>
+
+<!-- Footer Area -->
+<div id="footer">
+    <ul>
+        <li>最終更新 2024年4月10日 (水) 15:43 （日時は個人設定で未設定ならばUTC）。</li>
+        <li><a href="#">プライバシー・ポリシー</a></li>
+        <li><a href="#">ウィキペディアについて</a></li>
+        <li><a href="#">免責事項</a></li>
+        <li><a href="#">行動規範</a></li>
+        <li><a href="#">モバイルビュー</a></li>
+    </ul>
+</div>
+
+</body>
+</html>

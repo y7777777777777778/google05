@@ -1,0 +1,856 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>MIN-Tube-Pro — The Ultimate Hub</title>
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#00d4ff" />
+
+<!-- iOS / Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MIN-Tube-Pro" />
+<link rel="apple-touch-icon" href="/min-img.png" />
+
+<!-- Android / OGP -->
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="application-name" content="MIN-Tube-Pro" />
+<meta property="og:title" content="MIN-Tube-Pro" />
+<meta property="og:description" content="次世代アプリランチャー — すべてを、この一箇所に。" />
+<meta property="og:image" content="/min-img.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg-dark: #020612;
+    --bg-gradient: radial-gradient(circle at 50% 0%, #0a132a 0%, #020612 100%);
+    --accent: #00d4ff;
+    --accent-glow: rgba(0, 212, 255, 0.4);
+    --accent2: #7b61ff;
+    --accent3: #ff6fd8;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --card-bg: rgba(15, 23, 42, 0.6);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 18px;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    --green: #10b981;
+    --red: #f43f5e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-dark);
+    background-image: var(--bg-gradient);
+    color: var(--text);
+    font-family: 'Syne', 'Noto Sans JP', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── Background Mesh ── */
+  .mesh-bg {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    animation: float 20s infinite alternate;
+  }
+  .orb-1 { width: 400px; height: 400px; background: var(--accent); top: -100px; left: -100px; }
+  .orb-2 { width: 300px; height: 300px; background: var(--accent2); bottom: 10%; right: -50px; animation-delay: -5s; }
+  
+  @keyframes float {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(40px, 60px); }
+  }
+
+  .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: calc(40px + env(safe-area-inset-top)) 24px calc(60px + env(safe-area-inset-bottom));
+  }
+
+  /* ── Hero ── */
+  header.hero {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    margin-bottom: 48px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  }
+
+  header.hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 4px; height: 100%;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2));
+  }
+
+  .logo-area {
+    margin-right: 28px;
+    position: relative;
+  }
+
+  .logo-img {
+    width: 80px; height: 80px;
+    border-radius: 20px;
+    box-shadow: 0 0 25px var(--accent-glow);
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+
+  .hero-content h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, #fff, #a5b4fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .typewriter-container {
+    height: 24px;
+    display: flex;
+    align-items: center;
+    margin-top: 6px;
+  }
+
+  .typewriter {
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Legend & Filter ── */
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+    padding: 0 8px;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+  }
+
+  .status-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.done { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .dot.wip { background: var(--red); box-shadow: 0 0 8px var(--red); }
+
+  /* ── Category Section ── */
+  .category-section {
+    margin-bottom: 40px;
+  }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .cat-icon {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .cat-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .cat-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
+  }
+
+  .cat-count {
+    font-size: 12px;
+    padding: 2px 10px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    color: var(--text-dim);
+  }
+
+  /* ── Modern Grid Layout ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  /* ── Card Design ── */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    position: relative;
+    transition: var(--transition);
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    backdrop-filter: blur(10px);
+  }
+
+  .card:hover {
+    transform: translateY(-8px) scale(1.01);
+    background: rgba(30, 41, 59, 0.7);
+    border-color: rgba(0, 212, 255, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 212, 255, 0.1);
+  }
+
+  .card-top {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .app-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+    transition: var(--transition);
+  }
+
+  .card:hover .app-icon {
+    transform: rotate(-5deg) scale(1.1);
+    border-color: var(--accent);
+  }
+
+  .app-info {
+    flex: 1;
+  }
+
+  .app-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .app-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .app-path {
+    font-family: 'Syne', monospace;
+    font-size: 11px;
+    background: rgba(0, 212, 255, 0.1);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+
+  .app-badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    padding: 3px 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+  }
+
+  /* ── Pulse Animation ── */
+  .status-indicator {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    position: relative;
+  }
+  .status-indicator.done { background: var(--green); }
+  .status-indicator.wip { background: var(--red); }
+  .status-indicator.done::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(3); opacity: 0; }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    header.hero {
+      flex-direction: column;
+      text-align: center;
+      padding: 32px 20px;
+    }
+    header.hero::before {
+      width: 100%; height: 4px;
+      background: linear-gradient(to right, var(--accent), var(--accent2));
+    }
+    .logo-area { margin-right: 0; margin-bottom: 16px; }
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .toolbar {
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+  }
+
+  /* Scrollbar Customization */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-dark); }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+</style>
+</head>
+<body>
+
+  <div class="mesh-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <div class="wrap" role="main">
+
+    <!-- Hero Section -->
+    <header class="hero">
+      <div class="logo-area">
+        <img src="/min-img.png" alt="Logo" class="logo-img">
+      </div>
+      <div class="hero-content">
+        <h1>MIN‑Tube‑Pro</h1>
+        <div class="typewriter-container">
+          <div id="typewriter" class="typewriter"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="section-label">Exploration Hub</div>
+      <div class="status-legend">
+        <div class="legend-item"><span class="dot done"></span> 実装済み</div>
+        <div class="legend-item"><span class="dot wip"></span> 開発中</div>
+      </div>
+    </div>
+
+    <!-- ── Category: Videos ── -->
+    <section class="category-section">
+      <div class="category-header">
+        <div class="cat-icon">🎬</div>
+        <h2 class="cat-title">Video Streaming</h2>
+        <div class="cat-line"></div>
+        <div class="cat-count">5 Apps</div>
+      </div>
+      <div class="grid">
+        <article class="card" data-endpoint="/">
+          <div class="card-top">
+            <div class="app-icon">▶️</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> Youtube‑Pro</div>
+              <p class="app-desc">MIN-Tube2の進化系。改善されたUIとサーバー処理で、最高級の視聴体験を提供します。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/</span>
+            <span class="app-badge">Main</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/dl-pro">
+          <div class="card-top">
+            <div class="app-icon">⚡</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> STUDY2525</div>
+              <p class="app-desc">平均0.02秒の超高速ロード。究極のYoutube代替インスタンスをHTML1枚で実現。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/dl-pro</span>
+            <span class="app-badge">Ultra-Fast</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/wista">
+          <div class="card-top">
+            <div class="app-icon">😍</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> Wista</div>
+              <p class="app-desc">woolisbest様開発。デザインと機能性を高次元で融合させた視聴フロントエンド。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/wista</span>
+            <span class="app-badge">Premium UI</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/sia">
+          <div class="card-top">
+            <div class="app-icon">😎</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> しあtube</div>
+              <p class="app-desc">siawaseok様開発。シンプルかつ快適なYoutubeフロントエンドで自由な視聴を。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/sia</span>
+            <span class="app-badge">Minimal</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/k-tube">
+          <div class="card-top">
+            <div class="app-icon">🤩</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> K‑tube</div>
+              <p class="app-desc">KA1121Studio様開発。高速レスポンスに特化したYoutube視聴フロントエンド。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/k-tube</span>
+            <span class="app-badge">High-Speed</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── Category: Anime ── -->
+    <section class="category-section">
+      <div class="category-header">
+        <div class="cat-icon">🥰</div>
+        <h2 class="cat-title">Media Gallery</h2>
+        <div class="cat-line"></div>
+        <div class="cat-count">1 App</div>
+      </div>
+      <div class="grid">
+        <article class="card" data-endpoint="/anime">
+          <div class="card-top">
+            <div class="app-icon">✨</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> ANIME Viewer</div>
+              <p class="app-desc">膨大なアニメライブラリにアクセス。あなたの好きな作品がここに見つかります。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/anime</span>
+            <span class="app-badge">Entertainment</span>
+          </div>
+        </article>
+<article class="card" data-endpoint="/embed.html#https://web.cloudmoonapp.com/ja/">
+          <div class="card-top">
+            <div class="app-icon">📱</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span>Application Tool</div>
+              <p class="app-desc">全てのアプリが使えてしまう…</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/movie</span>
+            <span class="app-badge">Entertainment</span>
+          </div>
+        </article>
+          <article class="card" data-endpoint="/embed.html#https://mangaraw.am">
+          <div class="card-top">
+            <div class="app-icon">📕</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> Manga Viewer</div>
+              <p class="app-desc">最新刊をいち早く、最高の漫画体験をあなたに</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/manga</span>
+            <span class="app-badge">Entertainment</span>
+          </div>
+        </article>
+
+         <article class="card" data-endpoint="/embed.html#https://afterstream.org/">
+          <div class="card-top">
+            <div class="app-icon">🎞️</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> Movie Viewer</div>
+              <p class="app-desc">コアな物からあの有名作まで、映画を楽しもう</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/movie</span>
+            <span class="app-badge">Entertainment</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── Category: Community ── -->
+    <section class="category-section">
+      <div class="category-header">
+        <div class="cat-icon">🎮</div>
+        <h2 class="cat-title">Community & Play</h2>
+        <div class="cat-line"></div>
+        <div class="cat-count">2 Apps</div>
+      </div>
+      <div class="grid">
+        <article class="card" data-endpoint="/chat">
+          <div class="card-top">
+            <div class="app-icon">💬</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> Mino‑Chat</div>
+              <p class="app-desc">ついに完成‼︎。世界中のユーザーとリアルタイムで繋がり、語り合おう。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/chat</span>
+            <span class="app-badge">Social</span>
+          </div>
+        </article>
+        <article class="card" data-endpoint="/game/game.html">
+          <div class="card-top">
+            <div class="app-icon">🕹️</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> Games</div>
+              <p class="app-desc">厳選されたブラウザゲーム集。ちょっとした休憩時間に、最高に気軽な遊びを。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/game</span>
+            <span class="app-badge">Fun</span>
+          </div>
+        </article>
+        <article class="card" data-endpoint="/vc">
+          <div class="card-top">
+            <div class="app-icon">🧑‍💻</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> Mino‑video-chat</div>
+              <p class="app-desc">どんなに離れていても音声を通じて話し合おう</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/vc</span>
+            <span class="app-badge">Social</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── Category: Proxy ── -->
+    <section class="category-section">
+      <div class="category-header">
+        <div class="cat-icon">🔓</div>
+        <h2 class="cat-title">Proxy Network</h2>
+        <div class="cat-line"></div>
+        <div class="cat-count">6 Apps</div>
+      </div>
+      <div class="grid">
+　　　　 <article class="card" data-endpoint="/proxy">
+          <div class="card-top">
+            <div class="app-icon">🦈</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> RammerheadV2</div>
+              <p class="app-desc">RammerheadやShadowを内蔵した強力なウェブアクセス手段。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/proxy</span>
+            <span class="app-badge">Standard</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/croxy">
+          <div class="card-top">
+            <div class="app-icon">🐊</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> CroxyProxy</div>
+              <p class="app-desc">CroxyProxyが使えます</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/earth</span>
+            <span class="app-badge">UV Engine</span>
+          </div>
+        </article>
+        
+        <article class="card" data-endpoint="/earth">
+          <div class="card-top">
+            <div class="app-icon">🌏</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> EARTH Proxy</div>
+              <p class="app-desc">KA1121Studio様開発。Ultraviolet(UV)エンジン搭載。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/earth</span>
+            <span class="app-badge">UV Engine</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/nautilus-os">
+          <div class="card-top">
+            <div class="app-icon">🧭</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> NautilusOS</div>
+              <p class="app-desc">ブラウザ内OS体験。高度なHTML5プロキシで、制限のないウェブ探索を可能に。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/nautilus-os</span>
+            <span class="app-badge">HTML5 OS</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/helios">
+          <div class="card-top">
+            <div class="app-icon">☀️</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> Helios</div>
+              <p class="app-desc">マルチタブ対応プロキシ。NautilusOSとの完全互換性を持ち、並行ブラウジングに最適。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/helios</span>
+            <span class="app-badge">Multi-Tab</span>
+          </div>
+        </article>
+
+
+        <article class="card" data-endpoint="/gust">
+          <div class="card-top">
+            <div class="app-icon">🌪️</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> Gust</div>
+              <p class="app-desc">超軽量プロキシ。フィルターを突風のようにすり抜け、快適な速度を維持します。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/gust</span>
+            <span class="app-badge">Lightweight</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/science">
+          <div class="card-top">
+            <div class="app-icon">🧪</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> ANIME Proxy</div>
+              <p class="app-desc">KA1121Studio様開発。至高のパフォーマンスを追求したプロキシインスタンス。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/science</span>
+            <span class="app-badge">Special</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── Category: Tools ── -->
+    <section class="category-section">
+      <div class="category-header">
+        <div class="cat-icon">🛠️</div>
+        <h2 class="cat-title">Utility & Tools</h2>
+        <div class="cat-line"></div>
+        <div class="cat-count">5 Apps</div>
+      </div>
+      <div class="grid">
+        <article class="card" data-endpoint="/sys-update">
+          <div class="card-top">
+            <div class="app-icon">🔄</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> アップデート</div>
+              <p class="app-desc">利用しているサイトを最新版にアップデートします。常に最新の機能を利用可能に。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/sys-update</span>
+            <span class="app-badge">System</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/ai">
+          <div class="card-top">
+            <div class="app-icon">🤖</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span>Many AI</div>
+              <p class="app-desc">元からあったAIをさらに拡張、8つのAIから解答を選ぶことができます</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/ai</span>
+            <span class="app-badge">AI</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/code">
+          <div class="card-top">
+            <div class="app-icon">🧑‍💻</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> Code Edit</div>
+              <p class="app-desc">Pythonの試し書きやスクリプト開発。開発者のためのサンドボックス環境。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/code</span>
+            <span class="app-badge">IDE</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/check">
+          <div class="card-top">
+            <div class="app-icon">📡</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator done"></span> System Check</div>
+              <p class="app-desc">端末の監視状態や拡張機能を可視化。現在のブラウジング環境を詳細に分析します。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/check</span>
+            <span class="app-badge">Monitor</span>
+          </div>
+        </article>
+
+        <article class="card" data-endpoint="/use-api">
+          <div class="card-top">
+            <div class="app-icon">🔑</div>
+            <div class="app-info">
+              <div class="app-name"><span class="status-indicator wip"></span> API Portal</div>
+              <p class="app-desc">MIN-Tube-ProのAPIを利用するための鍵を入手。あなたのアプリを統合可能に。</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="app-path">/use-api</span>
+            <span class="app-badge">Dev-Only</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer style="text-align: center; margin-top: 40px; color: var(--text-dim); font-size: 13px;">
+      <p>&copy; 2026 MIN-Tube-Pro Project. Select an application to launch.</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // ── Optimized Typewriter ──
+    const phrases = [
+      "Welcome to the Next Generation. ✨",
+      "動画を、もっと快適に、自由に。🎬",
+      "プロキシ・AI・ツールを統合管理。🌐",
+      "最高の体験を、あなたに提供します。💎"
+    ];
+    const el = document.getElementById('typewriter');
+    let pIdx = 0, cIdx = 0, isDeleting = false;
+
+    function type() {
+      const current = phrases[pIdx];
+      if (isDeleting) {
+        el.textContent = current.substring(0, cIdx - 1);
+        cIdx--;
+      } else {
+        el.textContent = current.substring(0, cIdx + 1);
+        cIdx++;
+      }
+
+      let speed = isDeleting ? 40 : 80;
+      if (!isDeleting && cIdx === current.length) {
+        speed = 2500;
+        isDeleting = true;
+      } else if (isDeleting && cIdx === 0) {
+        isDeleting = false;
+        pIdx = (pIdx + 1) % phrases.length;
+        speed = 500;
+      }
+      setTimeout(type, speed);
+    }
+    window.onload = type;
+
+    // ── Secure Navigation ──
+    document.querySelectorAll('.card').forEach(card => {
+      const run = () => {
+        const url = card.getAttribute('data-endpoint');
+        if (url) {
+          card.style.transform = "scale(0.98) translateY(0)";
+          card.style.opacity = "0.7";
+          setTimeout(() => window.location.href = url, 150);
+        }
+      };
+      card.addEventListener('click', run);
+      card.addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+    });
+
+    // ── Service Worker ──
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

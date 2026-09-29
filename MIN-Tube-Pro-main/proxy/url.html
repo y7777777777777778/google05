@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1f2937;
+        }
+        
+        #embed-frame {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            display: block;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* --- Simple White Loading Theme --- */
+        .loading-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #fafafa;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .status-text {
+            color: #6b7280;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        /* 手動サーバー選択 UI */
+        .server-select-container {
+            margin-top: 1.5rem;
+        }
+        
+        .server-select {
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            font-size: 0.85rem;
+            color: #374151;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            max-width: 260px;
+            outline: none;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .server-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Error UI (White Theme) */
+        .error-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #ffffff;
+            position: relative;
+            z-index: 20;
+        }
+        
+        .error-content {
+            text-align: center;
+            padding: 2.5rem;
+            background: #ffffff;
+            border: 1px solid #fee2e2;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            max-width: 450px;
+            width: 90%;
+        }
+        
+        .error-content h1 {
+            font-size: 1.35rem;
+            margin-bottom: 0.75rem;
+            color: #ef4444;
+            font-weight: 700;
+        }
+        
+        .error-message {
+            color: #4b5563;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .url-example {
+            margin-top: 1.5rem;
+            background: #f3f4f6;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="loading-container" class="loading-container">
+        <div class="loading-content">
+            <h1 class="loading-title">Connecting to server...</h1>
+            <p id="loading-status" class="status-text">Locating optimal node...</p>
+            
+            <div class="server-select-container">
+                <select class="server-select">
+                    <option value="auto">自動選択（最適なノード）</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div id="error-container" class="error-container" style="display: none;">
+        <div class="error-content">
+            <h1>Connection Failed</h1>
+            <p id="error-message" class="error-message"></p>
+            
+            <div class="server-select-container">
+                <select class="server-select">
+                    <option value="auto">自動選択（最適なノード）</option>
+                </select>
+            </div>
+
+            <div class="url-example">/embed#https://example.com</div>
+        </div>
+    </div>
+    
+    <iframe id="embed-frame" style="display: none;"></iframe>
+    
+    <script src="uv/uv.bundle.js"></script>
+    <script src="uv/uv.config.js"></script>
+    <script type="module">
+        import { registerSW } from "/prxy/register-sw.mjs";
+        import * as BareMux from "/prxy/baremux/index.mjs";
+
+        const connection = new BareMux.BareMuxConnection("/prxy/baremux/worker.js");
+        
+
+        const wispServers = [
+            { url: "wss://wisp.rhw.one/", name: "Rammerhead" },     
+            { url: "wss://anura.pro/", name: "AnuraOS" },
+            { url: "wss://phantom.lol/wisp/", name: "ShadowV3" },
+            { url: "wss://wisp.mercurywork.shop/", name: "UV" },  
+            { url: "wss://shadow-3.swanndvr.net/wisp/", name: "ShadowV3" },
+            { url: "wss://shadow.curesoutpost.com/wisp/", name: "ShadowV3" },
+            { url: "wss://wisp.43059.lrga.space/", name: "WispV3" },
+            { url: "wss://wisp.lrga.space/", name: "WispV3" },
+            { url: "wss://wisp.artclass-eta.vercel.app", name: "Artclass" },
+            { url: "wss://wisp.gointerstellar.app/", name: "WispV3" },
+            { url: "wss://wisp.webmc.fun/", name: "WispV3" },
+            { url: "wss://construction.services.codd70.ru/socket/", name: "WispV3" },            
+            { url: "wss://tomp.app/wisp/", name: "WispV3" }
+        ];
+
+        let activeWispUrl = null;
+
+        async function checkWispServer(url) {
+            return new Promise((resolve) => {
+                let resolved = false;
+                try {
+                    const ws = new WebSocket(url);
+                    const timeout = setTimeout(() => {
+                        if (!resolved) {
+                            resolved = true;
+                            ws.close();
+                            resolve(false);
+                        }
+                    }, 3000);
+                    ws.onopen = () => {
+                        if (!resolved) {
+                            resolved = true;
+                            clearTimeout(timeout);
+                            ws.close();
+                            resolve(true);
+                        }
+                    };
+                    ws.onerror = () => {
+                        if (!resolved) {
+                            resolved = true;
+                            clearTimeout(timeout);
+                            ws.close();
+                            resolve(false);
+                        }
+                    };
+                } catch (e) {
+                    if (!resolved) {
+                        resolved = true;
+                        resolve(false);
+                    }
+                }
+            });
+        }
+
+        async function getAvailableWisp() {
+            // 手動選択されている場合は、自動巡回をスキップしてそのURLを返す
+            const currentSelect = document.querySelector('.server-select');
+            if (currentSelect && currentSelect.value !== 'auto') {
+                return currentSelect.value;
+            }
+
+            if (activeWispUrl) return activeWispUrl;
+            
+            const statusText = document.getElementById('loading-status');
+            
+            for (const server of wispServers) {
+                // 接続テスト中の表示も、ホスト名ではなく指定された名称に変更
+                if(statusText) statusText.textContent = `Testing Node: ${server.name}...`;
+                const isWorking = await checkWispServer(server.url);
+                if (isWorking) {
+                    activeWispUrl = server.url; 
+                    return server.url;
+                }
+            }
+            throw new Error("No usable nodes are currently available. All connections failed.");
+        }
+
+        function search(input, template = "https://html.duckduckgo.com/html?t=h_&q=%s") {
+            try { return new URL(input).toString(); } catch (err) {}
+            try {
+                const url = new URL(`http://${input}`);
+                if (url.hostname.includes(".")) return url.toString();
+            } catch (err) {}
+            return template.replace("%s", encodeURIComponent(input));
+        }
+
+        async function getUV(input) {
+            await registerSW();
+            let url = search(input);
+            
+            let wispUrl = await getAvailableWisp();
+            
+            if ((await connection.getTransport()) !== "/prxy/epoxy/index.mjs") {
+                await connection.setTransport("/prxy/epoxy/index.mjs", [{ wisp: wispUrl }]);
+            }
+            return __uv$config.prefix + __uv$config.encodeUrl(url);
+        }
+
+        function getUrlFromFragment() {
+            const fragment = window.location.hash.substring(1);
+            if (!fragment) return null;
+            try { return decodeURIComponent(fragment); } catch (err) { return fragment; }
+        }
+
+        function isValidUrl(string) {
+            if (!string) return false;
+            try {
+                const url = new URL(string.includes('://') ? string : `http://${string}`);
+                return url.hostname.includes('.');
+            } catch (_) { return false; }
+        }
+
+        function showError(message) {
+            document.getElementById('loading-container').style.display = 'none';
+            document.getElementById('error-message').textContent = message;
+            document.getElementById('error-container').style.display = 'flex';
+        }
+
+        async function embedUrl() {
+            const url = getUrlFromFragment();
+            const iframe = document.getElementById('embed-frame');
+            const loadingContainer = document.getElementById('loading-container');
+            const statusText = document.getElementById('loading-status');
+
+            if (!url) return showError("URL fragment missing.");
+            if (!isValidUrl(url)) return showError(`Invalid destination: ${url}`);
+
+            try {
+                statusText.textContent = "Locating optimal node...";
+                const proxiedUrl = await getUV(url);
+                
+                statusText.textContent = "Flowing to destination... / Connecting to node";
+                iframe.onload = () => {
+                    loadingContainer.style.display = 'none';
+                    iframe.style.display = 'block';
+                    document.title = `ELIXIR | ${url}`;
+                };
+
+                iframe.onerror = () => showError("The sanctuary refused the connection.");
+                iframe.src = proxiedUrl;
+            } catch (error) {
+                showError(error.message || "Proxy infusion failed.");
+            }
+        }
+
+        function setupServerSelect() {
+            const selects = document.querySelectorAll('.server-select');
+            
+            selects.forEach(select => {
+                wispServers.forEach(server => {
+                    const opt = document.createElement('option');
+                    opt.value = server.url;
+                    opt.textContent = server.name;
+                    select.appendChild(opt);
+                });
+
+                select.addEventListener('change', (e) => {
+                    const targetUrl = e.target.value;
+                    
+                    selects.forEach(s => s.value = targetUrl);
+
+                    document.getElementById('error-container').style.display = 'none';
+                    document.getElementById('loading-container').style.display = 'flex';
+                    document.getElementById('embed-frame').style.display = 'none';
+                    embedUrl();
+                });
+            });
+        }
+
+        window.addEventListener('hashchange', embedUrl);
+
+        const init = () => {
+            setupServerSelect(); 
+            
+            if (typeof __uv$config !== 'undefined') {
+                embedUrl();
+            } else {
+                const check = setInterval(() => {
+                    if (typeof __uv$config !== 'undefined') {
+                        clearInterval(check);
+                        embedUrl();
+                    }
+                }, 10);
+            }
+        };
+
+        if (document.readyState === 'complete') init();
+        else window.addEventListener('load', init);
+    </script>
+</body>
+</html>

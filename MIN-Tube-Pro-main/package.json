@@ -1,0 +1,26 @@
+{
+  "name": "min-wlyt-plus",
+  "version": "1.0.0",
+  "description": "min-wlyt-plus is smart youtube watcher",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "youtube",
+    "search",
+    "video",
+    "express",
+    "nodejs"
+  ],
+  "author": "mino woolisbest",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cookie-parser": "^1.4.6",
+    "ejs": "^3.1.9",
+    "node-fetch": "^2.6.7",
+    "undici": "^6.19.8",
+    "youtube-search-api": "^1.2.2"
+  }
+}
