@@ -868,6 +868,22 @@ app.get("/nothing/*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "home.html"));
 });
 
+// Groq中継（APIキーはサーバーの環境変数 GROQ_API_KEY から読む）
+app.post("/api/groq", express.json({ limit: "1mb" }), async (req, res) => {
+  const key = process.env.GROQ_API_KEY;
+  if (!key) return res.status(503).json({ error: "GROQ_API_KEY is not set on the server" });
+  try {
+    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify(req.body),
+    });
+    res.status(r.status).type("application/json").send(await r.text());
+  } catch (e) {
+    res.status(502).json({ error: "Groq request failed" });
+  }
+});
+
 app.post("/api/save-history", express.json(), (req, res) => {
   res.json({ success: true });
 });
