@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ロボットではないことを証明してください</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: #0f0f0f; color: #f1f1f1; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+        
+        .card { background: #1f1f1f; border: 1px solid #2f2f2f; border-radius: 12px; padding: 32px; width: 360px; text-align: center; position: relative; }
+        h1 { font-size: 16px; font-weight: 500; margin-bottom: 24px; color: #aaa; }
+        
+        .captcha-container {
+            display: inline-flex; align-items: center; background: #151515; border: 1px solid #333; border-radius: 4px; padding: 16px; width: 260px; height: 74px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); transition: all 0.1s ease-out; cursor: pointer; user-select: none;
+        }
+        .checkbox { width: 24px; height: 24px; border: 2px solid #555; border-radius: 2px; margin-right: 12px; background: #0f0f0f; }
+        .label-text { font-size: 13px; color: #e1e1e1; pointer-events: none; }
+        
+        .spacer { height: 100px; } 
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>人間である証明を行ってください</h1>
+        <div class="spacer"></div>
+        
+        <div class="captcha-container" id="evadingBox">
+            <div class="checkbox"></div>
+            <div class="label-text">私はロボットではありません</div>
+        </div>
+    </div>
+
+    <script>
+        const box = document.getElementById('evadingBox');
+        
+        const escape = (e) => {
+            const padding = 100;
+            const maxX = window.innerWidth - padding * 2;
+            const maxY = window.innerHeight - padding * 2;
+            
+            const randomX = Math.random() * maxX + padding;
+            const randomY = Math.random() * maxY + padding;
+            
+            box.style.position = 'fixed';
+            box.style.left = randomX + 'px';
+            box.style.top = randomY + 'px';
+            box.style.transform = 'none';
+        };
+
+        box.addEventListener('mouseenter', escape);
+        box.addEventListener('touchstart', escape);
+        
+        box.addEventListener('click', () => {
+            alert('あなたの反射神経は人間を超えています。ロボットと判定し、アクセスをブロックしました。');
+        });
+    </script>
+</body>
+</html>

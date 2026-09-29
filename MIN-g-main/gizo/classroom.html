@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ストリーム - 現代プログラミング基礎 - Google Classroom</title>
+    <!-- Googleのフォントとアイコンシステム（Material Symbols）を読み込み -->
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', 'Arial', sans-serif;
+            background-color: #ffffff; /* Classroomは基本的に白ベース */
+            color: #3c4043;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ----- ナビゲーションバー (ヘッダー) ----- */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 64px;
+            background-color: white;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5f6368;
+            transition: background-color 0.2s;
+        }
+
+        .icon-btn:hover {
+            background-color: #f1f3f4;
+        }
+
+        .class-title-nav {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #3c4043;
+            white-space: nowrap;
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            padding: 0 16px;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #5f6368;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* 選択されているタブ */
+        .nav-tab.active {
+            color: #1a73e8;
+            border-bottom: 3px solid #1a73e8;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background-color: #f8f9fa;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .profile-pic {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #8ab4f8; /* デフォルトのプロフ画像代わり */
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+
+        /* ----- メインコンテンツ ----- */
+        .main-container {
+            margin-top: 64px;
+            padding: 24px 24px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ヒーローバナー（トップのクラス名画像部分） */
+        .hero-banner {
+            height: 240px;
+            border-radius: 8px;
+            /* クラスルーム特有の模様が入ったヘッダー風のグラデーション */
+            background: linear-gradient(135deg, #106f36, #32b561);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ちょっとした装飾円（実際のGoogleのデフォルトテーマを模倣） */
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: 50px;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 36px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            z-index: 1;
+        }
+
+        .hero-subtitle {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 20px;
+            font-weight: 400;
+            z-index: 1;
+        }
+
+        /* 2カラムレイアウト部分 */
+        .content-grid {
+            display: flex;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        /* 左側（期限間近ブロック） */
+        .left-sidebar {
+            flex: 0 0 196px; /* 固定幅 */
+        }
+
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: white;
+        }
+
+        .upcoming-card {
+            padding: 16px;
+        }
+
+        .upcoming-header {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #3c4043;
+            margin-bottom: 12px;
+        }
+
+        .upcoming-content {
+            font-size: 13px;
+            color: #5f6368;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .upcoming-link {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a73e8;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            text-align: right;
+            width: 100%;
+        }
+
+        /* 右側（ストリーム/お知らせ・課題リスト） */
+        .stream-feed {
+            flex: 1;
+        }
+
+        /* シェアボックス（クラスに共有...） */
+        .share-box {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            gap: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+            cursor: text;
+        }
+
+        .share-box:hover {
+            box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+        }
+
+        .share-box-text {
+            color: #5f6368;
+            font-size: 15px;
+            font-weight: 400;
+            flex-grow: 1;
+        }
+
+        .share-box .material-symbols-outlined {
+            color: #5f6368;
+            cursor: pointer;
+        }
+
+        /* フィードアイテム（課題のカード） */
+        .feed-item {
+            margin-bottom: 24px;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+            overflow: hidden;
+        }
+
+        .feed-item:hover {
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+            background-color: #f8f9fa; /* ホバー時にほんのり背景が変わる効果 */
+        }
+
+        .feed-item-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* 丸いアイコンエリア */
+        .item-icon-container {
+            width: 40px;
+            height: 40px;
+            background-color: #1a73e8; /* 各クラスのテーマカラーになる */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .feed-item-info {
+            flex-grow: 1;
+        }
+
+        .feed-title {
+            font-size: 15px;
+            font-family: 'Google Sans', sans-serif;
+            color: #3c4043;
+            letter-spacing: .01785714em;
+            font-weight: 500;
+        }
+
+        .feed-date {
+            font-size: 13px;
+            color: #5f6368;
+            margin-top: 2px;
+        }
+
+        .item-menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #5f6368;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .item-menu-btn:hover {
+            background-color: #e8eaed;
+        }
+
+        /* コメントエリア（細部の再現） */
+        .feed-item-footer {
+            border-top: 1px solid #e0e0e0;
+            padding: 12px 20px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        /* feed-itemへのhover時、footerは少し暗くしないように分離 */
+        .feed-item:hover .feed-item-footer {
+            background-color: #f8f9fa;
+        }
+
+        .add-comment {
+            border: 1px solid #dadce0;
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #5f6368;
+            font-size: 13px;
+            flex-grow: 1;
+            cursor: text;
+        }
+
+        /* --- レスポンシブ (タブレット・スマホ対応) --- */
+        @media (max-width: 800px) {
+            .hero-title { font-size: 28px; }
+            .hero-subtitle { font-size: 18px; }
+            
+            /* タブレット時は2カラムを1カラムに変更し、Upcoming部分を消す */
+            .content-grid {
+                flex-direction: column;
+            }
+            .left-sidebar {
+                display: none; 
+            }
+        }
+
+        @media (max-width: 600px) {
+            .nav-center {
+                display: none; /* スマホでは中央のタブメニューを隠し、後でメニュー等に逃がす前提 */
+            }
+            .main-container {
+                padding: 16px;
+            }
+            .hero-banner {
+                border-radius: 0;
+                margin-left: -16px;
+                margin-right: -16px;
+                width: calc(100% + 32px);
+                height: 180px;
+            }
+            .content-grid { margin-top: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 画面上部の固定ナビゲーションバー -->
+    <nav class="top-nav">
+        <!-- 左: ハンバーガーメニューとタイトル -->
+        <div class="nav-left">
+            <button class="icon-btn">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <div class="class-title-nav">現代プログラミング基礎</div>
+        </div>
+
+        <!-- 中央: メインタブ (スマホでは非表示) -->
+        <div class="nav-center">
+            <a href="#" class="nav-tab active">ストリーム</a>
+            <a href="#" class="nav-tab">授業</a>
+            <a href="#" class="nav-tab">メンバー</a>
+            <a href="#" class="nav-tab">採点</a>
+        </div>
+
+        <!-- 右: アプリ切り替え、プロフ画像 -->
+        <div class="nav-right">
+            <button class="icon-btn">
+                <span class="material-symbols-outlined">apps</span>
+            </button>
+            <div class="profile-pic">A</div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="main-container">
+        
+        <!-- トップのカラフルなバナー部分 -->
+        <header class="hero-banner">
+            <h1 class="hero-title">現代プログラミング基礎 101</h1>
+            <h2 class="hero-subtitle">金曜日 - 前期日程</h2>
+        </header>
+
+        <div class="content-grid">
+            
+            <!-- 左カラム（PC限定）: 期限間近のアナウンス -->
+            <aside class="left-sidebar">
+                <div class="card upcoming-card">
+                    <div class="upcoming-header">期限間近</div>
+                    <div class="upcoming-content">
+                        期限が間近の課題はありません。
+                    </div>
+                    <a href="#" class="upcoming-link">すべて表示</a>
+                </div>
+            </aside>
+
+            <!-- 右カラム: メインストリーム（投稿と課題一覧） -->
+            <section class="stream-feed">
+                
+                <!-- 投稿入力欄 (Classroom風に白抜き・浮遊感を持たせたブロック) -->
+                <div class="card share-box" style="border: none;">
+                    <div class="profile-pic" style="margin: 0; width: 40px; height: 40px; background-color: #8ab4f8;">A</div>
+                    <div class="share-box-text">クラスで共有...</div>
+                    <button class="icon-btn">
+                        <span class="material-symbols-outlined">repeat</span> <!-- 投稿を再利用のアイコン代替 -->
+                    </button>
+                </div>
+
+                <!-- タイムライン要素 1（お知らせ） -->
+                <article class="card feed-item">
+                    <div class="feed-item-header">
+                        <div class="profile-pic" style="margin: 0; width: 40px; height: 40px; background-color: #7986cb; flex-shrink: 0;">先</div>
+                        <div class="feed-item-info">
+                            <div class="feed-title">山田 先生</div>
+                            <div class="feed-date">昨日 14:00</div>
+                        </div>
+                        <button class="item-menu-btn"><span class="material-symbols-outlined">more_vert</span></button>
+                    </div>
+                    <!-- お知らせ本文 (少しの余白とともに) -->
+                    <div style="padding: 0 20px 20px; font-size: 14px; color: #3c4043; line-height: 1.5;">
+                        次回の講義はオンラインでの開催となります。<br>
+                        準備物：テキスト、Visual Studio CodeがインストールされたPC。<br>
+                        詳細はリンクのシラバスを確認してください。
+                    </div>
+                    
+                    <div class="feed-item-footer">
+                        <span class="material-symbols-outlined" style="color: #5f6368; font-size: 20px;">group</span>
+                        <div class="add-comment">クラスのコメントを追加...</div>
+                    </div>
+                </article>
+
+                <!-- タイムライン要素 2（新しい課題） -->
+                <article class="card feed-item">
+                    <div class="feed-item-header">
+                        <div class="item-icon-container">
+                            <!-- クリップボード系のアイコン -->
+                            <span class="material-symbols-outlined" style="font-size: 24px;">assignment</span>
+                        </div>
+                        <div class="feed-item-info">
+                            <div class="feed-title">ねむ 先生が新しい課題を投稿しました: 【第2回】 HTMLとCSSの応用構造</div>
+                            <div class="feed-date">5月18日</div>
+                        </div>
+                        <button class="item-menu-btn"><span class="material-symbols-outlined">more_vert</span></button>
+                    </div>
+                    
+                    <div class="feed-item-footer">
+                        <div class="profile-pic" style="margin: 0; width: 32px; height: 32px; background-color: #8ab4f8; font-size: 14px;">A</div>
+                        <div class="add-comment">クラスのコメントを追加...</div>
+                    </div>
+                </article>
+
+            </section>
+        </div>
+
+    </main>
+
+</body>
+</html>

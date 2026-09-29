@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>まなびのトビラ ログイン</title>
+<link rel="icon" type="image/webp" href="https://i.postimg.cc/L4fXm0kP/assets-task-01k4pqvmrdfpq8j99gfrzgj1vk-1757404936-img-0.webp">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f2f4f8;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  padding-top: 70px;
+  box-sizing: border-box;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  box-sizing: border-box;
+  z-index: 1000;
+  animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.navbar-brand {
+  font-size: 20px;
+  font-weight: bold;
+  color: #0078d7;
+}
+
+.main-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  padding: 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.description-box {
+  width: 450px;
+  animation: fadeInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.description-box h1 {
+  font-size: 28px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.description-box p {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.8;
+}
+
+.login-box {
+  background: white;
+  padding: 32px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  width: 350px;
+  text-align: center;
+  animation: fadeInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.login-box img {
+  display: block;
+  margin: 0 auto 18px auto;
+  width: 220px;
+}
+
+input[type="text"], input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+  border-color: #0078d7;
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  background: #0078d7;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.1s;
+}
+
+button:hover {
+  background: #005fa3;
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.other-login {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.other-login-options {
+  display: none;
+  margin-top: 10px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.other-login-options.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.other-login-options button {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  background: #eee;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.other-login-options button:hover {
+  background: #ddd;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 850px) {
+  .main-container {
+    flex-direction: column;
+    gap: 40px;
+    padding-top: 20px;
+  }
+  .description-box {
+    width: 100%;
+    text-align: center;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">まなびのトビラ</div>
+</nav>
+
+<div class="main-container">
+  <div class="description-box">
+    <h1>一歩先へ進む、これからの学習</h1>
+    <p>まなびのトビラは全国の学生にまなびを教えるシステムです。日本全国どこにいても、最高品質の教育コンテンツにシームレスにアクセスし、自立的な学習を進められる環境を提供しています。基礎的な知識の定着から、応用力を高める発展的な課題解決まで、一人ひとりの可能性を最大限に引き出す多彩なサポート機能がこのプラットフォームに凝縮されています。</p>
+  </div>
+
+  <div class="login-box">
+    <img src="https://i.postimg.cc/85sgfcNq/assets-task-01k4pqmgr4f0wtbg08eg9q4ssq-1757404702-img-0.webp" alt="システムのロゴ">
+    <form>
+      <input type="text" placeholder="ユーザー名" required>
+      <input type="password" placeholder="パスワード" required>
+      <button type="submit">ログイン</button>
+    </form>
+    <div class="other-login">
+      <button type="button" onclick="toggleOtherLogin()">その他のログイン</button>
+      <div class="other-login-options" id="other-login-options">
+        <button type="button">Googleでログイン</button>
+        <button type="button">Microsoftでログイン</button>
+        <button type="button">LINEでログイン</button>
+        <button type="button">ゲストとしてログイン</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleOtherLogin() {
+  const options = document.getElementById("other-login-options");
+  if (options.classList.contains("show")) {
+    options.classList.remove("show");
+    setTimeout(() => { options.style.display = "none"; }, 300);
+  } else {
+    options.style.display = "block";
+    setTimeout(() => { options.classList.add("show"); }, 10);
+  }
+}
+
+function executeRedirect(e) {
+  if (e) e.preventDefault();
+  document.cookie = "humanVerified=true; path=/";
+  window.location.href = "/";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector("form");
+  if (form) {
+    form.addEventListener("submit", executeRedirect);
+  }
+
+  const allActionButtons = document.querySelectorAll(".other-login-options button");
+  allActionButtons.forEach(btn => {
+    btn.addEventListener("click", executeRedirect);
+  });
+});
+</script>
+
+</body>
+</html>

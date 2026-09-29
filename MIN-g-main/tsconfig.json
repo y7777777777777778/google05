@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+
+    "allowJs": true,
+    "checkJs": false,
+
+    "resolveJsonModule": true,
+    "strict": false,
+    "skipLibCheck": true,
+
+    "outDir": "dist"
+  },
+  "include": [
+    "index.js",
+    "src/ts/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "public",
+    "views",
+    "src/react"
+  ]
+}

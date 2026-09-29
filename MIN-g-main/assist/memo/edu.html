@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="author" content="mino" />
+  <title>mino Kahoot YouTubeEducation Player</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; margin: 20px; color:#111; }
+    h3 { margin-top: 0; }
+    .card { border:1px solid #e6e6e6; padding:16px; border-radius:8px; max-width:900px; }
+    label { display:block; margin:8px 0 4px; font-weight:600; }
+    input[type="text"], input[type="number"], select { width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; }
+    .row { display:flex; gap:12px; }
+    .col { flex:1; }
+    button { margin-top:12px; padding:10px 14px; border-radius:8px; border:0; background:#0066ff; color:#fff; cursor:pointer; }
+    button.secondary { background:#666; }
+    pre { background:#f7f7f7; padding:12px; border-radius:6px; overflow:auto; }
+    iframe { width:100%; height:480px; border:0; margin-top:12px; border-radius:8px; }
+    .muted { opacity:0.6; font-size:0.9em; }
+    .small { font-size:0.9em; color:#444; }
+    .error { color:#b00020; font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h3>mino Kahoot YouTubeEducation Embed Generator</h3>
+    <p class="small">動画 ID を入力すると Kahoot の鍵を取得して埋め込みストリーム URL を生成し、iframe で再生します。</p>
+
+    <label for="videoId">動画 ID</label>
+    <input id="videoId" type="text" placeholder="例: dQw4w9WgXcQ" />
+
+    <div class="row" style="margin-top:8px;">
+      <div class="col">
+        <label for="autoplay">autoplay</label>
+        <select id="autoplay"><option value="1">1</option><option value="0">0</option></select>
+      </div>
+      <div class="col">
+        <label for="mute">mute</label>
+        <select id="mute"><option value="0">0</option><option value="1">1</option></select>
+      </div>
+      <div class="col">
+        <label for="controls">controls</label>
+        <select id="controls"><option value="1">1</option><option value="0">0</option></select>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:8px;">
+      <div class="col">
+        <label for="start">start (秒)</label>
+        <input id="start" type="number" min="0" value="0" />
+      </div>
+      <div class="col">
+        <label for="origin">origin (オプション)</label>
+        <input id="origin" type="text" placeholder="https://create.kahoot.it" />
+      </div>
+      <div class="col">
+        <label for="forigin">forigin (オプション)</label>
+        <input id="forigin" type="text" placeholder="https://create.kahoot.it/..." />
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <button id="generateBtn">生成して再生</button>
+      <button id="copyBtn" class="secondary">URL をコピー</button>
+      <button id="previewBtn" class="secondary">iframe プレビューのみ</button>
+    </div>
+
+    <p class="muted" style="margin-top:8px;">注: ブラウザの CORS 制約により直接取得できない場合があります。失敗したらプロキシ経由で再試行します。</p>
+
+    <div id="status" style="margin-top:12px;"></div>
+
+    <label style="margin-top:12px;">生成されたストリーム URL</label>
+    <pre id="result">—</pre>
+
+    <div id="playerArea" style="margin-top:12px; display:none;">
+      <label>プレイヤー</label>
+      <div id="iframeWrap"></div>
+    </div>
+  </div>
+
+  <script>
+    const KAHOOT_KEY_URL = 'https://apis.kahoot.it/media-api/youtube/key';
+    const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+    const CACHE_KEY = 'kahoot_enc_cache_v1';
+    const CACHE_TTL = 5 * 60 * 1000;
+    const $ = id => document.getElementById(id);
+    const statusEl = $('status');
+    const resultEl = $('result');
+    const iframeWrap = $('iframeWrap');
+    const playerArea = $('playerArea');
+
+    function setStatus(msg, isError) {
+      statusEl.innerHTML = msg ? (isError ? `<div class="error">${msg}</div>` : msg) : '';
+    }
+
+    function saveCache(enc) {
+      const payload = { enc, ts: Date.now() };
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(payload)); } catch(e){}
+    }
+
+    function loadCache() {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (!obj || !obj.enc || !obj.ts) return null;
+        if ((Date.now() - obj.ts) > CACHE_TTL) return null;
+        return obj.enc;
+      } catch (e) { return null; }
+    }
+
+    async function fetchKahootKey(useProxy=false) {
+      const cached = loadCache();
+      if (cached) return cached;
+      const url = KAHOOT_KEY_URL;
+      let fetchUrl = url;
+      if (useProxy) fetchUrl = CORS_PROXY + encodeURIComponent(url);
+      setStatus(`Kahoot key を取得中... ${useProxy ? '(proxy 経由)' : ''}`);
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 7000);
+        const resp = await fetch(fetchUrl, { signal: controller.signal });
+        clearTimeout(timeout);
+        if (!resp.ok) throw new Error('fetch failed: ' + resp.status);
+        const ct = resp.headers.get('content-type') || '';
+        let key;
+        if (ct.includes('application/json')) {
+          const data = await resp.json();
+          if (typeof data === 'string') key = data;
+          else if (data.key) key = data.key;
+          else if (data.enc) key = data.enc;
+          else key = JSON.stringify(data);
+        } else {
+          key = await resp.text();
+        }
+        if (!key) throw new Error('no key in response');
+        saveCache(key);
+        setStatus('Kahoot key を取得しました。');
+        return key;
+      } catch (err) {
+        setStatus('Kahoot key 取得に失敗しました: ' + err.message, true);
+        throw err;
+      }
+    }
+
+    function buildDefaultParams() {
+      return {
+        autoplay: '1',
+        mute: '0',
+        controls: '1',
+        start: '0',
+        origin: encodeURIComponent('https://create.kahoot.it'),
+        playsinline: '1',
+        showinfo: '0',
+        rel: '0',
+        iv_load_policy: '3',
+        modestbranding: '1',
+        fs: '1',
+        cc_load_policy: '0',
+        enablejsapi: '1',
+        widgetid: '1',
+        forigin: encodeURIComponent('https://create.kahoot.it/learner/cb8cb5ae-d835-4c4a-bc2d-9cc78519d646/course/6fba06e3-1f76-47a8-9a4a-53c53eb86286/0'),
+        aoriginsup: '1',
+        vf: '6'
+      };
+    }
+
+    function buildUrl(videoId, enc, overrides={}) {
+      const embedConfig = { enc: enc, hideTitle: true };
+      const embedConfigParam = encodeURIComponent(JSON.stringify(embedConfig));
+      const params = buildDefaultParams();
+      for (const k in overrides) {
+        if (!overrides[k]) continue;
+        if (k === 'origin' || k === 'forigin') params[k] = encodeURIComponent(overrides[k]);
+        else params[k] = String(overrides[k]);
+      }
+      const orderedKeys = [
+        'autoplay','mute','controls','start','origin','playsinline',
+        'showinfo','rel','iv_load_policy','modestbranding','fs',
+        'cc_load_policy','enablejsapi','widgetid','forigin','aoriginsup','vf'
+      ];
+      const qs = orderedKeys.map(k => `${k}=${params[k]}`).join('&') + `&embed_config=${embedConfigParam}`;
+      return `https://www.youtubeeducation.com/embed/${encodeURIComponent(videoId)}?${qs}`;
+    }
+
+    async function generateAndPlay({ previewOnly=false } = {}) {
+      setStatus('');
+      resultEl.textContent = '生成中...';
+      iframeWrap.innerHTML = '';
+      playerArea.style.display = 'none';
+      const videoId = $('videoId').value.trim();
+      if (!videoId) {
+        setStatus('動画 ID を入力してください。', true);
+        resultEl.textContent = '—';
+        return;
+      }
+      const overrides = {
+        autoplay: $('autoplay').value,
+        mute: $('mute').value,
+        controls: $('controls').value,
+        start: $('start').value,
+        origin: $('origin').value || undefined,
+        forigin: $('forigin').value || undefined
+      };
+      let enc = null;
+      try {
+        enc = await fetchKahootKey(false);
+      } catch (e1) {
+        try {
+          enc = await fetchKahootKey(true);
+        } catch (e2) {
+          setStatus('Kahoot key の取得に失敗しました。ブラウザの CORS 制約の可能性があります。', true);
+          resultEl.textContent = '取得失敗';
+          return;
+        }
+      }
+      const finalUrl = buildUrl(videoId, enc, overrides);
+      resultEl.textContent = finalUrl;
+      setStatus('生成完了');
+      $('copyBtn').onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(finalUrl);
+          setStatus('URL をクリップボードにコピーしました。');
+        } catch (e) {
+          setStatus('クリップボードにコピーできませんでした: ' + e.message, true);
+        }
+      };
+      if (previewOnly) {
+        iframeWrap.innerHTML = `<iframe src="${finalUrl}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+        playerArea.style.display = 'block';
+        return;
+      }
+      iframeWrap.innerHTML = `<iframe src="${finalUrl}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+      playerArea.style.display = 'block';
+    }
+
+    $('generateBtn').addEventListener('click', () => generateAndPlay({ previewOnly:false }));
+    $('previewBtn').addEventListener('click', () => generateAndPlay({ previewOnly:true }));
+    $('copyBtn').addEventListener('click', async () => {
+      const txt = resultEl.textContent || '';
+      if (!txt || txt === '—' || txt === '生成中...' || txt === '取得失敗') {
+        setStatus('コピーする URL がありません。まず生成してください。', true);
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(txt);
+        setStatus('URL をクリップボードにコピーしました。');
+      } catch (e) {
+        setStatus('クリップボードにコピーできませんでした: ' + e.message, true);
+      }
+    });
+
+    $('origin').value = 'https://create.kahoot.it';
+    $('forigin').value = 'https://create.kahoot.it/learner/cb8cb5ae-d835-4c4a-bc2d-9cc78519d646/course/6fba06e3-1f76-47a8-9a4a-53c53eb86286/0';
+  </script>
+</body>
+</html>

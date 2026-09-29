@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>微分の重要性 - 物理学における微分定数</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <style>
+    :root {
+      --main-bg: #1a1a2e;
+      --accent: #e94560;
+      --text: #e0e1dd;
+      --font: 'Inter', sans-serif;
+    }
+    body.light {
+      --main-bg: #f0f0f0;
+      --text: #1a1a2e;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: var(--main-bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(0,0,0,0.2);
+    }
+    .logo {
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+    nav ul {
+      display: flex;
+      gap: 1.5rem;
+    }
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .hero {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      min-height: 80vh;
+      background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+    }
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+    .hero p {
+      max-width: 600px;
+      margin: auto;
+    }
+    .content {
+      padding: 4rem 2rem;
+      display: grid;
+      gap: 3rem;
+      max-width: 960px;
+      margin: auto;
+    }
+    section h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+    .equation {
+      background: rgba(0,0,0,0.3);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    ul {
+      list-style: inside;
+      padding-left: 1rem;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+    .toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--accent);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+    }
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      nav ul {
+        display: none;
+      }
+      .toggle {
+        top: 0.5rem;
+        right: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">微分物理</div>
+    <ul>
+      <li><a href="#rate">変化率</a></li>
+      <li><a href="#model">モデル化</a></li>
+      <li><a href="#unity">理論統一</a></li>
+      <li><a href="#applications">応用</a></li>
+    </ul>
+    <button class="toggle" onclick="document.body.classList.toggle('light')">Light/Dark</button>
+  </nav>
+  <div class="hero">
+    <div>
+      <h1>微分定数が物理学に不可欠な理由</h1>
+      <p>速度から電磁気学まで、微分は自然現象を解き明かす鍵です。</p>
+    </div>
+  </div>
+  <main class="content">
+    <section id="rate">
+      <h2>1. 物理現象の変化を記述</h2>
+      <p>位置\(x(t)\)の時間微分で速度\(v(t)\)を、さらに加速度\(a(t)\)を得る。</p>
+      <div class="equation">\(\displaystyle v(t)=\frac{dx}{dt},\quad a(t)=\frac{dv}{dt}\)</div>
+    </section>
+    <section id="model">
+      <h2>2. 自然現象のモデル化</h2>
+      <p>ニュートンの運動方程式や波動方程式は微分方程式で表される。</p>
+      <div class="equation">\(\displaystyle F=ma\ \Rightarrow\ m\frac{d^2x}{dt^2}=F(x,t)\)</div>
+      <div class="equation">\(\displaystyle \frac{\partial^2\psi}{\partial t^2}=c^2\nabla^2\psi\)</div>
+    </section>
+    <section id="unity">
+      <h2>3. 理論の統一性</h2>
+      <p>異なる法則も微分の視点で統一的に扱える。</p>
+      <div class="equation">\(\displaystyle \nabla\cdot\mathbf{E}=\frac{\rho}{\varepsilon_0},\quad \nabla\times\mathbf{B}-\mu_0\varepsilon_0\frac{\partial\mathbf{E}}{\partial t}=\mu_0\mathbf{J}\)</div>
+    </section>
+    <section id="applications">
+      <h2>4. 実用的な応用</h2>
+      <p>工学、経済学、生物学など多領域で変化率を解析。</p>
+      <ul>
+        <li>電気回路解析: \(\displaystyle L\frac{dI}{dt}+RI=V(t)\)</li>
+        <li>経済モデル: \(\displaystyle \frac{dP}{dt}=kP\bigl(1-\frac{P}{M}\bigr)\)</li>
+        <li>人口成長: \(\displaystyle \frac{dN}{dt}=rN\)</li>
+      </ul>
+    </section>
+  </main>
+  <footer>© 2025 微分物理. All rights reserved.</footer>
+</body>
+</html>

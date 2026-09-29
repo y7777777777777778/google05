@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人間性および現代人適性検査システム</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --border-color: #333333;
+            --text-main: #f1f1f1;
+            --text-sub: #aaa;
+            --google-blue: #8ab4f8;
+            --google-red: #f28b82;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .bg-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .captcha-anchor {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            width: 304px;
+            height: 78px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: border-color 0.3s;
+        }
+
+        .captcha-anchor:hover {
+            border-color: #444;
+        }
+
+        .checkbox-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-custom {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #555;
+            border-radius: 2px;
+            position: relative;
+            background-color: #252525;
+            transition: all 0.2s;
+        }
+
+        .checkbox-area:hover .checkbox-custom {
+            border-color: #777;
+        }
+
+        .spinner {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 28px;
+            height: 28px;
+            border: 3px solid transparent;
+            border-top-color: var(--google-blue);
+            border-radius: 50%;
+            display: none;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .captcha-text {
+            font-size: 14px;
+            color: var(--text-main);
+            font-weight: 400;
+        }
+
+        .brand-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            opacity: 0.8;
+        }
+
+        .brand-links {
+            font-size: 8px;
+            color: var(--text-sub);
+            margin-top: 4px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .captcha-modal {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 380px;
+            padding: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: none;
+        }
+
+        .modal-overlay.active .captcha-modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            background-color: var(--google-blue);
+            color: #121212;
+            padding: 16px;
+            margin: -16px -16px 16px -16px;
+        }
+
+        .modal-header h2 {
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.2;
+        }
+
+        .modal-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            background-color: #121212;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+
+        .grid-item {
+            aspect-ratio: 1;
+            background: #2a2a2a;
+            border: 2px solid transparent;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+
+        .grid-item:hover {
+            background: #333;
+        }
+
+        .grid-item.selected {
+            transform: scale(0.92);
+            border-color: var(--google-blue);
+            background: #1a233a;
+        }
+
+        .grid-item.selected::after {
+            content: "✓";
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background: var(--google-blue);
+            color: #121212;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid-item-emoji {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+        }
+
+        .footer-icons {
+            display: flex;
+            gap: 14px;
+            opacity: 0.6;
+        }
+
+        .footer-icons svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-main);
+            cursor: pointer;
+        }
+
+        .footer-icons svg:hover {
+            fill: var(--google-blue);
+        }
+
+        .btn-verify {
+            background-color: var(--google-blue);
+            color: #121212;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-verify:hover {
+            background-color: #a8c7fa;
+        }
+
+        .stress-auth {
+            display: none;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .error-message {
+            color: var(--google-red);
+            font-size: 13px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .shake-zone {
+            border: 2px dashed #444;
+            border-radius: 8px;
+            padding: 30px 20px;
+            background: #161616;
+            cursor: move;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #222;
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--google-blue);
+            transition: width 0.1s ease;
+        }
+
+        .success-screen {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            fill: #81c995;
+            margin-bottom: 16px;
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .dodge-btn-container {
+            position: relative;
+            height: 50px;
+            margin-top: 15px;
+        }
+
+        .btn-dodge {
+            position: absolute;
+            left: 35%;
+            transition: all 0.1s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+
+    <div class="container">
+        <div class="captcha-anchor" id="captchaAnchor">
+            <div class="checkbox-area" id="checkboxArea">
+                <div class="checkbox-custom" id="checkboxCustom">
+                    <div class="spinner" id="spinner"></div>
+                </div>
+                <span class="captcha-text">私はロボットです</span>
+            </div>
+            <div class="brand-area">
+                <svg class="brand-logo" viewBox="0 0 24 24">
+                    <path fill="#8ab4f8" d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    <path fill="#f28b82" d="M12 6a6 6 0 0 0-6 6c0 1.66.67 3.16 1.76 4.24l1.42-1.42A3.98 3.98 0 0 1 8 12c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .95-.33 1.81-.88 2.5l1.42 1.42C17.33 15.16 18 13.66 18 12a6 6 0 0 0-6-6z"/>
+                </svg>
+                <div class="brand-links">
+                    reCAPTCHA<br>
+                    <span style="color:#666;">プライバシー・規約</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        
+        <div class="captcha-modal" id="modalGrid" style="display: block;">
+            <div class="modal-header">
+                <h1>『実質不労所得』</h1>
+                <h2>の概念をすべて選択してください</h2>
+            </div>
+
+            <div class="grid-container" id="gridContainer">
+            </div>
+
+            <div class="modal-footer">
+                <div class="footer-icons">
+                    <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.86 3.14-7 7-7s7 3.14 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M11 18h2v-6h-2v6zm1-14c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm0 12c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm-1-9h2v-2h-2v2z"/></svg>
+                </div>
+                <button class="btn-verify" id="btnVerify">確認</button>
+            </div>
+        </div>
+
+        <div class="captcha-modal" id="modalStress">
+            <div class="modal-header" style="background-color: #333; color: var(--text-main);">
+                <h1>追加の検証が必要</h1>
+                <h2>システムはあなたの異常性を検知しました</h2>
+            </div>
+            <div class="stress-auth" style="display: block;">
+                <div class="error-message">
+                    エラー：さきほどのマウス軌跡が人間的すぎます。人間性を捨てて再挑戦してください
+                </div>
+                <div class="shake-zone" id="shakeZone">
+                    <span style="font-size: 13px; color: var(--text-sub);" id="shakeText">
+                        現代人のストレスを証明するため、このエリア内でマウスを激しく振ってください
+                    </span>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="captcha-modal" id="modalDodge">
+            <div class="modal-header" style="background-color: var(--google-blue); color: #121212;">
+                <h1>最終誓約</h1>
+                <h2>私は本当に、本当に人間です</h2>
+            </div>
+            <div style="padding: 10px 0; text-align: center;">
+                <p style="font-size: 13px; color: var(--text-sub); line-height: 1.5;">
+                    「明日から本気出す」という誓いに偽りがない場合のみ、以下の承認ボタンを押して検証を完了してください。
+                </p>
+                <div class="dodge-btn-container">
+                    <button class="btn-verify btn-dodge" id="btnDodge">承認する</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="captcha-modal" id="modalSuccess">
+            <div class="success-screen" style="display: block;">
+                <svg class="success-icon" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <h1 style="font-size: 22px; color: #81c995; margin-bottom: 8px;">検証に成功しました</h1>
+                <p style="font-size: 14px; color: var(--text-sub);">
+                    あなたは「約42%」の確率で人間、<br>または極めて高度なサボり魔です。
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const checkboxArea = document.getElementById('checkboxArea');
+        const checkboxCustom = document.getElementById('checkboxCustom');
+        const spinner = document.getElementById('spinner');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalGrid = document.getElementById('modalGrid');
+        const modalStress = document.getElementById('modalStress');
+        const modalDodge = document.getElementById('modalDodge');
+        const modalSuccess = document.getElementById('modalSuccess');
+        const gridContainer = document.getElementById('gridContainer');
+        const btnVerify = document.getElementById('btnVerify');
+        const shakeZone = document.getElementById('shakeZone');
+        const progressBar = document.getElementById('progressBar');
+        const shakeText = document.getElementById('shakeText');
+        const btnDodge = document.getElementById('btnDodge');
+
+        const concepts = [
+            { id: 1, emoji: "🛌", text: "昼の2時に起きる" },
+            { id: 2, emoji: "📈", text: "寝てる間の株高" },
+            { id: 3, emoji: "🪙", text: "ビットコインのネタ化" },
+            { id: 4, emoji: "💻", text: "週休5日のリモート" },
+            { id: 5, emoji: "📉", text: "全財産微減" },
+            { id: 6, emoji: "💬", text: "Slack未読無視" },
+            { id: 7, emoji: "📮", text: "マイナンバー通知" },
+            { id: 8, emoji: "🧾", text: "終わらない確定申告" },
+            { id: 9, emoji: "☕", text: "スタバでドヤ離席" }
+        ];
+
+        function initGrid() {
+            gridContainer.innerHTML = '';
+            concepts.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'grid-item';
+                div.innerHTML = `
+                    <div class="grid-item-emoji">${item.emoji}</div>
+                    <div>${item.text}</div>
+                `;
+                div.addEventListener('click', () => {
+                    div.classList.toggle('selected');
+                });
+                gridContainer.appendChild(div);
+            });
+        }
+
+        checkboxArea.addEventListener('click', () => {
+            checkboxCustom.style.background = 'transparent';
+            spinner.style.display = 'block';
+
+            setTimeout(() => {
+                modalOverlay.classList.add('active');
+                initGrid();
+            }, 1800);
+        });
+
+        btnVerify.addEventListener('click', () => {
+            modalGrid.style.display = 'none';
+            modalStress.style.display = 'block';
+            initShakeEvent();
+        });
+
+
+        function initShakeEvent() {
+            let lastX = null;
+            let lastY = null;
+            let totalMovement = 0;
+            const targetMovement = 30000; 
+
+            function handleMouseMove(e) {
+                if (lastX !== null && lastY !== null) {
+                    const deltaX = Math.abs(e.clientX - lastX);
+                    const deltaY = Math.abs(e.clientY - lastY);
+                    totalMovement += (deltaX + deltaY);
+
+                    let percentage = Math.min((totalMovement / targetMovement) * 100, 100);
+                    progressBar.style.width = percentage + '%';
+
+                    if (percentage >= 100) {
+                        shakeZone.removeEventListener('mousemove', handleMouseMove);
+                        shakeText.innerText = "ストレスを十分に感知しました。だからといって何かが変わるわけじゃありません";
+                        setTimeout(() => {
+                            modalStress.style.style.display = 'none'; 
+                            modalStress.style.display = 'none';
+                            modalDodge.style.display = 'block';
+                        }, 800);
+                    }
+                }
+                lastX = e.clientX;
+                lastY = e.clientY;
+            }
+
+            shakeZone.addEventListener('mousemove', handleMouseMove);
+        }
+
+        btnDodge.addEventListener('mouseover', () => {
+            const containerWidth = 340;
+            const btnWidth = 100;
+            const randomX = Math.floor(Math.random() * (containerWidth - btnWidth));
+            
+            btnDodge.style.left = randomX + 'px';
+            btnDodge.innerText = "本気出す！";
+        });
+
+        let dodgeCount = 0;
+        btnDodge.addEventListener('mouseenter', () => {
+            dodgeCount++;
+            if (dodgeCount > 4) {
+                btnDodge.style.left = '35%'; 
+                btnDodge.innerText = "もう許す（クリック可）";
+            }
+        });
+
+        btnDodge.addEventListener('click', () => {
+            modalDodge.style.display = 'none';
+            modalSuccess.style.display = 'block';
+            
+            setTimeout(() => {
+                modalOverlay.classList.remove('active');
+                checkboxCustom.innerHTML = '✓';
+                checkboxCustom.style.border = 'none';
+                checkboxCustom.style.color = '#81c995';
+                checkboxCustom.style.display = 'flex';
+                checkboxCustom.style.alignItems = 'center';
+                checkboxCustom.style.justifyContent = 'center';
+                checkboxCustom.style.fontWeight = 'bold';
+                checkboxCustom.style.fontSize = '18px';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

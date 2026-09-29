@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中学校2年生 社会(歴史)│語呂合わせで記憶を定着！ Teacch it</title>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          display: flex;
+      }
+      #sidebar {
+          width: 220px;
+          background-color: #e0f7fa; /* 目立ちづらい青色 */
+          padding: 15px;
+          position: fixed;
+          height: 100%;
+      }
+      #content {
+          margin-left: 240px;
+          padding: 20px;
+      }
+      h2 {
+          color: #333;
+      }
+      a {
+          text-decoration: none;
+          color: #007BFF;
+      }
+      a:hover {
+          text-decoration: underline;
+      }
+      section {
+          margin-bottom: 40px;
+      }
+      .highlight {
+          background-color: #f9f9f9;
+          border-left: 4px solid #007BFF;
+          padding: 10px;
+          margin: 10px 0;
+      }
+  </style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h1>Teacch It</h1>
+  <ul>
+      <li><a href="#kamakura">鎌倉時代</a></li>
+      <li><a href="#mughal">室町時代</a></li>
+      <li><a href="#sengoku">戦国時代</a></li>
+      <li><a href="#edo">江戸時代</a></li>
+      <li><a href="#meiji">明治時代</a></li>
+  </ul>
+</div>
+
+<div id="content">
+  <h1>中学校2年生 社会(歴史)│語呂合わせで記憶を定着！ Teacch it</h1>
+
+  <section id="kamakura">
+      <h2>鎌倉時代</h2>
+      <p>鎌倉時代は1185年から1333年までの期間で、日本の歴史において重要な時代です。この時代は、武士が政治の中心となり、鎌倉幕府が成立しました。源頼朝が初代将軍となり、武士の時代が始まりました。</p>
+      <p>この時代には、武士の身分制度が確立され、平氏との戦いである「平治の乱」や、源氏と平氏の戦いである「源平合戦」がありました。また、鎌倉時代は、仏教が広まった時代でもあり、浄土宗や禅宗が盛んになりました。</p>
+      <p>さらに、鎌倉幕府は、法律や政治制度を整備し、御成敗式目を制定しました。この法律は、武士の行動規範を示したもので、後の時代にも影響を与えました。</p>
+
+      <div class="highlight">
+          <h3>ここだけはおさえとけ！</h3>
+          <ul>
+              <li>源頼朝が初代将軍として鎌倉幕府を開いた。</li>
+              <li>平治の乱と源平合戦が重要な戦い。</li>
+              <li>御成敗式目が武士の行動規範を定めた。</li>
+          </ul>
+      </div>
+  </section>
+
+  <section id="mughal">
+      <h2>室町時代</h2>
+      <p>室町時代は1336年から1573年まで続き、足利氏が政権を握りました。この時代は、文化が栄え、特に茶道や能楽などが発展しました。室町幕府が設立され、将軍は政治の中心としての役割を果たしました。</p>
+      <p>また、この時代には「応仁の乱」という大規模な内乱が起こり、戦国時代への道を開くこととなります。応仁の乱は、足利将軍家の後継者争いが原因で、全国的な混乱を引き起こしました。</p>
+      <p>室町時代は、商業が発展し、特に京都や奈良などの都市が栄えました。貿易も活発になり、中国や朝鮮との交流が増え、さまざまな文化が流入しました。</p>
+
+      <div class="highlight">
+          <h3>ここだけはおさえとけ！</h3>
+          <ul>
+              <li>足利氏が室町幕府を開いた。</li>
+              <li>応仁の乱が戦国時代の始まりとなった。</li>
+              <li>茶道や能楽などの文化が栄えた。</li>
+          </ul>
+      </div>
+  </section>
+
+  <section id="sengoku">
+      <h2>戦国時代</h2>
+      <p>戦国時代は1467年から1603年までの期間で、多くの大名が争いを繰り広げた時代です。この時代には、織田信長、豊臣秀吉、徳川家康などの有名な武将が登場しました。</p>
+      <p>戦国時代は、各地の大名が領地を拡大しようとする中で、合戦や同盟が頻繁に行われました。織田信長は「天下布武」を掲げ、中央集権的な政権を目指しました。</p>
+      <p>豊臣秀吉は、信長の死後、その遺志を継ぎ、全国統一を達成しました。彼は、農民を武士に変える「刀狩り」や、海外への進出を図る「朝鮮出兵」を行いました。</p>
+      <p>最後に、徳川家康が関ヶ原の戦いで勝利し、江戸時代を迎えることとなります。この時代は、戦国時代の混乱を経て、安定した時代へと移行しました。</p>
+
+      <div class="highlight">
+          <h3>ここだけはおさえとけ！</h3>
+          <ul>
+              <li>織田信長が天下統一を目指した。</li>
+              <li>豊臣秀吉が全国統一を達成した。</li>
+              <li>徳川家康が関ヶ原の戦いで勝利した。</li>
+          </ul>
+      </div>
+  </section>
+
+  <section id="edo">
+      <h2>江戸時代</h2>
+      <p>江戸時代は1603年から1868年まで続き、平和な時代でした。徳川家康が江戸幕府を開き、約260年間の長い安定期をもたらしました。この時代は、商業や文化が発展し、浮世絵や歌舞伎が人気を博しました。</p>
+      <p>また、江戸時代には、鎖国政策が採られ、西洋との交流が制限されました。しかし、オランダとの貿易は続き、西洋の文化や技術が少しずつ流入しました。</p>
+      <p>この時代には、江戸の町が発展し、庶民文化が栄えました。特に、歌舞伎や落語などの娯楽が広まり、商業活動が活発になりました。</p>
+      <p>幕末には、外国の圧力が高まり、開国を余儀なくされることになります。これが後の明治維新へとつながっていきます。</p>
+
+      <div class="highlight">
+          <h3>ここだけはおさえとけ！</h3>
+          <ul>
+              <li>徳川家康が江戸幕府を開いた。</li>
+              <li>鎖国政策が採られたがオランダとの貿易は続いた。</li>
+              <li>庶民文化が栄え、歌舞伎や浮世絵が人気。</li>
+          </ul>
+      </div>
+  </section>
+
+  <section id="meiji">
+      <h2>明治時代</h2>
+      <p>明治時代は1868年から1912年までの期間で、日本が近代国家へと変革する重要な時代です。明治維新によって、封建制度が廃止され、西洋の文化や技術が導入されました。</p>
+      <p>この時代には、中央集権的な政府が樹立され、憲法が制定され、近代的な教育制度が整備されました。特に、明治憲法は日本の政治体制の基礎を築くものでした。</p>
+      <p>また、産業革命が進み、鉄道や通信網が整備され、経済が急速に発展しました。日本は、日清戦争や日露戦争を経て、国際的な地位を確立しました。</p>
+      <p>この時代の終わりには、第一次世界大戦が勃発し、日本は連合国側として参戦しました。これにより、日本の国際的な影響力がさらに強まりました。</p>
+
+      <div class="highlight">
+          <h3>ここだけはおさえとけ！</h3>
+          <ul>
+              <li>明治維新で封建制度が廃止された。</li>
+              <li>明治憲法が制定され、近代国家へと変革。</li>
+              <li>日清戦争や日露戦争で国際的地位を確立。</li>
+          </ul>
+      </div>
+  </section>
+</div>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"94c79d4d951745d085049dd7f2bbd8f8","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

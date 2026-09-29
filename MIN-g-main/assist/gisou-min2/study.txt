@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勉強の大切さ</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            margin: 15px 0;
+        }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #4a90e2;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #4a90e2;
+            color: white;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>勉強の大切さ</h1>
+    <nav>
+        <a href="#importance">勉強の重要性</a>
+        <a href="#tips">勉強のコツ</a>
+        <a href="#conclusion">まとめ</a>
+    </nav>
+</header>
+
+<section id="importance">
+    <h2>勉強の重要性</h2>
+    <p>勉強は自己成長のための重要な手段です。知識を深めることで、将来の選択肢が広がります。</p>
+</section>
+
+<section id="tips">
+    <h2>勉強のコツ</h2>
+    <ul>
+        <li>計画を立てて効率的に学ぶ</li>
+        <li>定期的に復習する</li>
+        <li>興味を持って学ぶことが大切</li>
+    </ul>
+</section>
+
+<section id="conclusion">
+    <h2>まとめ</h2>
+    <p>勉強は人生を豊かにするための鍵です。継続的な学びを大切にしましょう。</p>
+</section>
+
+<footer>
+    <p>&copy; 2025 勉強の大切さ</p>
+</footer>
+
+</body>
+</html>

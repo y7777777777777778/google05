@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微分定数の仕組み</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #eaeaea;
+            color: #333;
+        }
+        header {
+            background-color: #007acc;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            margin: 15px 0;
+        }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #007acc;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #007acc;
+            color: white;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+        .formula {
+            background-color: #f9f9f9;
+            border-left: 4px solid #007acc;
+            padding: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>微分定数の仕組み</h1>
+    <nav>
+        <a href="#definition">定義</a>
+        <a href="#importance">重要性</a>
+        <a href="#examples">例</a>
+    </nav>
+</header>
+
+<section id="definition">
+    <h2>定義</h2>
+    <p>微分定数とは、関数の変化率を表す数値であり、特定の点における接線の傾きを示します。微分は、関数の変化を理解するための基本的な手法です。</p>
+    <div class="formula">
+        $ f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} $
+    </div>
+</section>
+
+<section id="importance">
+    <h2>重要性</h2>
+    <p>微分定数は、物理学や工学、経済学など多くの分野で重要な役割を果たします。例えば、速度や加速度の計算、最適化問題の解決などに利用されます。</p>
+</section>
+
+<section id="examples">
+    <h2>例</h2>
+    <p>以下は、微分定数の具体的な例です。</p>
+    <ul>
+        <li>位置関数の微分による速度の計算</li>
+        <li>コスト関数の微分による利益の最大化</li>
+        <li>物体の運動における加速度の計算</li>
+    </ul>
+</section>
+
+<footer>
+    <p>&copy; 2025 微分定数の仕組み</p>
+</footer>
+
+</body>
+</html>

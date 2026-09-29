@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>モジュラー形式入門</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body)"></script>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --fg: #e0e1dd;
+      --accent: #e94560;
+      --font: 'Inter', sans-serif;
+    }
+    body.light {
+      --bg: #f0f0f0;
+      --fg: #1a1a2e;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font);
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(0,0,0,0.2);
+    }
+    .logo {
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+    nav ul {
+      display: flex;
+      gap: 1.5rem;
+    }
+    nav a {
+      color: var(--fg);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .toggle {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .hero {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      min-height: 60vh;
+      background: linear-gradient(135deg,#16213e 0%,#0f3460 100%);
+    }
+    .hero h1 {
+      font-size: 3rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      max-width: 600px;
+      margin: auto;
+    }
+    main {
+      padding: 4rem 2rem;
+      max-width: 960px;
+      margin: auto;
+      display: grid;
+      gap: 3rem;
+    }
+    section h2 {
+      font-size: 2rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .equation {
+      background: rgba(0,0,0,0.3);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    ul {
+      list-style: inside;
+      padding-left: 1rem;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+    @media(max-width:600px){
+      .hero h1{font-size:2.5rem}
+      nav ul{display:none}
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">モジュラー形式入門</div>
+    <ul>
+      <li><a href="#def">定義</a></li>
+      <li><a href="#trans">変換性</a></li>
+      <li><a href="#q">q展開</a></li>
+      <li><a href="#space">形式の空間</a></li>
+    </ul>
+    <button class="toggle" onclick="document.body.classList.toggle('light')">Light/Dark</button>
+  </nav>
+  <div class="hero">
+    <div>
+      <h1>モジュラー形式とは何か</h1>
+      <p>複素上半平面上の関数で、特定の線形変換に対して重み付き不変性を持つものを指します。</p>
+    </div>
+  </div>
+  <main>
+    <section id="def">
+      <h2>定義</h2>
+      <p>複素上半平面\( \mathbb{H} = \{ \tau \mid \mathrm{Im}\,\tau>0 \} \)上のホロモルフィック関数\( f(\tau) \)がモジュラー形式であるとは、全ての\( \begin{pmatrix}a & b \\ c & d\end{pmatrix}\in SL_2(\mathbb{Z})\)に対し</p>
+      <div class="equation">\(\displaystyle f\biggl(\frac{a\tau+b}{c\tau+d}\biggr)=(c\tau+d)^k\,f(\tau)\)</div>
+      <p>という変換性と無限遠での有界性を満たすことを言います。ここで\(k\)を重み(weight)と呼びます。</p>
+    </section>
+    <section id="trans">
+      <h2>変換性</h2>
+      <p>行列\(\gamma=\begin{pmatrix}a & b \\ c & d\end{pmatrix}\)作用によって</p>
+      <div class="equation">\(\displaystyle (\gamma\cdot f)(\tau) = (c\tau+d)^{-k}f\bigl(\tfrac{a\tau+b}{c\tau+d}\bigr)\)</div>
+      <p>が元の関数\(f\)に戻ることが要求されます。この条件がモジュラー群の不変性を保証します。</p>
+    </section>
+    <section id="q">
+      <h2>q展開</h2>
+      <p>変数\(q=e^{2\pi i\tau}\)によるテイラー展開をq展開と呼び、</p>
+      <div class="equation">\(\displaystyle f(\tau)=\sum_{n=0}^{\infty}a_n\,q^n\)</div>
+      <p>と書くことで係数列\(a_n\)が様々な数論的情報を含むことが知られています。</p>
+    </section>
+    <section id="space">
+      <h2>モジュラー形式の空間</h2>
+      <p>重み\(k\)のモジュラー形式全体は有限次元線形空間を成し、</p>
+      <div class="equation">\(\displaystyle \dim M_k = \begin{cases}
+      \lfloor \tfrac{k}{12}\rfloor & k\equiv2\!\!\mod12,\\
+      \lfloor \tfrac{k}{12}\rfloor+1 & \text{otherwise}.
+      \end{cases}\)</div>
+      <p>特に零点条件を加えた空間をクスプ形式空間と呼びます。</p>
+      <ul>
+        <li>エイゼンシュタイン級数\(E_4,E_6\)</li>
+        <li>ディスクリミナント関数\(\Delta(\tau)=q\prod_{n=1}^\infty(1-q^n)^{24}\)</li>
+      </ul>
+    </section>
+  </main>
+  <footer>© 2025 モジュラー形式入門</footer>
+</body>
+</html>

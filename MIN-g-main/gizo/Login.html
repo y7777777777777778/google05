@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google ログイン</title>
+    <style>
+        /* Googleの公式フォント（Google Sans）を読み込み */
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Roboto:wght@400;500&display=swap');
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+        }
+
+        body {
+            /* 最新のPC版は薄いブルーグレーの背景 */
+            background-color: #f0f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #1f1f1f;
+        }
+
+        /* 2カラムの大きな横長カード（最新のPCデザイン） */
+        .login-container {
+            display: flex;
+            background-color: #ffffff;
+            width: 1040px;
+            max-width: 90vw;
+            border-radius: 28px;
+            padding: 40px;
+            min-height: 400px;
+        }
+
+        /* 左側エリア */
+        .left-panel {
+            flex: 1;
+            padding: 10px 48px 10px 10px;
+        }
+
+        .logo {
+            height: 24px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 400;
+            margin: 0 0 16px 0;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #1f1f1f;
+            margin: 0;
+        }
+
+        /* 右側エリア */
+        .right-panel {
+            flex: 1;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* フローティングラベル（入力枠のアニメーション） */
+        .input-container {
+            position: relative;
+            margin-bottom: 8px;
+            margin-top: 10px;
+        }
+
+        .input-container input {
+            width: 100%;
+            padding: 16px 14px;
+            font-size: 16px;
+            border: 1px solid #747775;
+            border-radius: 4px;
+            outline: none;
+            background: transparent;
+        }
+
+        .input-container input:focus {
+            border: 2px solid #0b57d0;
+            padding: 15px 13px; /* 枠線が太くなる分のズレを調整 */
+        }
+
+        .input-container label {
+            position: absolute;
+            left: 14px;
+            top: 16px;
+            font-size: 16px;
+            color: #444746;
+            pointer-events: none;
+            transition: 0.2s ease all;
+            background-color: #ffffff;
+            padding: 0 4px;
+        }
+
+        /* 入力中、または文字が入っている時にラベルを上に移動 */
+        .input-container input:focus ~ label,
+        .input-container input:not(:placeholder-shown) ~ label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: #0b57d0;
+        }
+
+        .input-container input:not(:focus):not(:placeholder-shown) ~ label {
+            color: #444746;
+        }
+
+        .forgot-link {
+            color: #0b57d0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            align-self: flex-start;
+            padding: 8px 0;
+            border-radius: 4px;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .info-text {
+            color: #444746;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-top: 30px;
+            margin-bottom: 40px;
+        }
+
+        .info-text a {
+            color: #0b57d0;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .info-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* ボタンエリア */
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .create-account {
+            color: #0b57d0;
+            background: transparent;
+            border: none;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 10px 16px;
+            border-radius: 100px;
+            transition: background-color 0.2s;
+        }
+
+        .create-account:hover {
+            background-color: #f6fafe;
+        }
+
+        .next-btn {
+            background-color: #0b57d0;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 100px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .next-btn:hover {
+            background-color: #0842a0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        /* フッター */
+        footer {
+            display: flex;
+            justify-content: space-between;
+            width: 1040px;
+            max-width: 90vw;
+            margin-top: 16px;
+            font-size: 12px;
+            color: #444746;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links span {
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 4px;
+        }
+
+        .footer-links span:hover {
+            background-color: #e8eaed;
+        }
+
+        /* 画面幅が狭い場合（タブレット以下）は縦並びに変化 */
+        @media (max-width: 800px) {
+            .login-container {
+                flex-direction: column;
+                padding: 32px 24px;
+                border-radius: 20px;
+            }
+            .left-panel {
+                padding: 0 0 24px 0;
+            }
+            .right-panel {
+                padding: 0;
+            }
+            h1 {
+                font-size: 32px;
+            }
+        }
+
+        /* スマホ画面の場合は背景を白にして枠を消す */
+        @media (max-width: 600px) {
+            body {
+                background-color: #ffffff;
+            }
+            .login-container {
+                width: 100%;
+                max-width: 100vw;
+                border-radius: 0;
+                padding: 24px;
+            }
+            footer {
+                width: 100%;
+                padding: 0 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <!-- 左側パネル -->
+        <div class="left-panel">
+            <!-- 無理なSVG描画をやめ、Google公式のロゴ画像を読み込むことで文字潰れを解消 -->
+            <img src="https://www.gstatic.com/images/branding/googlelogo/svg/googlelogo_clr_74x24px.svg" alt="Google" class="logo">
+            <h1>ログイン</h1>
+            <p class="subtitle">Google アカウントを使用</p>
+        </div>
+
+        <!-- 右側パネル -->
+        <div class="right-panel">
+            <!-- プレースホルダに半角スペース(" ")を入れることで、CSSだけでラベルが動くアニメーションを実現 -->
+            <div class="input-container">
+                <input type="email" id="email" placeholder=" " required autocomplete="off">
+                <label for="email">メールアドレスまたは電話番号</label>
+            </div>
+
+            <a href="#" class="forgot-link">メールアドレスを忘れた場合</a>
+
+            <div class="info-text">
+                自分のパソコンではない場合は、ゲストモードを使用してプライベートにログインしてください。
+                <a href="#">詳細</a>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="create-account">アカウントを作成</button>
+                <button type="button" class="next-btn">次へ</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="language-selector">日本語</div>
+        <div class="footer-links">
+            <span>ヘルプ</span>
+            <span>プライバシー</span>
+            <span>利用規約</span>
+        </div>
+    </footer>
+
+</body>
+</html>
