@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "min-g-main": {
+      "root": "MIN-g-main",
+      "framework": "vite"
+    },
+    "min-tube-pro-main": {
+      "root": "MIN-Tube-Pro-main",
+      "framework": "express"
+    }
+  },
+  "rewrites": []
+}
