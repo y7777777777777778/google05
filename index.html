@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>シンプル無限計算 - Simple Infinite Math</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+            mono: ['SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Courier New', 'monospace'],
+          },
+          animation: {
+            shake: 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
+            pop: 'pop 0.2s ease-out both',
+          },
+          keyframes: {
+            shake: {
+              '10%, 90%': { transform: 'translate3d(-2px, 0, 0)' },
+              '20%, 80%': { transform: 'translate3d(4px, 0, 0)' },
+              '30%, 50%, 70%': { transform: 'translate3d(-6px, 0, 0)' },
+              '40%, 60%': { transform: 'translate3d(6px, 0, 0)' },
+            },
+            pop: {
+              '0%': { transform: 'scale(0.95)' },
+              '50%': { transform: 'scale(1.02)' },
+              '100%': { transform: 'scale(1)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Fraction styling for simple math display */
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: middle;
+      text-align: center;
+      padding: 0 4px;
+    }
+    .frac .top {
+      border-bottom: 2px solid currentColor;
+      padding-bottom: 2px;
+    }
+    .frac .bottom {
+      padding-top: 2px;
+    }
+
+    /* Soft shadow card */
+    .clean-card {
+      background: #ffffff;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+      border: 1px solid #e2e8f0;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center p-4 sm:p-6">
+
+  <!-- Top Header & Category Tabs -->
+  <header class="w-full max-w-xl mx-auto flex flex-col items-center gap-4 mt-2 mb-4">
+    <div class="flex items-center justify-between w-full px-2">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+          ＋
+        </div>
+        <h1 class="text-lg font-bold tracking-tight text-slate-800">シンプル無限計算</h1>
+      </div>
+
+      <button id="audio-btn" onclick="app.toggleSound()" class="p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-lg hover:bg-slate-200/50">
+        <svg id="sound-on-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z"></path></svg>
+        <svg id="sound-off-icon" class="w-5 h-5 hidden text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
+      </button>
+    </div>
+
+    <!-- Category Selector Tabs -->
+    <nav class="w-full flex bg-slate-200/60 p-1 rounded-2xl text-xs font-medium overflow-x-auto no-scrollbar gap-1">
+      <button onclick="app.setCategory('addsub')" id="tab-addsub" class="category-tab flex-1 min-w-[70px] py-2 px-2.5 rounded-xl transition-all text-center whitespace-nowrap text-slate-600">たし算・ひき算</button>
+      <button onclick="app.setCategory('muldiv')" id="tab-muldiv" class="category-tab flex-1 min-w-[70px] py-2 px-2.5 rounded-xl transition-all text-center whitespace-nowrap text-slate-600">けいさん</button>
+      <button onclick="app.setCategory('advanced')" id="tab-advanced" class="category-tab flex-1 min-w-[70px] py-2 px-2.5 rounded-xl transition-all text-center whitespace-nowrap text-slate-600">小数・分数・正負</button>
+      <button onclick="app.setCategory('equation')" id="tab-equation" class="category-tab flex-1 min-w-[70px] py-2 px-2.5 rounded-xl transition-all text-center whitespace-nowrap text-slate-600">方程式</button>
+      <button onclick="app.setCategory('random')" id="tab-random" class="category-tab flex-1 min-w-[70px] py-2 px-2.5 rounded-xl transition-all text-center whitespace-nowrap text-slate-600">ランダム</button>
+    </nav>
+  </header>
+
+  <!-- Main Active Card Container -->
+  <main class="w-full max-w-xl mx-auto flex-1 flex flex-col justify-center gap-4">
+
+    <!-- Score & Streak Header -->
+    <div class="flex items-center justify-between px-2 text-sm font-semibold text-slate-500">
+      <div class="flex items-center gap-2">
+        <span>正解数:</span>
+        <span id="score-counter" class="text-slate-800 font-mono text-base font-bold">0</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span id="streak-fire" class="opacity-30 transition-opacity">🔥</span>
+        <span>連続:</span>
+        <span id="streak-counter" class="text-emerald-600 font-mono text-base font-bold">0</span>
+      </div>
+    </div>
+
+    <!-- Math Question Display Card -->
+    <div id="math-card" class="clean-card rounded-3xl p-8 sm:p-12 flex flex-col items-center justify-center text-center relative transition-all duration-200 min-h-[220px]">
+      
+      <!-- Math Display -->
+      <div id="math-display" class="text-4xl sm:text-6xl font-bold tracking-wide text-slate-800 my-auto py-2 flex items-center justify-center flex-wrap gap-2">
+        <!-- Math question rendered here -->
+      </div>
+
+      <!-- Hint Section Accordion -->
+      <div class="w-full mt-4">
+        <button onclick="app.toggleHint()" class="text-xs text-slate-400 hover:text-slate-600 transition-colors inline-flex items-center gap-1 py-1 px-2 rounded-lg">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span>ヒント</span>
+        </button>
+        <div id="hint-text" class="hidden mt-2 text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100 font-mono">
+          <!-- Hint rendered here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Form & Action Row -->
+    <form id="answer-form" onsubmit="app.submitAnswer(event)" class="flex flex-col gap-3">
+      <div class="flex items-center gap-2">
+        <input 
+          type="text" 
+          id="answer-input" 
+          placeholder="答え" 
+          autocomplete="off" 
+          autofocus
+          class="flex-1 bg-white border border-slate-200 text-slate-800 text-2xl font-mono font-bold text-center py-3.5 rounded-2xl outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-sm"
+        />
+        <button 
+          type="submit" 
+          class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl transition-all shadow-sm active:scale-95 text-base flex items-center justify-center min-w-[90px]"
+        >
+          回答
+        </button>
+      </div>
+
+      <div class="flex justify-end px-1">
+        <button type="button" onclick="app.skipQuestion()" class="text-xs text-slate-400 hover:text-slate-600 transition-colors py-1 px-3">
+          スキップ ➔
+        </button>
+      </div>
+    </form>
+
+    <!-- On-screen Soft Keyboard (Collapsible) -->
+    <div class="mt-2">
+      <div class="flex justify-between items-center px-1 mb-2">
+        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">テンキー</span>
+        <button onclick="app.toggleNumpad()" id="numpad-toggle" class="text-[11px] text-slate-400 hover:text-slate-600">
+          非表示
+        </button>
+      </div>
+
+      <div id="numpad-container" class="grid grid-cols-4 gap-1.5">
+        <button onclick="app.pressKey('7')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">7</button>
+        <button onclick="app.pressKey('8')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">8</button>
+        <button onclick="app.pressKey('9')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">9</button>
+        <button onclick="app.pressKey('-')" class="py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">-</button>
+
+        <button onclick="app.pressKey('4')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">4</button>
+        <button onclick="app.pressKey('5')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">5</button>
+        <button onclick="app.pressKey('6')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">6</button>
+        <button onclick="app.pressKey('.')" class="py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">.</button>
+
+        <button onclick="app.pressKey('1')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">1</button>
+        <button onclick="app.pressKey('2')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">2</button>
+        <button onclick="app.pressKey('3')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">3</button>
+        <button onclick="app.pressKey('/')" class="py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">/</button>
+
+        <button onclick="app.clearInput()" class="py-3 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-600 font-mono text-sm font-bold rounded-xl border border-rose-200 shadow-sm transition-all">AC</button>
+        <button onclick="app.pressKey('0')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">0</button>
+        <button onclick="app.backspaceInput()" class="py-3 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 text-amber-600 font-mono text-lg font-semibold rounded-xl border border-amber-200 shadow-sm transition-all">⌫</button>
+        <button onclick="app.submitAnswer(event)" class="py-3 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-mono text-xl font-bold rounded-xl shadow-sm transition-all">⏎</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-xl mx-auto text-center py-4 text-xs text-slate-400">
+    シンプル無限計算 • Simple Infinite Math
+  </footer>
+
+  <script>
+    // Web Audio Synthesizer for Clean Micro-SFX
+    class MinimalSound {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playCorrect() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
+
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.2);
+      }
+
+      playWrong() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.linearRampToValueAtTime(140, now + 0.15);
+
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.18);
+      }
+    }
+
+    // Problem Generator Class
+    class SimpleMathGenerator {
+      static rand(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      static generate(category) {
+        let cat = category;
+        if (cat === 'random') {
+          const cats = ['addsub', 'muldiv', 'advanced', 'equation'];
+          cat = cats[Math.floor(Math.random() * cats.length)];
+        }
+
+        switch (cat) {
+          case 'addsub':
+            return this.genAddSub();
+          case 'muldiv':
+            return this.genMulDiv();
+          case 'advanced':
+            return this.genAdvanced();
+          case 'equation':
+            return this.genEquation();
+          default:
+            return this.genAddSub();
+        }
+      }
+
+      // 1. たし算・ひき算
+      static genAddSub() {
+        const isAdd = Math.random() > 0.5;
+        if (isAdd) {
+          const a = this.rand(5, 99);
+          const b = this.rand(5, 99);
+          return {
+            html: `${a} + ${b} = ?`,
+            answers: [(a + b).toString()],
+            hint: `${a} + ${b} = ${a + b}`
+          };
+        } else {
+          const a = this.rand(15, 99);
+          const b = this.rand(5, a);
+          return {
+            html: `${a} − ${b} = ?`,
+            answers: [(a - b).toString()],
+            hint: `${a} − ${b} = ${a - b}`
+          };
+        }
+      }
+
+      // 2. けいさん (掛け算・割り算)
+      static genMulDiv() {
+        const isMul = Math.random() > 0.5;
+        if (isMul) {
+          const a = this.rand(3, 12);
+          const b = this.rand(3, 12);
+          return {
+            html: `${a} × ${b} = ?`,
+            answers: [(a * b).toString()],
+            hint: `${a} × ${b} = ${a * b}`
+          };
+        } else {
+          const b = this.rand(2, 9);
+          const ans = this.rand(3, 12);
+          const a = b * ans;
+          return {
+            html: `${a} ÷ ${b} = ?`,
+            answers: [ans.toString()],
+            hint: `${a} ÷ ${b} = ${ans}`
+          };
+        }
+      }
+
+      // 3. 小数・分数・正負
+      static genAdvanced() {
+        const type = this.rand(1, 3);
+        if (type === 1) { // 小数
+          const a = (this.rand(1, 49) / 10);
+          const b = (this.rand(1, 49) / 10);
+          const ans = Math.round((a + b) * 10) / 10;
+          return {
+            html: `${a} + ${b} = ?`,
+            answers: [ans.toString()],
+            hint: `${a} + ${b} = ${ans}`
+          };
+        } else if (type === 2) { // 正負の数
+          const a = this.rand(-12, -2);
+          const b = this.rand(-9, 9);
+          const ans = a + b;
+          return {
+            html: `(${a}) + (${b >= 0 ? b : '(' + b + ')'}) = ?`,
+            answers: [ans.toString()],
+            hint: `${a} + (${b}) = ${ans}`
+          };
+        } else { // 分数
+          const b = this.rand(3, 7);
+          const a1 = this.rand(1, b - 1);
+          const a2 = this.rand(1, b - 1);
+          const ansNum = a1 + a2;
+          const html = `
+            <div class="frac"><span class="top">${a1}</span><span class="bottom">${b}</span></div>
+            <span>+</span>
+            <div class="frac"><span class="top">${a2}</span><span class="bottom">${b}</span></div>
+            <span>= ?</span>
+          `;
+          return {
+            html: html,
+            answers: [`${ansNum}/${b}`, (ansNum / b).toString()],
+            hint: `分母が同じなので分子同士を足します: ${ansNum}/${b}`
+          };
+        }
+      }
+
+      // 4. 方程式
+      static genEquation() {
+        const type = this.rand(1, 2);
+        if (type === 1) { // x + a = b
+          const x = this.rand(1, 20);
+          const a = this.rand(3, 15);
+          const b = x + a;
+          return {
+            html: `x + ${a} = ${b}`,
+            answers: [x.toString()],
+            hint: `x = ${b} − ${a} = ${x}`
+          };
+        } else { // ax = b
+          const x = this.rand(2, 12);
+          const a = this.rand(2, 6);
+          const b = a * x;
+          return {
+            html: `${a}x = ${b}`,
+            answers: [x.toString()],
+            hint: `x = ${b} ÷ ${a} = ${x}`
+          };
+        }
+      }
+    }
+
+    // Main App Controller
+    class App {
+      constructor() {
+        this.sound = new MinimalSound();
+        this.category = 'addsub';
+        this.score = 0;
+        this.streak = 0;
+        this.currentProblem = null;
+        this.isNumpadVisible = true;
+      }
+
+      init() {
+        this.setCategory('addsub');
+      }
+
+      setCategory(cat) {
+        this.category = cat;
+        
+        // Update tab styles
+        document.querySelectorAll('.category-tab').forEach(tab => {
+          tab.classList.remove('bg-white', 'text-slate-900', 'font-bold', 'shadow-sm');
+          tab.classList.add('text-slate-600');
+        });
+
+        const activeTab = document.getElementById(`tab-${cat}`);
+        if (activeTab) {
+          activeTab.classList.add('bg-white', 'text-slate-900', 'font-bold', 'shadow-sm');
+          activeTab.classList.remove('text-slate-600');
+        }
+
+        this.nextQuestion();
+      }
+
+      nextQuestion() {
+        this.currentProblem = SimpleMathGenerator.generate(this.category);
+        
+        // Render Math HTML
+        document.getElementById('math-display').innerHTML = this.currentProblem.html;
+        document.getElementById('hint-text').innerText = this.currentProblem.hint;
+        document.getElementById('hint-text').classList.add('hidden');
+
+        // Reset Input
+        const input = document.getElementById('answer-input');
+        input.value = '';
+        input.focus();
+      }
+
+      submitAnswer(e) {
+        if (e) e.preventDefault();
+        const input = document.getElementById('answer-input');
+        const userAns = input.value.trim();
+
+        if (!userAns || !this.currentProblem) return;
+
+        const isCorrect = this.currentProblem.answers.some(ans => {
+          if (ans === userAns) return true;
+          const numUser = parseFloat(userAns);
+          const numAns = parseFloat(ans);
+          return !isNaN(numUser) && !isNaN(numAns) && Math.abs(numUser - numAns) < 0.0001;
+        });
+
+        const card = document.getElementById('math-card');
+
+        if (isCorrect) {
+          this.score++;
+          this.streak++;
+          this.sound.playCorrect();
+
+          // Quick pop animation
+          card.classList.add('animate-pop');
+          setTimeout(() => card.classList.remove('animate-pop'), 200);
+
+          this.updateStats();
+          this.nextQuestion();
+        } else {
+          this.streak = 0;
+          this.sound.playWrong();
+
+          // Shake animation
+          card.classList.add('animate-shake');
+          setTimeout(() => card.classList.remove('animate-shake'), 400);
+
+          this.updateStats();
+          input.value = '';
+          input.focus();
+        }
+      }
+
+      skipQuestion() {
+        this.streak = 0;
+        this.updateStats();
+        this.nextQuestion();
+      }
+
+      updateStats() {
+        document.getElementById('score-counter').innerText = this.score;
+        document.getElementById('streak-counter').innerText = this.streak;
+        
+        const fire = document.getElementById('streak-fire');
+        if (this.streak >= 3) {
+          fire.classList.remove('opacity-30');
+          fire.classList.add('opacity-100', 'scale-110');
+        } else {
+          fire.classList.add('opacity-30');
+          fire.classList.remove('opacity-100', 'scale-110');
+        }
+      }
+
+      toggleHint() {
+        const hint = document.getElementById('hint-text');
+        hint.classList.toggle('hidden');
+      }
+
+      pressKey(char) {
+        const input = document.getElementById('answer-input');
+        input.value += char;
+        input.focus();
+      }
+
+      clearInput() {
+        const input = document.getElementById('answer-input');
+        input.value = '';
+        input.focus();
+      }
+
+      backspaceInput() {
+        const input = document.getElementById('answer-input');
+        input.value = input.value.slice(0, -1);
+        input.focus();
+      }
+
+      toggleNumpad() {
+        const container = document.getElementById('numpad-container');
+        const btn = document.getElementById('numpad-toggle');
+        this.isNumpadVisible = !this.isNumpadVisible;
+
+        if (this.isNumpadVisible) {
+          container.classList.remove('hidden');
+          btn.innerText = '非表示';
+        } else {
+          container.classList.add('hidden');
+          btn.innerText = '表示';
+        }
+      }
+
+      toggleSound() {
+        this.sound.enabled = !this.sound.enabled;
+        const iconOn = document.getElementById('sound-on-icon');
+        const iconOff = document.getElementById('sound-off-icon');
+
+        if (this.sound.enabled) {
+          iconOn.classList.remove('hidden');
+          iconOff.classList.add('hidden');
+        } else {
+          iconOn.classList.add('hidden');
+          iconOff.classList.remove('hidden');
+        }
+      }
+    }
+
+    let app;
+    window.onload = () => {
+      app = new App();
+      app.init();
+    };
+  </script>
+</body>
+</html>
