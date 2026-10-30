@@ -1,575 +1,348 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>シンプル無限計算 - Simple Infinite Math</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
-            mono: ['SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Courier New', 'monospace'],
-          },
-          animation: {
-            shake: 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
-            pop: 'pop 0.2s ease-out both',
-          },
-          keyframes: {
-            shake: {
-              '10%, 90%': { transform: 'translate3d(-2px, 0, 0)' },
-              '20%, 80%': { transform: 'translate3d(4px, 0, 0)' },
-              '30%, 50%, 70%': { transform: 'translate3d(-6px, 0, 0)' },
-              '40%, 60%': { transform: 'translate3d(6px, 0, 0)' },
-            },
-            pop: {
-              '0%': { transform: 'scale(0.95)' },
-              '50%': { transform: 'scale(1.02)' },
-              '100%': { transform: 'scale(1)' },
-            }
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    body {
-      background-color: #f8fafc;
-      color: #0f172a;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    
-    /* Fraction styling for simple math display */
-    .frac {
-      display: inline-flex;
-      flex-direction: column;
-      vertical-align: middle;
-      text-align: center;
-      padding: 0 4px;
-    }
-    .frac .top {
-      border-bottom: 2px solid currentColor;
-      padding-bottom: 2px;
-    }
-    .frac .bottom {
-      padding-top: 2px;
-    }
-
-    /* Soft shadow card */
-    .clean-card {
-      background: #ffffff;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-      border: 1px solid #e2e8f0;
-    }
-
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="中学生の定期テスト対策。計画を立てて、問題を解いて、間違えた所だけ直すための練習サイトです。">
+<title>テスト前ノート 中学生の定期テスト対策</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--paper:#fff;--surf:#f8f9fa;--ink:#202124;--sub:#5f6368;--line:#dadce0;--grid:#e8f0fe;--red:#d93025;--ok:#188038;--okbg:#e6f4ea;--ngbg:#fce8e6;--btn:#1a73e8;--btnink:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#202124;--paper:#292a2d;--surf:#2d2e31;--ink:#e8eaed;--sub:#9aa0a6;--line:#3c4043;--grid:#1f3350;--red:#f28b82;--ok:#81c995;--okbg:#1e3a2a;--ngbg:#4a2523;--btn:#8ab4f8;--btnink:#202124}}
+:root[data-theme="dark"]{--bg:#202124;--paper:#292a2d;--surf:#2d2e31;--ink:#e8eaed;--sub:#9aa0a6;--line:#3c4043;--grid:#1f3350;--red:#f28b82;--ok:#81c995;--okbg:#1e3a2a;--ngbg:#4a2523;--btn:#8ab4f8;--btnink:#202124}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Roboto,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;line-height:1.8;font-size:16px}
+header{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:space-between;padding:14px max(20px,4vw);border-bottom:1px solid var(--line);background:var(--paper)}
+.logo{font-weight:500;font-size:20px;color:var(--ink);text-decoration:none}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav a{color:var(--sub);text-decoration:none;padding:8px 16px;border-radius:999px;font-size:14px;font-weight:500}
+nav a[aria-current="page"]{color:var(--btn);background:var(--grid)}
+nav a:hover{color:var(--ink)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--btn);outline-offset:2px}
+main{max-width:980px;margin:0 auto;padding:0 max(20px,4vw) 80px}
+section[hidden]{display:none}
+h1{font-size:clamp(30px,5.2vw,48px);font-weight:400;line-height:1.35;margin:0 0 20px}
+h2{font-size:24px;font-weight:400;margin:48px 0 12px;line-height:1.5}
+p{margin:0 0 14px;max-width:38em}
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;padding:64px 0 24px}
+.sheet{background:var(--surf);border-radius:16px;padding:24px 28px;font-size:16px;box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15)}
+.sheet .q{margin:0 0 10px}
+.sheet .wrong{text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:2px}
+.sheet .fix{color:var(--red);font-weight:500;margin:6px 0 0}
+.sheet small{display:block;color:var(--sub);margin-top:12px;font-size:13px;line-height:1.6}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+.btn{font:inherit;font-weight:500;font-size:15px;background:var(--btn);color:var(--btnink);border:1px solid var(--btn);padding:10px 24px;border-radius:999px;cursor:pointer;text-decoration:none;display:inline-block;line-height:1.6}
+.btn.ghost{background:transparent;color:var(--btn);border-color:var(--line)}.btn.ghost:hover{background:var(--grid)}
+.btn.small{padding:10px 22px;font-size:14px;min-height:44px}
+ol.flow{padding-left:1.4em;max-width:38em}
+ol.flow li{margin-bottom:8px}
+.limits p{border-left:4px solid var(--grid);padding-left:16px}
+.subjects{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.subjects .btn{min-width:84px}
+.card{background:var(--paper);border:1px solid var(--line);padding:28px;border-radius:16px;margin-top:20px}
+.meta{color:var(--sub);font-size:14px;margin-bottom:8px}
+.q-text{font-size:20px;font-weight:500;margin-bottom:16px;max-width:none}
+.choices{display:grid;gap:10px}
+.choice{font:inherit;text-align:left;background:var(--paper);color:var(--ink);border:1px solid var(--line);padding:12px 16px;border-radius:12px;cursor:pointer}
+.choice:hover:not(:disabled){border-color:var(--btn);background:var(--grid)}
+.choice.ok{background:var(--okbg);border-color:var(--ok)}
+.choice.ng{background:var(--ngbg);border-color:var(--red)}
+.explain{margin-top:16px;padding:14px 18px;background:var(--surf);border-radius:12px}
+.explain b{font-weight:700}
+.res-ok{color:var(--ok)}.res-ng{color:var(--red)}
+label.f{display:block;margin:16px 0 6px;font-weight:500}
+input[type=date]{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
+.checks{display:flex;flex-wrap:wrap;gap:6px 18px}
+.checks label{cursor:pointer}
+table{border-collapse:collapse;width:100%;margin-top:16px;background:var(--paper)}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;font-size:15px;line-height:1.6}
+th{background:var(--surf);width:7.5em;font-weight:500}
+.tablewrap{overflow-x:auto}
+.rv{border-bottom:1px solid var(--line);padding:16px 0}
+.rv:last-child{border-bottom:0}
+.rv p{margin-bottom:6px}
+footer{border-top:1px solid var(--line);padding:24px max(20px,4vw);color:var(--sub);font-size:14px;text-align:center}
+.badge{display:inline-block;min-width:20px;margin-left:6px;padding:0 6px;border-radius:999px;background:var(--btn);color:var(--btnink);font-size:12px;line-height:20px;text-align:center}.badge:empty{display:none}.btn:hover{filter:brightness(.94)}
+:root{--cm:#1a73e8;--tm:#e8f0fe;--ce:#d93025;--te:#fce8e6;--cs:#188038;--ts:#e6f4ea;--cy:#b06000;--ty:#fef0c7;--ck:#9334e6;--tk:#f3e8fd}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cm:#8ab4f8;--tm:#1f3350;--ce:#f28b82;--te:#4a2523;--cs:#81c995;--ts:#1e3a2a;--cy:#fdd663;--ty:#4a3b12;--ck:#d7aefb;--tk:#3b2756}}
+:root[data-theme="dark"]{--cm:#8ab4f8;--tm:#1f3350;--ce:#f28b82;--te:#4a2523;--cs:#81c995;--ts:#1e3a2a;--cy:#fdd663;--ty:#4a3b12;--ck:#d7aefb;--tk:#3b2756}
+.s-m{--sc:var(--cm);--st:var(--tm)}.s-e{--sc:var(--ce);--st:var(--te)}.s-s{--sc:var(--cs);--st:var(--ts)}.s-y{--sc:var(--cy);--st:var(--ty)}.s-k{--sc:var(--ck);--st:var(--tk)}
+.chip{display:inline-block;padding:1px 12px;border-radius:999px;background:var(--st);color:var(--sc);font-size:13px;font-weight:500;line-height:1.7}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--paper);z-index:6}
+.logo{display:inline-flex;align-items:center}.logo::before{content:"✓";display:inline-grid;place-items:center;width:26px;height:26px;margin-right:10px;border-radius:8px;background:var(--btn);color:var(--btnink);font-size:15px}
+.hero{background:var(--grid);border-radius:28px;padding:56px 48px;margin-top:28px}.hero h1{font-size:clamp(32px,5.4vw,54px);line-height:1.3}.sheet{background:var(--paper)}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin-top:16px}.sc{display:block;text-decoration:none;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden}.sc:hover{border-color:var(--sc)}.sc .top{display:block;background:var(--st);color:var(--sc);font-size:26px;font-weight:500;padding:20px 18px}.sc .bt{display:block;padding:10px 18px;color:var(--sub);font-size:14px}
+ol.flow{list-style:none;padding:0;counter-reset:n;display:grid;gap:12px;max-width:none}ol.flow li{counter-increment:n;display:flex;gap:16px;align-items:flex-start;background:var(--surf);border-radius:16px;padding:16px 20px;margin:0}ol.flow li::before{content:counter(n);flex:none;width:30px;height:30px;border-radius:50%;background:var(--btn);color:var(--btnink);display:grid;place-items:center;font-weight:500;font-size:15px}
+.btn.tone{background:var(--st);color:var(--sc);border-color:transparent}
+.bar{height:6px;border-radius:3px;background:var(--st);overflow:hidden;margin-bottom:18px}.bar i{display:block;height:100%;background:var(--sc);border-radius:3px;transition:width .3s}
+.choice{display:flex;gap:14px;align-items:center}.lt{flex:none;width:28px;height:28px;border-radius:50%;background:var(--surf);color:var(--sub);display:grid;place-items:center;font-size:13px;font-weight:500}.choice.ok .lt{background:var(--ok);color:var(--btnink)}.choice.ng .lt{background:var(--red);color:var(--btnink)}
+.explain.g{background:var(--okbg)}.explain.b{background:var(--ngbg)}
+.done{display:flex;gap:28px;align-items:center;flex-wrap:wrap}.ring{width:120px;height:120px;border-radius:50%;background:conic-gradient(var(--sc) calc(var(--p)*1%),var(--st) 0);display:grid;place-items:center;position:relative}.ring::before{content:"";position:absolute;inset:12px;border-radius:50%;background:var(--paper)}.ring b{position:relative;font-size:32px;font-weight:500;color:var(--sc)}.ring small{font-size:14px;color:var(--sub);font-weight:400}
+.rv,.rv:last-child{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px 20px;margin-top:12px}summary{cursor:pointer;color:var(--btn);margin:6px 0}
+input[type=checkbox]{accent-color:var(--btn);width:18px;height:18px;vertical-align:-3px}
+footer{line-height:2}footer a{color:var(--btn);text-decoration:none;margin:0 8px}
+h1.pt{font-size:28px;font-weight:400;line-height:1.5;margin:40px 0 12px}.prow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px 0;border-bottom:1px solid var(--line)}.prow label{min-width:110px;cursor:pointer}.ex{margin:0 0 6px;color:var(--sub);font-size:14px}.rvfb{margin-top:4px}
+@media (max-width:760px){.hero{grid-template-columns:1fr;padding:32px 22px;gap:28px;border-radius:24px}header{padding-top:10px;padding-bottom:10px}h2{margin-top:36px}.card{padding:20px}.done{gap:18px}}
+@media (prefers-reduced-motion:no-preference){.choice{transition:border-color .15s,background .15s}}
+</style>
 </head>
-<body class="min-h-screen flex flex-col justify-between items-center p-4 sm:p-6">
-
-  <!-- Top Header & Category Tabs -->
-  <header class="w-full max-w-xl mx-auto flex flex-col items-center gap-4 mt-2 mb-4">
-    <div class="flex items-center justify-between w-full px-2">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
-          ＋
-        </div>
-        <h1 class="text-lg font-bold tracking-tight text-slate-800">シンプル無限計算</h1>
-      </div>
-
-      <button id="audio-btn" onclick="app.toggleSound()" class="p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-lg hover:bg-slate-200/50">
-        <svg id="sound-on-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z"></path></svg>
-        <svg id="sound-off-icon" class="w-5 h-5 hidden text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
-      </button>
-    </div>
-
-    <!-- Category Selector Tabs -->
-    <nav class="w-full flex bg-slate-200/60 p-1 rounded-2xl text-xs font-medium overflow-x-auto no-scrollbar gap-1">
-      <button onclick="app.setCategory('addsub')" id="tab-addsub" class="category-tab flex-1 min-w-[70px] py-2 px-2.5 rounded-xl transition-all text-center whitespace-nowrap text-slate-600">たし算・ひき算</button>
-      <button onclick="app.setCategory('muldiv')" id="tab-muldiv" class="category-tab flex-1 min-w-[70px] py-2 px-2.5 rounded-xl transition-all text-center whitespace-nowrap text-slate-600">けいさん</button>
-      <button onclick="app.setCategory('advanced')" id="tab-advanced" class="category-tab flex-1 min-w-[70px] py-2 px-2.5 rounded-xl transition-all text-center whitespace-nowrap text-slate-600">小数・分数・正負</button>
-      <button onclick="app.setCategory('equation')" id="tab-equation" class="category-tab flex-1 min-w-[70px] py-2 px-2.5 rounded-xl transition-all text-center whitespace-nowrap text-slate-600">方程式</button>
-      <button onclick="app.setCategory('random')" id="tab-random" class="category-tab flex-1 min-w-[70px] py-2 px-2.5 rounded-xl transition-all text-center whitespace-nowrap text-slate-600">ランダム</button>
-    </nav>
-  </header>
-
-  <!-- Main Active Card Container -->
-  <main class="w-full max-w-xl mx-auto flex-1 flex flex-col justify-center gap-4">
-
-    <!-- Score & Streak Header -->
-    <div class="flex items-center justify-between px-2 text-sm font-semibold text-slate-500">
-      <div class="flex items-center gap-2">
-        <span>正解数:</span>
-        <span id="score-counter" class="text-slate-800 font-mono text-base font-bold">0</span>
-      </div>
-      <div class="flex items-center gap-1.5">
-        <span id="streak-fire" class="opacity-30 transition-opacity">🔥</span>
-        <span>連続:</span>
-        <span id="streak-counter" class="text-emerald-600 font-mono text-base font-bold">0</span>
-      </div>
-    </div>
-
-    <!-- Math Question Display Card -->
-    <div id="math-card" class="clean-card rounded-3xl p-8 sm:p-12 flex flex-col items-center justify-center text-center relative transition-all duration-200 min-h-[220px]">
-      
-      <!-- Math Display -->
-      <div id="math-display" class="text-4xl sm:text-6xl font-bold tracking-wide text-slate-800 my-auto py-2 flex items-center justify-center flex-wrap gap-2">
-        <!-- Math question rendered here -->
-      </div>
-
-      <!-- Hint Section Accordion -->
-      <div class="w-full mt-4">
-        <button onclick="app.toggleHint()" class="text-xs text-slate-400 hover:text-slate-600 transition-colors inline-flex items-center gap-1 py-1 px-2 rounded-lg">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          <span>ヒント</span>
-        </button>
-        <div id="hint-text" class="hidden mt-2 text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100 font-mono">
-          <!-- Hint rendered here -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Input Form & Action Row -->
-    <form id="answer-form" onsubmit="app.submitAnswer(event)" class="flex flex-col gap-3">
-      <div class="flex items-center gap-2">
-        <input 
-          type="text" 
-          id="answer-input" 
-          placeholder="答え" 
-          autocomplete="off" 
-          autofocus
-          class="flex-1 bg-white border border-slate-200 text-slate-800 text-2xl font-mono font-bold text-center py-3.5 rounded-2xl outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-sm"
-        />
-        <button 
-          type="submit" 
-          class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl transition-all shadow-sm active:scale-95 text-base flex items-center justify-center min-w-[90px]"
-        >
-          回答
-        </button>
-      </div>
-
-      <div class="flex justify-end px-1">
-        <button type="button" onclick="app.skipQuestion()" class="text-xs text-slate-400 hover:text-slate-600 transition-colors py-1 px-3">
-          スキップ ➔
-        </button>
-      </div>
-    </form>
-
-    <!-- On-screen Soft Keyboard (Collapsible) -->
-    <div class="mt-2">
-      <div class="flex justify-between items-center px-1 mb-2">
-        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">テンキー</span>
-        <button onclick="app.toggleNumpad()" id="numpad-toggle" class="text-[11px] text-slate-400 hover:text-slate-600">
-          非表示
-        </button>
-      </div>
-
-      <div id="numpad-container" class="grid grid-cols-4 gap-1.5">
-        <button onclick="app.pressKey('7')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">7</button>
-        <button onclick="app.pressKey('8')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">8</button>
-        <button onclick="app.pressKey('9')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">9</button>
-        <button onclick="app.pressKey('-')" class="py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">-</button>
-
-        <button onclick="app.pressKey('4')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">4</button>
-        <button onclick="app.pressKey('5')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">5</button>
-        <button onclick="app.pressKey('6')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">6</button>
-        <button onclick="app.pressKey('.')" class="py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">.</button>
-
-        <button onclick="app.pressKey('1')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">1</button>
-        <button onclick="app.pressKey('2')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">2</button>
-        <button onclick="app.pressKey('3')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">3</button>
-        <button onclick="app.pressKey('/')" class="py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">/</button>
-
-        <button onclick="app.clearInput()" class="py-3 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-600 font-mono text-sm font-bold rounded-xl border border-rose-200 shadow-sm transition-all">AC</button>
-        <button onclick="app.pressKey('0')" class="py-3 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-mono text-xl font-semibold rounded-xl border border-slate-200 shadow-sm transition-all">0</button>
-        <button onclick="app.backspaceInput()" class="py-3 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 text-amber-600 font-mono text-lg font-semibold rounded-xl border border-amber-200 shadow-sm transition-all">⌫</button>
-        <button onclick="app.submitAnswer(event)" class="py-3 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-mono text-xl font-bold rounded-xl shadow-sm transition-all">⏎</button>
-      </div>
-    </div>
-
-  </main>
-
-  <!-- Footer -->
-  <footer class="w-full max-w-xl mx-auto text-center py-4 text-xs text-slate-400">
-    シンプル無限計算 • Simple Infinite Math
-  </footer>
-
-  <script>
-    // Web Audio Synthesizer for Clean Micro-SFX
-    class MinimalSound {
-      constructor() {
-        this.ctx = null;
-        this.enabled = true;
-      }
-
-      init() {
-        if (!this.ctx) {
-          const AudioContext = window.AudioContext || window.webkitAudioContext;
-          if (AudioContext) this.ctx = new AudioContext();
-        }
-        if (this.ctx && this.ctx.state === 'suspended') {
-          this.ctx.resume();
-        }
-      }
-
-      playCorrect() {
-        if (!this.enabled) return;
-        this.init();
-        if (!this.ctx) return;
-
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, now); // D5
-        osc.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
-
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start(now);
-        osc.stop(now + 0.2);
-      }
-
-      playWrong() {
-        if (!this.enabled) return;
-        this.init();
-        if (!this.ctx) return;
-
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(180, now);
-        osc.frequency.linearRampToValueAtTime(140, now + 0.15);
-
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start(now);
-        osc.stop(now + 0.18);
-      }
-    }
-
-    // Problem Generator Class
-    class SimpleMathGenerator {
-      static rand(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-      }
-
-      static generate(category) {
-        let cat = category;
-        if (cat === 'random') {
-          const cats = ['addsub', 'muldiv', 'advanced', 'equation'];
-          cat = cats[Math.floor(Math.random() * cats.length)];
-        }
-
-        switch (cat) {
-          case 'addsub':
-            return this.genAddSub();
-          case 'muldiv':
-            return this.genMulDiv();
-          case 'advanced':
-            return this.genAdvanced();
-          case 'equation':
-            return this.genEquation();
-          default:
-            return this.genAddSub();
-        }
-      }
-
-      // 1. たし算・ひき算
-      static genAddSub() {
-        const isAdd = Math.random() > 0.5;
-        if (isAdd) {
-          const a = this.rand(5, 99);
-          const b = this.rand(5, 99);
-          return {
-            html: `${a} + ${b} = ?`,
-            answers: [(a + b).toString()],
-            hint: `${a} + ${b} = ${a + b}`
-          };
-        } else {
-          const a = this.rand(15, 99);
-          const b = this.rand(5, a);
-          return {
-            html: `${a} − ${b} = ?`,
-            answers: [(a - b).toString()],
-            hint: `${a} − ${b} = ${a - b}`
-          };
-        }
-      }
-
-      // 2. けいさん (掛け算・割り算)
-      static genMulDiv() {
-        const isMul = Math.random() > 0.5;
-        if (isMul) {
-          const a = this.rand(3, 12);
-          const b = this.rand(3, 12);
-          return {
-            html: `${a} × ${b} = ?`,
-            answers: [(a * b).toString()],
-            hint: `${a} × ${b} = ${a * b}`
-          };
-        } else {
-          const b = this.rand(2, 9);
-          const ans = this.rand(3, 12);
-          const a = b * ans;
-          return {
-            html: `${a} ÷ ${b} = ?`,
-            answers: [ans.toString()],
-            hint: `${a} ÷ ${b} = ${ans}`
-          };
-        }
-      }
-
-      // 3. 小数・分数・正負
-      static genAdvanced() {
-        const type = this.rand(1, 3);
-        if (type === 1) { // 小数
-          const a = (this.rand(1, 49) / 10);
-          const b = (this.rand(1, 49) / 10);
-          const ans = Math.round((a + b) * 10) / 10;
-          return {
-            html: `${a} + ${b} = ?`,
-            answers: [ans.toString()],
-            hint: `${a} + ${b} = ${ans}`
-          };
-        } else if (type === 2) { // 正負の数
-          const a = this.rand(-12, -2);
-          const b = this.rand(-9, 9);
-          const ans = a + b;
-          return {
-            html: `(${a}) + (${b >= 0 ? b : '(' + b + ')'}) = ?`,
-            answers: [ans.toString()],
-            hint: `${a} + (${b}) = ${ans}`
-          };
-        } else { // 分数
-          const b = this.rand(3, 7);
-          const a1 = this.rand(1, b - 1);
-          const a2 = this.rand(1, b - 1);
-          const ansNum = a1 + a2;
-          const html = `
-            <div class="frac"><span class="top">${a1}</span><span class="bottom">${b}</span></div>
-            <span>+</span>
-            <div class="frac"><span class="top">${a2}</span><span class="bottom">${b}</span></div>
-            <span>= ?</span>
-          `;
-          return {
-            html: html,
-            answers: [`${ansNum}/${b}`, (ansNum / b).toString()],
-            hint: `分母が同じなので分子同士を足します: ${ansNum}/${b}`
-          };
-        }
-      }
-
-      // 4. 方程式
-      static genEquation() {
-        const type = this.rand(1, 2);
-        if (type === 1) { // x + a = b
-          const x = this.rand(1, 20);
-          const a = this.rand(3, 15);
-          const b = x + a;
-          return {
-            html: `x + ${a} = ${b}`,
-            answers: [x.toString()],
-            hint: `x = ${b} − ${a} = ${x}`
-          };
-        } else { // ax = b
-          const x = this.rand(2, 12);
-          const a = this.rand(2, 6);
-          const b = a * x;
-          return {
-            html: `${a}x = ${b}`,
-            answers: [x.toString()],
-            hint: `x = ${b} ÷ ${a} = ${x}`
-          };
-        }
-      }
-    }
-
-    // Main App Controller
-    class App {
-      constructor() {
-        this.sound = new MinimalSound();
-        this.category = 'addsub';
-        this.score = 0;
-        this.streak = 0;
-        this.currentProblem = null;
-        this.isNumpadVisible = true;
-      }
-
-      init() {
-        this.setCategory('addsub');
-      }
-
-      setCategory(cat) {
-        this.category = cat;
-        
-        // Update tab styles
-        document.querySelectorAll('.category-tab').forEach(tab => {
-          tab.classList.remove('bg-white', 'text-slate-900', 'font-bold', 'shadow-sm');
-          tab.classList.add('text-slate-600');
-        });
-
-        const activeTab = document.getElementById(`tab-${cat}`);
-        if (activeTab) {
-          activeTab.classList.add('bg-white', 'text-slate-900', 'font-bold', 'shadow-sm');
-          activeTab.classList.remove('text-slate-600');
-        }
-
-        this.nextQuestion();
-      }
-
-      nextQuestion() {
-        this.currentProblem = SimpleMathGenerator.generate(this.category);
-        
-        // Render Math HTML
-        document.getElementById('math-display').innerHTML = this.currentProblem.html;
-        document.getElementById('hint-text').innerText = this.currentProblem.hint;
-        document.getElementById('hint-text').classList.add('hidden');
-
-        // Reset Input
-        const input = document.getElementById('answer-input');
-        input.value = '';
-        input.focus();
-      }
-
-      submitAnswer(e) {
-        if (e) e.preventDefault();
-        const input = document.getElementById('answer-input');
-        const userAns = input.value.trim();
-
-        if (!userAns || !this.currentProblem) return;
-
-        const isCorrect = this.currentProblem.answers.some(ans => {
-          if (ans === userAns) return true;
-          const numUser = parseFloat(userAns);
-          const numAns = parseFloat(ans);
-          return !isNaN(numUser) && !isNaN(numAns) && Math.abs(numUser - numAns) < 0.0001;
-        });
-
-        const card = document.getElementById('math-card');
-
-        if (isCorrect) {
-          this.score++;
-          this.streak++;
-          this.sound.playCorrect();
-
-          // Quick pop animation
-          card.classList.add('animate-pop');
-          setTimeout(() => card.classList.remove('animate-pop'), 200);
-
-          this.updateStats();
-          this.nextQuestion();
-        } else {
-          this.streak = 0;
-          this.sound.playWrong();
-
-          // Shake animation
-          card.classList.add('animate-shake');
-          setTimeout(() => card.classList.remove('animate-shake'), 400);
-
-          this.updateStats();
-          input.value = '';
-          input.focus();
-        }
-      }
-
-      skipQuestion() {
-        this.streak = 0;
-        this.updateStats();
-        this.nextQuestion();
-      }
-
-      updateStats() {
-        document.getElementById('score-counter').innerText = this.score;
-        document.getElementById('streak-counter').innerText = this.streak;
-        
-        const fire = document.getElementById('streak-fire');
-        if (this.streak >= 3) {
-          fire.classList.remove('opacity-30');
-          fire.classList.add('opacity-100', 'scale-110');
-        } else {
-          fire.classList.add('opacity-30');
-          fire.classList.remove('opacity-100', 'scale-110');
-        }
-      }
-
-      toggleHint() {
-        const hint = document.getElementById('hint-text');
-        hint.classList.toggle('hidden');
-      }
-
-      pressKey(char) {
-        const input = document.getElementById('answer-input');
-        input.value += char;
-        input.focus();
-      }
-
-      clearInput() {
-        const input = document.getElementById('answer-input');
-        input.value = '';
-        input.focus();
-      }
-
-      backspaceInput() {
-        const input = document.getElementById('answer-input');
-        input.value = input.value.slice(0, -1);
-        input.focus();
-      }
-
-      toggleNumpad() {
-        const container = document.getElementById('numpad-container');
-        const btn = document.getElementById('numpad-toggle');
-        this.isNumpadVisible = !this.isNumpadVisible;
-
-        if (this.isNumpadVisible) {
-          container.classList.remove('hidden');
-          btn.innerText = '非表示';
-        } else {
-          container.classList.add('hidden');
-          btn.innerText = '表示';
-        }
-      }
-
-      toggleSound() {
-        this.sound.enabled = !this.sound.enabled;
-        const iconOn = document.getElementById('sound-on-icon');
-        const iconOff = document.getElementById('sound-off-icon');
-
-        if (this.sound.enabled) {
-          iconOn.classList.remove('hidden');
-          iconOff.classList.add('hidden');
-        } else {
-          iconOn.classList.add('hidden');
-          iconOff.classList.remove('hidden');
-        }
-      }
-    }
-
-    let app;
-    window.onload = () => {
-      app = new App();
-      app.init();
-    };
-  </script>
+<body>
+<header>
+<a class="logo" href="#home">テスト前ノート</a>
+<nav aria-label="メインメニュー">
+<a href="#home" data-n="home">ホーム</a>
+<a href="#plan" data-n="plan">計画</a>
+<a href="#practice" data-n="practice">練習</a>
+<a href="#review" data-n="review">見直しリスト<span class="badge" id="rvn"></span></a>
+</nav>
+</header>
+<main>
+
+<section id="home">
+<div class="hero">
+<div>
+<h1>定期テストの前に、<br>解いて、直す。</h1>
+<p>テスト前に使える時間は多くありません。教科書を最初から読み直す前に、まず問題を解いて、間違えた所だけを直していく。このサイトはその順番で使うように作りました。</p>
+<div class="btns">
+<a class="btn" href="#plan">テストまでの計画を立てる</a>
+<a class="btn ghost" href="#practice">問題を解く</a>
+</div>
+</div>
+<div class="sheet" aria-label="見直しの例">
+<p class="q">問　2x + 5 = 13 を解きなさい。</p>
+<p class="q">答え　<span class="wrong">x = 9</span></p>
+<p class="fix">直し　2x = 8 だから x = 4</p>
+<small>間違えた問題は、答えを見て終わりにせず、自分で直したところまでを勉強にします。</small>
+</div>
+</div>
+
+<h2>教科を選んで始める</h2>
+<div class="sg">
+<a class="sc s-m" href="#practice" data-go="数学"><span class="top">数学</span><span class="bt">4問</span></a>
+<a class="sc s-e" href="#practice" data-go="英語"><span class="top">英語</span><span class="bt">4問</span></a>
+<a class="sc s-s" href="#practice" data-go="理科"><span class="top">理科</span><span class="bt">4問</span></a>
+<a class="sc s-y" href="#practice" data-go="社会"><span class="top">社会</span><span class="bt">4問</span></a>
+<a class="sc s-k" href="#practice" data-go="国語"><span class="top">国語</span><span class="bt">4問</span></a>
+</div>
+
+<h2>使い方</h2>
+<ol class="flow">
+<li>「計画」でテスト日を入れて、残り日数と教科ごとの割り振りを見る。</li>
+<li>「練習」で教科を選んで8問解く。答えたらすぐ解説が出る。</li>
+<li>間違えた問題は「見直しリスト」に残る。解き直せたら「直した」を押して消す。</li>
+</ol>
+
+<h2>先に書いておくこと</h2>
+<div class="limits">
+<p>問題は5教科が8問ずつで、中学で習う基本事項の確認用です。学校によって教科書もテスト範囲も違うので、範囲を指定する機能はありません。</p>
+<p>学校のワークや授業プリントの代わりにはなりません。それらを解いたあとに、抜けがないか確かめる使い方をおすすめします。</p>
+<p>見直しリストは、いま使っているブラウザの中にだけ保存されます。スマホとパソコンの間で共有はされません。</p>
+</div>
+</section>
+
+<section id="plan" hidden>
+<h1 class="pt">テストまでの計画</h1>
+<p>教科ごとにテスト日を入れてください。その日の前日までの勉強を、今日から割り振ります。翌日にテストがある教科は、その前日に見直しを入れます。</p>
+<div class="card"><p class="meta">勉強しない教科は、チェックを外してください。</p>
+
+
+<div id="psub"></div>
+<div class="btns"><button class="btn" id="mk">計画を作る</button></div></div>
+<div id="pout" aria-live="polite"></div>
+</section>
+
+<section id="practice" hidden>
+<h1 class="pt">練習問題</h1>
+<p id="pr-lead">教科を選ぶと、8問が順番に出ます。</p>
+<div class="subjects" id="pick"></div>
+<div id="quiz"></div>
+</section>
+
+<section id="review" hidden>
+<h1 class="pt">見直しリスト</h1>
+<div id="rvout"></div>
+</section>
+
+</main>
+<footer><a href="#home">ホーム</a><a href="#plan">計画</a><a href="#practice">練習</a><a href="#review">見直しリスト</a><br>テスト前ノート　問題は中学の基本事項の確認用です。学校のワークや授業プリントと合わせて使ってください。</footer>
+
+<script>
+var DATA={
+"数学":[
+{q:"-3 - (-5) を計算しなさい。",c:["2","-8","8","-2"],e:"引く数の符号を変えて足します。-3 + 5 = 2。"},
+{q:"方程式 2x + 5 = 13 の解は?",c:["x = 4","x = 9","x = 8","x = 3"],e:"5を移項して 2x = 8。両辺を2でわって x = 4。"},
+{q:"半径6cmの円の面積は?(円周率はπ)",c:["36π cm²","12π cm²","72π cm²","6π cm²"],e:"面積は 半径×半径×π。6×6×π = 36π。12π は円周の長さです。"},
+{q:"直角をはさむ2辺が3cmと4cmの直角三角形で、斜辺の長さは?",c:["5cm","7cm","6cm","√7 cm"],e:"三平方の定理より 3²+4²=25。斜辺は √25 = 5。"},
+{q:"x² - 9 を因数分解しなさい。",c:["(x + 3)(x - 3)","(x - 3)²","(x + 9)(x - 1)","x(x - 9)"],e:"x² - 3² の形なので、和と差の積になります。"},
+{q:"比例 y = 3x で、x = 4 のときの y は?",c:["12","7","3/4","81"],e:"y = 3 × 4 = 12。"},
+{q:"半径5cmの円の円周の長さは?(円周率はπ)",c:["10π cm","5π cm","25π cm","20π cm"],e:"円周 = 直径 × π = 10 × π。25π は面積です。"},
+{q:"-2² の値は?",c:["-4","4","-2","2"],e:"-2² は 2² に - がついたものなので -4。(-2)² と書いてあれば 4 です。"}],
+"英語":[
+{q:"She ( ) to school every day.",c:["goes","go","going","went"],e:"主語が三人称単数で現在の文なので、動詞に -es がつきます。"},
+{q:"I ( ) a book now.",c:["am reading","read","reads","was reading"],e:"now があるので、いまの動作を表す現在進行形 am + ing。"},
+{q:"buy の過去形は?",c:["bought","buyed","boughten","buys"],e:"buy は不規則動詞で、過去形は bought です。"},
+{q:"This book is ( ) than that one.",c:["more interesting","interestinger","most interesting","interesting"],e:"interesting のように長い語の比較級は more をつけます。than があるので最上級は使えません。"},
+{q:"( ) you play tennis yesterday?",c:["Did","Do","Are","Does"],e:"yesterday があるので過去の疑問文です。Did を使い、動詞は原形になります。"},
+{q:"「私は昨日、友達に会いました」に合う英文は?",c:["I met my friend yesterday.","I meet my friend yesterday.","I meeted my friend yesterday.","I am meeting my friend yesterday."],e:"yesterday があるので過去形です。meet の過去形は met です。"},
+{q:"There ( ) two books on the desk.",c:["are","is","be","am"],e:"two books は複数なので are を使います。"},
+{q:"He can ( ) the piano.",c:["play","plays","playing","played"],e:"can のあとの動詞は、主語が何でも原形です。"}],
+"理科":[
+{q:"光合成で植物がとり入れる気体は?",c:["二酸化炭素","酸素","窒素","水素"],e:"光合成では二酸化炭素と水から、デンプンと酸素をつくります。"},
+{q:"質量60g、体積20cm³の物質の密度は?",c:["3g/cm³","1200g/cm³","0.33g/cm³","40g/cm³"],e:"密度 = 質量 ÷ 体積 = 60 ÷ 20 = 3。"},
+{q:"電圧3V、抵抗6Ωの回路に流れる電流は?",c:["0.5A","18A","2A","3A"],e:"オームの法則 I = V ÷ R = 3 ÷ 6 = 0.5。"},
+{q:"マグマが地表や地表近くで急に冷えてできる火成岩は?",c:["火山岩","深成岩","堆積岩","変成岩"],e:"急に冷えるので結晶が大きく育たず、斑状組織になります。ゆっくり冷えた深成岩は等粒状組織です。"},
+{q:"ヒトの血液で、酸素を運ぶはたらきをする成分は?",c:["赤血球","白血球","血小板","血しょう"],e:"赤血球に含まれるヘモグロビンが酸素と結びつきます。"},
+{q:"うすい塩酸に亜鉛を入れたときに発生する気体は?",c:["水素","酸素","二酸化炭素","塩素"],e:"亜鉛などの金属が酸にとけると、水素が発生します。"},
+{q:"物体を凸レンズの焦点の内側に置き、レンズ越しにのぞいたときに見える像は?",c:["正立の虚像","倒立の実像","正立の実像","倒立の虚像"],e:"焦点の内側では実像はできず、拡大された正立の虚像が見えます。"},
+{q:"地震のとき、P波によるはじめの小さなゆれを何という?",c:["初期微動","主要動","震度","マグニチュード"],e:"P波が先に届いて初期微動を起こし、あとからS波による主要動が来ます。"}],
+"社会":[
+{q:"日本の標準時の基準になっている経線は?",c:["東経135度","東経140度","東経120度","西経135度"],e:"兵庫県明石市などを通る東経135度です。"},
+{q:"1603年に江戸幕府を開いた人物は?",c:["徳川家康","豊臣秀吉","織田信長","徳川吉宗"],e:"徳川家康は征夷大将軍に任命されて幕府を開きました。"},
+{q:"三権分立のうち、法律をつくる権限をもつ機関は?",c:["国会","内閣","裁判所","地方公共団体"],e:"国会が立法、内閣が行政、裁判所が司法を担当します。"},
+{q:"日本で最も長い川は?",c:["信濃川","利根川","石狩川","木曽川"],e:"信濃川が最長で、利根川は流域面積が最も広い川です。"},
+{q:"鎌倉幕府を開いた人物は?",c:["源頼朝","足利尊氏","平清盛","北条時宗"],e:"源頼朝が征夷大将軍となり、鎌倉に幕府を開きました。"},
+{q:"日本国憲法の三大原則は、国民主権、平和主義と、あと1つは?",c:["基本的人権の尊重","三権分立","地方自治","議院内閣制"],e:"三大原則は、国民主権、基本的人権の尊重、平和主義です。"},
+{q:"六大陸のうち、面積が最大の大陸は?",c:["ユーラシア大陸","アフリカ大陸","北アメリカ大陸","南アメリカ大陸"],e:"ユーラシア大陸が最大で、2番目に大きいのがアフリカ大陸です。"},
+{q:"1853年に浦賀に来航して、開国を求めたペリーはどの国の人?",c:["アメリカ","イギリス","ロシア","フランス"],e:"アメリカのペリーが黒船を率いて来航しました。"}],
+"国語":[
+{q:"「情けは人のためならず」の本来の意味は?",c:["人に親切にすれば、めぐって自分にも良いことがある","親切は相手のためにならないのでやめたほうがよい","情けをかけると相手が甘えてしまう","人のためになることだけをするべきだ"],e:"「人のためではなく、自分のため」という意味で使われてきた言葉です。"},
+{q:"「雨降って地固まる」の意味は?",c:["もめごとのあとは、かえって物事が安定する","悪いことは続けて起こる","雨の日は何もしないほうがよい","努力は必ず報われる"],e:"雨で一度ぬかるんだ地面が、乾くと前より固くなることからできた言葉です。"},
+{q:"「ぜんだいみもん」を漢字で書くと?",c:["前代未聞","全代未聞","前大未聞","前代未問"],e:"これまでに聞いたことがないほど珍しい、という意味です。"},
+{q:"「推敲」の読み方は?",c:["すいこう","おうこう","すいけい","ついこう"],e:"詩や文章の言葉を練り直すことです。"},
+{q:"「確信犯」の本来の意味は?",c:["信念に基づいて、正しいと思って行う行為","悪いと知りながら行う犯罪","あらかじめ計画して行う犯罪","何度も繰り返される犯罪"],e:"本来は、政治的・宗教的な信念に基づく行為を指します。「悪いと知りながらする」は本来の意味ではありません。"},
+{q:"「煮詰まる」の本来の意味は?",c:["議論が出尽くして、結論が出る状態になる","行き詰まって先に進めなくなる","話が長引いて疲れる","内容が薄くなる"],e:"本来は、結論が出る段階になることです。「行き詰まる」の意味で使う人も多くなっています。"},
+{q:"「雰囲気」の読みは?",c:["ふんいき","ふいんき","ふんき","ぼういき"],e:"「ふんいき」が正しい読みです。「ふいんき」と言い間違える人が多いので注意してください。"},
+{q:"「矛盾」という言葉のもとになった話は?",c:["どんな盾も突き通す矛と、どんな矛も防ぐ盾","どんな的にも当たる弓と矢","どんなものも切れる刀とさや","どんな攻撃も防ぐ鎧と兜"],e:"つじつまが合わないことを表す、中国の故事からできた言葉です。"}]
+};
+var NAMES=Object.keys(DATA),mem=[],SC={"数学":"s-m","英語":"s-e","理科":"s-s","社会":"s-y","国語":"s-k"};
+function load(){try{var v=localStorage.getItem("tn-review");if(v)return JSON.parse(v)}catch(e){}return mem}
+function save(a){mem=a;try{localStorage.setItem("tn-review",JSON.stringify(a))}catch(e){}badge()}
+function badge(){var n=load().length;$("rvn").textContent=n?n:""}
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(m){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]})}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+/* routing */
+var VIEWS=["home","plan","practice","review"],TT={plan:"テストまでの計画",practice:"練習問題",review:"見直しリスト"};
+function route(){
+ var h=(location.hash||"#home").slice(1);if(VIEWS.indexOf(h)<0)h="home";
+ VIEWS.forEach(function(v){$(v).hidden=(v!==h)});
+ document.querySelectorAll("nav a").forEach(function(a){if(a.dataset.n===h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+ if(h==="review")renderReview();
+ document.title=h==="home"?"テスト前ノート 中学生の定期テスト対策":TT[h]+" | テスト前ノート";
+ window.scrollTo(0,0);
+}
+window.addEventListener("hashchange",route);
+
+/* practice */
+var st={s:null,list:[],i:0,score:0};
+function renderPick(){
+ $("pick").innerHTML=NAMES.map(function(n){return '<button class="btn tone '+SC[n]+'" data-s="'+n+'">'+n+'</button>'}).join("");
+ $("pick").onclick=function(e){var b=e.target.closest("button");if(b)start(b.dataset.s)};
+}
+function start(s){st={s:s,list:shuffle(DATA[s]),i:0,score:0};ask();$("quiz").scrollIntoView({block:"start"})}
+function ask(){
+ var q=st.list[st.i],ans=q.c[0],opts=shuffle(q.c);
+ $("quiz").innerHTML='<div class="card '+SC[st.s]+'"><div class="bar"><i style="width:'+(st.i/st.list.length*100)+'%"></i></div><p class="meta"><span class="chip">'+st.s+'</span>　'+(st.i+1)+' / '+st.list.length+'問目</p><p class="q-text">'+esc(q.q)+'</p><div class="choices">'+
+  opts.map(function(o,k){return '<button class="choice" data-v="'+esc(o)+'"><span class="lt">'+"ABCD"[k]+'</span><span>'+esc(o)+'</span></button>'}).join("")+'</div><div id="fb" aria-live="polite"></div></div>';
+ $("quiz").querySelector(".choices").onclick=function(e){
+  var b=e.target.closest(".choice");if(!b||b.disabled)return;
+  var right=b.dataset.v===ans;
+  this.querySelectorAll(".choice").forEach(function(x){x.disabled=true;if(x.dataset.v===ans)x.classList.add("ok")});
+  if(right)st.score++;else{b.classList.add("ng");addReview(st.s,q)}
+  var last=st.i===st.list.length-1;
+  $("fb").innerHTML='<div class="explain '+(right?"g":"b")+'"><b class="'+(right?"res-ok":"res-ng")+'">'+(right?"✓ 正解です":"× 不正解です。正しい答えは「"+esc(ans)+"」")+'</b><br>'+esc(q.e)+'</div><div class="btns"><button class="btn" id="nx">'+(last?"結果を見る":"次の問題")+'</button></div>';
+  $("nx").focus();
+  $("nx").onclick=function(){if(last)finish();else{st.i++;ask()}};
+ };
+}
+function finish(){
+ var miss=st.list.length-st.score;
+ $("quiz").innerHTML='<div class="card '+SC[st.s]+' done"><div class="ring" style="--p:'+(st.score/st.list.length*100)+'"><b>'+st.score+'<small>/'+st.list.length+'</small></b></div><div><p class="q-text"><span class="chip">'+st.s+'</span>　'+st.score+'問正解</p><p>'+
+  (miss?'間違えた'+miss+'問は見直しリストに入っています。解説を読んで、何も見ずに解き直してみてください。':'全問正解でした。同じ教科をもう一度やると、問題の並びと選択肢が入れ替わります。')+
+  '</p><div class="btns"><button class="btn" id="again">もう一度</button>'+(miss?'<a class="btn ghost" href="#review">見直しリストを開く</a>':'')+'</div></div></div>';
+ $("again").onclick=function(){start(st.s)};
+}
+function addReview(s,q){
+ var a=load();if(a.some(function(x){return x.q===q.q}))return;
+ a.push({s:s,q:q.q,a:q.c[0],o:shuffle(q.c),e:q.e});save(a);
+}
+
+/* review */
+function rvBody(x,i){
+ if(!x.o)return '<details><summary>答えと解説を見る</summary><p>答え　'+esc(x.a)+'</p><p>'+esc(x.e)+'</p></details><div class="btns"><button class="btn ghost small" data-d="'+i+'">直した</button></div>';
+ return '<div class="choices">'+x.o.map(function(o,k){return '<button class="choice" data-i="'+i+'" data-v="'+esc(o)+'"><span class="lt">'+"ABCD"[k]+'</span><span>'+esc(o)+'</span></button>'}).join("")+'</div><div class="rvfb" aria-live="polite"></div>';
+}
+function renderReview(){
+ var a=load();
+ if(!a.length){$("rvout").innerHTML='<p>見直す問題はありません。「練習」で間違えた問題がここに残ります。</p><a class="btn" href="#practice">練習へ</a>';return}
+ $("rvout").innerHTML='<p>'+a.length+'問が残っています。答えを見ずに選び直してください。正解すると「直した」を押せます。</p>'+
+  a.map(function(x,i){return '<div class="rv"><p class="meta"><span class="chip '+SC[x.s]+'">'+x.s+'</span></p><p><b>'+esc(x.q)+'</b></p>'+rvBody(x,i)+'</div>'}).join("");
+ $("rvout").onclick=function(e){
+  var d=e.target.closest("button[data-d]");
+  if(d){var r=load();r.splice(+d.dataset.d,1);save(r);renderReview();return}
+  var b=e.target.closest(".choice");if(!b||b.disabled)return;
+  var x=load()[+b.dataset.i],box=b.closest(".rv"),fb=box.querySelector(".rvfb");b.disabled=true;
+  if(b.dataset.v===x.a){
+   box.querySelectorAll(".choice").forEach(function(c){c.disabled=true});b.classList.add("ok");
+   fb.innerHTML='<div class="explain g"><b class="res-ok">✓ 正解です</b><br>'+esc(x.e)+'</div><div class="btns"><button class="btn small" data-d="'+b.dataset.i+'">直した</button></div>';
+  }else{b.classList.add("ng");fb.innerHTML='<div class="explain b"><b class="res-ng">× 違います。もう一度選んでください。</b></div>'}
+ };
+}
+
+/* plan */
+function fmt(x){return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")}
+function initPlan(){
+ var sv={};try{sv=JSON.parse(localStorage.getItem("tn-dates"))||{}}catch(e){}
+ var tm=new Date();tm.setDate(tm.getDate()+1);var mn=fmt(tm);
+ var d=new Date();d.setDate(d.getDate()+14);
+ $("psub").innerHTML=NAMES.map(function(n){var v=sv[n]&&sv[n]>=mn?sv[n]:fmt(d);
+  return '<div class="prow"><label><input type="checkbox" value="'+n+'" checked> <span class="chip '+SC[n]+'">'+n+'</span></label><input type="date" aria-label="'+n+'のテスト日" min="'+mn+'" value="'+v+'"></div>'}).join("");
+ $("mk").onclick=makePlan;
+}
+function makePlan(){
+ var out=$("pout"),n=new Date();n=new Date(n.getFullYear(),n.getMonth(),n.getDate());
+ var L=[],ds={},bad="";
+ document.querySelectorAll("#psub .prow").forEach(function(r){
+  var c=r.querySelector("input[type=checkbox]"),t=r.querySelector("input[type=date]");
+  if(t.value)ds[c.value]=t.value;
+  if(!c.checked||bad)return;
+  if(!t.value){bad=c.value+"のテスト日を入力してください。";return}
+  var q=t.value.split("-"),d=Math.round((new Date(+q[0],+q[1]-1,+q[2])-n)/86400000);
+  if(d<1){bad=c.value+"のテスト日は明日以降にしてください。";return}
+  L.push({s:c.value,d:d,k:0});
+ });
+ try{localStorage.setItem("tn-dates",JSON.stringify(ds))}catch(e){}
+ if(bad){out.innerHTML='<p class="res-ng">'+bad+'</p>';return}
+ if(!L.length){out.innerHTML='<p class="res-ng">教科を1つ以上選んでください。</p>';return}
+ var first=Math.min.apply(null,L.map(function(x){return x.d})),last=Math.max.apply(null,L.map(function(x){return x.d})),rows=[];
+ for(var i=0;i<=last;i++){
+  var ex=L.filter(function(x){return x.d===i}),cand=L.filter(function(x){return x.d>i}),eve=cand.filter(function(x){return x.d===i+1}),pool=eve.length?eve:cand,pick=null,task="";
+  pool.forEach(function(x){if(!pick||x.k/x.d<pick.k/pick.d||(x.k/x.d===pick.k/pick.d&&x.d<pick.d))pick=x});
+  if(pick){task=pick.k===0?"範囲を通して解く。わからなかった所に印をつける。":(pick.d===i+1?"見直しリストと、印をつけた所だけを見る。新しいことは始めない。":"前に印をつけた所と、見直しリストの問題を解き直す。");pick.k++}
+  if(ex.length||pick)rows.push({i:i,ex:ex,pick:pick,task:task});
+ }
+ var skip=Math.max(0,rows.length-21),html="";
+ rows.slice(skip).forEach(function(r){
+  var dt=new Date(n);dt.setDate(n.getDate()+r.i);
+  html+='<tr><th>'+dt.toLocaleDateString("ja-JP",{month:"numeric",day:"numeric",weekday:"short"})+'</th><td>'+
+   (r.ex.length?'<p class="ex">テスト　'+r.ex.map(function(x){return '<span class="chip '+SC[x.s]+'">'+x.s+'</span>'}).join(" ")+'</p>':'')+
+   (r.pick?'<span class="chip '+SC[r.pick.s]+'">'+r.pick.s+'</span>　'+r.task:'')+'</td></tr>';
+ });
+ var none=L.filter(function(x){return x.k===0}).map(function(x){return x.s});
+ out.innerHTML='<h2>最初のテストまであと'+first+'日</h2><p>'+(skip?'表示は直前の21日分です。':'')+'テスト期間中も、あとに残っている教科の勉強を入れています。'+'</p>'+
+  (none.length?'<p class="res-ng">日数が足りず、一度も割り振れなかった教科: '+none.join("、")+'。教科を絞るか、日付を見直してください。</p>':'')+
+  '<div class="tablewrap"><table>'+html+'</table></div>';
+}
+
+document.addEventListener("click",function(e){var a=e.target.closest("[data-go]");if(!a)return;e.preventDefault();start(a.dataset.go);location.hash="practice";setTimeout(function(){$("quiz").scrollIntoView({block:"start"})},50)});
+document.querySelectorAll("[data-go] .bt").forEach(function(x){x.textContent=DATA[x.parentNode.dataset.go].length+"問"});
+renderPick();initPlan();badge();route();
+</script>
 </body>
 </html>
