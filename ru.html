@@ -82,7 +82,7 @@ main{max-width:1000px;margin:0 auto;padding:8px}
 <div class="ol"><div><b>今回のラウンド</b>　みんなのBET</div><ul id="oth"><li>読み込み中…</li></ul></div>
 <div class="ol"><b>チャット</b><div id="cm"></div><div style="display:flex;gap:6px"><input id="ci" maxlength="100" placeholder="メッセージ"><button id="cs">送信</button></div></div>
 <div id="md" hidden><div class="mc"><button id="mx">×</button><h3>🏦 BANK</h3>
-<div id="ma"><div>ログインすると、メダルを預けられます。</div><input id="un" placeholder="ユーザー名（英数字と_・3〜12文字）" maxlength="12" autocomplete="username"><input id="pw" type="password" placeholder="パスワード（6文字以上）" autocomplete="current-password"><div class="row"><button class="bb" id="li">ログイン</button><button class="bb" id="su">新規登録</button></div></div>
+<div id="ma"><div>ログインすると、メダルを預けられます。</div><input id="un" placeholder="ユーザー名（数字のみ・例 20261031）" maxlength="12" inputmode="numeric" autocomplete="username"><input id="pw" type="password" inputmode="numeric" maxlength="4" placeholder="パスワード（4桁の数字）" autocomplete="current-password"><div class="row"><button class="bb" id="li">ログイン</button><button class="bb" id="su">新規登録</button></div></div>
 <div id="mb" hidden><div>👤 <b id="mn"></b></div><div>バンク残高 <b id="bk">0</b>枚　／　所持メダル <b id="mm">0</b>枚</div><input id="ba" type="number" min="1" placeholder="枚数"><div class="row"><button class="bb" id="bd">預ける</button><button class="bb" id="bw">引き出す</button></div><div id="bl"></div><div class="row"><button class="bb" id="lo">ログアウト</button></div></div>
 <div id="bm"></div></div></div>
 <canvas id="cf"></canvas></main><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -231,12 +231,12 @@ el('mx').onclick=()=>{el('md').hidden=true};el('md').onclick=e=>{if(e.target===e
 const em=n=>n.toLowerCase()+'@roulette.example';
 const EM={'auth/email-already-in-use':'そのユーザー名は使われています','auth/invalid-credential':'ユーザー名かパスワードが違います','auth/wrong-password':'ユーザー名かパスワードが違います','auth/user-not-found':'ユーザー名かパスワードが違います','auth/operation-not-allowed':'Firebaseでメール/パスワードのログインを有効にしてください','auth/weak-password':'パスワードが弱すぎます'};
 async function doAuth(kind){const n=el('un').value.trim(),pw=el('pw').value;
-  if(!/^[A-Za-z0-9_]{3,12}$/.test(n))return bm('ユーザー名は英数字と_の3〜12文字です');if(pw.length<6)return bm('パスワードは6文字以上です');
+  if(!/^[0-9]{4,12}$/.test(n))return bm('ユーザー名は数字の4〜12桁です（例 20261031）');if(!/^[0-9]{4}$/.test(pw))return bm('パスワードは4桁の数字です');
   if(RP.busy()||RP.tot())return bm('BETしていないBET受付中に操作してください');
-  try{if(kind==='su'){const cur=auth.currentUser,cred=EmailAuthProvider.credential(em(n),pw);let r;
-      if(cur&&cur.isAnonymous)r=await linkWithCredential(cur,cred);else r=await createUserWithEmailAndPassword(auth,em(n),pw);
+  try{if(kind==='su'){const cur=auth.currentUser,cred=EmailAuthProvider.credential(em(n),'ru'+pw);let r;
+      if(cur&&cur.isAnonymous)r=await linkWithCredential(cur,cred);else r=await createUserWithEmailAndPassword(auth,em(n),'ru'+pw);
       await updateProfile(r.user,{displayName:n});await setUser(auth.currentUser);bm('登録しました！')}
-    else{await signInWithEmailAndPassword(auth,em(n),pw);bm('ログインしました')}
+    else{await signInWithEmailAndPassword(auth,em(n),'ru'+pw);bm('ログインしました')}
     el('pw').value=''}catch(e){bm(EM[e.code]||'失敗しました（'+e.code+'）')}}
 el('li').onclick=()=>doAuth('li');el('su').onclick=()=>doAuth('su');
 el('lo').onclick=()=>{if(RP.busy()||RP.tot())return bm('BETしていないBET受付中に操作してください');signOut(auth)};
