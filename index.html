@@ -87,6 +87,8 @@ ol.flow{list-style:none;padding:0;counter-reset:n;display:grid;gap:12px;max-widt
 input[type=checkbox]{accent-color:var(--btn);width:18px;height:18px;vertical-align:-3px}
 footer{line-height:2}footer a{color:var(--btn);text-decoration:none;margin:0 8px}
 h1.pt{font-size:28px;font-weight:400;line-height:1.5;margin:40px 0 12px}.prow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px 0;border-bottom:1px solid var(--line)}.prow label{min-width:110px;cursor:pointer}.ex{margin:0 0 6px;color:var(--sub);font-size:14px}.rvfb{margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}.stat{background:var(--surf);border-radius:16px;padding:16px 20px}.stat small{display:block;color:var(--sub);font-size:13px}.stat b{font-size:28px;font-weight:500;color:var(--btn)}
+.cal{display:grid;grid-template-rows:repeat(7,22px);grid-auto-flow:column;grid-auto-columns:22px;gap:5px;overflow-x:auto;padding-bottom:4px}.cal i{border-radius:5px;background:var(--surf);border:1px solid var(--line)}.cal i.f{visibility:hidden}.cal i.l1{background:color-mix(in srgb,var(--btn) 30%,var(--paper));border-color:transparent}.cal i.l2{background:color-mix(in srgb,var(--btn) 60%,var(--paper));border-color:transparent}.cal i.l3{background:var(--btn);border-color:transparent}
 @media (max-width:760px){.hero{grid-template-columns:1fr;padding:32px 22px;gap:28px;border-radius:24px}header{padding-top:10px;padding-bottom:10px}h2{margin-top:36px}.card{padding:20px}.done{gap:18px}}
 @media (prefers-reduced-motion:no-preference){.choice{transition:border-color .15s,background .15s}}
 </style>
@@ -98,6 +100,7 @@ h1.pt{font-size:28px;font-weight:400;line-height:1.5;margin:40px 0 12px}.prow{di
 <a href="#home" data-n="home">ホーム</a>
 <a href="#plan" data-n="plan">計画</a>
 <a href="#practice" data-n="practice">練習</a>
+<a href="#keep" data-n="keep">続ける</a>
 <a href="#review" data-n="review">見直しリスト<span class="badge" id="rvn"></span></a>
 </nav>
 </header>
@@ -135,6 +138,7 @@ h1.pt{font-size:28px;font-weight:400;line-height:1.5;margin:40px 0 12px}.prow{di
 <li>「計画」でテスト日を入れて、残り日数と教科ごとの割り振りを見る。</li>
 <li>「練習」で教科を選んで8問解く。答えたらすぐ解説が出る。</li>
 <li>間違えた問題は「見直しリスト」に残る。解き直せたら「直した」を押して消す。</li>
+<li>毎日続けたいときは「続ける」を開く。連続日数が見えて、問題を出し続けることもできる。</li>
 </ol>
 
 <h2>先に書いておくこと</h2>
@@ -163,13 +167,22 @@ h1.pt{font-size:28px;font-weight:400;line-height:1.5;margin:40px 0 12px}.prow{di
 <div id="quiz"></div>
 </section>
 
+<section id="keep" hidden>
+<h1 class="pt">続ける</h1>
+<p>毎日少しずつ続けるためのページです。1問でも解いた日が記録されます。記録はこのブラウザの中にだけ残ります。</p>
+<div class="stats" id="stats"></div>
+<div class="card"><p class="meta">この8週間(日曜はじまり。濃いほど、その日に多く解いています)</p><div class="cal" id="cal"></div></div>
+<h2>終わりなしで解く</h2>
+<div id="endless"></div>
+</section>
+
 <section id="review" hidden>
 <h1 class="pt">見直しリスト</h1>
 <div id="rvout"></div>
 </section>
 
 </main>
-<footer><a href="#home">ホーム</a><a href="#plan">計画</a><a href="#practice">練習</a><a href="#review">見直しリスト</a><br>テスト前ノート　問題は中学の基本事項の確認用です。学校のワークや授業プリントと合わせて使ってください。</footer>
+<footer><a href="#home">ホーム</a><a href="#plan">計画</a><a href="#practice">練習</a><a href="#keep">続ける</a><a href="#review">見直しリスト</a><br>テスト前ノート　問題は中学の基本事項の確認用です。学校のワークや授業プリントと合わせて使ってください。</footer>
 
 <script>
 var DATA={
@@ -228,12 +241,13 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(m){return{"&":"&amp;
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
 
 /* routing */
-var VIEWS=["home","plan","practice","review"],TT={plan:"テストまでの計画",practice:"練習問題",review:"見直しリスト"};
+var VIEWS=["home","plan","practice","keep","review"],TT={plan:"テストまでの計画",practice:"練習問題",keep:"続ける",review:"見直しリスト"};
 function route(){
  var h=(location.hash||"#home").slice(1);if(VIEWS.indexOf(h)<0)h="home";
  VIEWS.forEach(function(v){$(v).hidden=(v!==h)});
  document.querySelectorAll("nav a").forEach(function(a){if(a.dataset.n===h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
  if(h==="review")renderReview();
+ if(h==="keep")renderKeep();
  document.title=h==="home"?"テスト前ノート 中学生の定期テスト対策":TT[h]+" | テスト前ノート";
  window.scrollTo(0,0);
 }
@@ -254,7 +268,7 @@ function ask(){
   var b=e.target.closest(".choice");if(!b||b.disabled)return;
   var right=b.dataset.v===ans;
   this.querySelectorAll(".choice").forEach(function(x){x.disabled=true;if(x.dataset.v===ans)x.classList.add("ok")});
-  if(right)st.score++;else{b.classList.add("ng");addReview(st.s,q)}
+  bump();if(right)st.score++;else{b.classList.add("ng");addReview(st.s,q)}
   var last=st.i===st.list.length-1;
   $("fb").innerHTML='<div class="explain '+(right?"g":"b")+'"><b class="'+(right?"res-ok":"res-ng")+'">'+(right?"✓ 正解です":"× 不正解です。正しい答えは「"+esc(ans)+"」")+'</b><br>'+esc(q.e)+'</div><div class="btns"><button class="btn" id="nx">'+(last?"結果を見る":"次の問題")+'</button></div>';
   $("nx").focus();
@@ -292,6 +306,46 @@ function renderReview(){
    box.querySelectorAll(".choice").forEach(function(c){c.disabled=true});b.classList.add("ok");
    fb.innerHTML='<div class="explain g"><b class="res-ok">✓ 正解です</b><br>'+esc(x.e)+'</div><div class="btns"><button class="btn small" data-d="'+b.dataset.i+'">直した</button></div>';
   }else{b.classList.add("ng");fb.innerHTML='<div class="explain b"><b class="res-ng">× 違います。もう一度選んでください。</b></div>'}
+ };
+}
+
+/* keep */
+var memlog={},en={n:0,ok:0,bag:[]};
+function logs(){try{return JSON.parse(localStorage.getItem("tn-log"))||{}}catch(e){return memlog}}
+function bump(){var l=logs(),t=fmt(new Date());l[t]=(l[t]||0)+1;memlog=l;try{localStorage.setItem("tn-log",JSON.stringify(l))}catch(e){}}
+function streak(l){var d=new Date(),c=0;if(!l[fmt(d)])d.setDate(d.getDate()-1);while(l[fmt(d)]){c++;d.setDate(d.getDate()-1)}return c}
+function renderKeep(){
+ var l=logs(),t=l[fmt(new Date())]||0,tot=0,k;for(k in l)tot+=l[k];
+ $("stats").innerHTML=[["連続日数",streak(l)+"日"],["今日",t+"問"],["合計",tot+"問"]].map(function(x){return '<div class="stat"><small>'+x[0]+'</small><b>'+x[1]+'</b></div>'}).join("");
+ var now=new Date(),st0=new Date(now.getFullYear(),now.getMonth(),now.getDate()-now.getDay()-49),h="",i,c,d,key;
+ for(i=0;i<56;i++){d=new Date(st0);d.setDate(st0.getDate()+i);key=fmt(d);c=l[key]||0;
+  h+='<i class="'+(d>now?"f":c>5?"l3":c>2?"l2":c?"l1":"")+'" title="'+(d.getMonth()+1)+'/'+d.getDate()+' '+c+'問"></i>'}
+ $("cal").innerHTML=h;
+}
+function nextQ(){
+ if(!en.bag.length){
+  var all=[],rv=load().map(function(x){return x.q});
+  NAMES.forEach(function(s){DATA[s].forEach(function(q){all.push({s:s,q:q})})});
+  en.bag=shuffle(all.filter(function(x){return rv.indexOf(x.q.q)>=0})).concat(shuffle(all.filter(function(x){return rv.indexOf(x.q.q)<0})));
+ }
+ return en.bag.shift();
+}
+function initEndless(){
+ var n=0;NAMES.forEach(function(s){n+=DATA[s].length});
+ $("endless").innerHTML='<p>全教科で'+n+'問あります。一周すると、同じ問題が最初から出ます。見直しリストにある問題は先に出ます。</p><button class="btn" id="go">解きはじめる</button>';
+ $("go").onclick=askEndless;
+}
+function askEndless(){
+ var it=nextQ(),q=it.q,ans=q.c[0],opts=shuffle(q.c);
+ $("endless").innerHTML='<div class="card '+SC[it.s]+'"><p class="meta"><span class="chip">'+it.s+'</span>　'+en.n+'問解いて、'+en.ok+'問正解</p><p class="q-text">'+esc(q.q)+'</p><div class="choices">'+
+  opts.map(function(o,k){return '<button class="choice" data-v="'+esc(o)+'"><span class="lt">'+"ABCD"[k]+'</span><span>'+esc(o)+'</span></button>'}).join("")+'</div><div id="efb" aria-live="polite"></div></div>';
+ $("endless").querySelector(".choices").onclick=function(e){
+  var b=e.target.closest(".choice");if(!b||b.disabled)return;
+  var right=b.dataset.v===ans;
+  this.querySelectorAll(".choice").forEach(function(x){x.disabled=true;if(x.dataset.v===ans)x.classList.add("ok")});
+  en.n++;bump();if(right)en.ok++;else{b.classList.add("ng");addReview(it.s,q)}
+  $("efb").innerHTML='<div class="explain '+(right?"g":"b")+'"><b class="'+(right?"res-ok":"res-ng")+'">'+(right?"✓ 正解です":"× 不正解です。正しい答えは「"+esc(ans)+"」")+'</b><br>'+esc(q.e)+'</div><div class="btns"><button class="btn" id="en-nx">次の問題</button></div>';
+  $("en-nx").focus();$("en-nx").onclick=askEndless;renderKeep();badge();
  };
 }
 
@@ -342,7 +396,7 @@ function makePlan(){
 
 document.addEventListener("click",function(e){var a=e.target.closest("[data-go]");if(!a)return;e.preventDefault();start(a.dataset.go);location.hash="practice";setTimeout(function(){$("quiz").scrollIntoView({block:"start"})},50)});
 document.querySelectorAll("[data-go] .bt").forEach(function(x){x.textContent=DATA[x.parentNode.dataset.go].length+"問"});
-renderPick();initPlan();badge();route();
+renderPick();initPlan();initEndless();badge();route();
 </script>
 </body>
 </html>
