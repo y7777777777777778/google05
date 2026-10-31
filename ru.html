@@ -59,7 +59,12 @@ main{max-width:1000px;margin:0 auto;padding:8px}
 .tr{width:62px;height:34px;background:#1a1a1a;border-bottom:9px solid #ff8a1f;border-radius:6px}
 .ol{margin-top:14px;background:#fff4d6;border:3px solid #e8438f;border-radius:14px;padding:10px 14px;color:#4a1038;font:700 14px "Noto Sans JP",sans-serif}.ol b{color:#d6258a}#tk{min-height:22px;margin:4px 0;color:#188038}#rk{margin:4px 0 0;padding:0;list-style:none}#rk li{display:flex;gap:8px;padding:2px 0}#rk li b{margin-left:auto}
 #oth{margin:4px 0 0;padding:0;list-style:none}#oth li{display:flex;gap:8px;padding:2px 0}#oth li b{margin-left:auto}.win2{color:#188038}.lose2{color:#d93025}
-#cm{height:150px;overflow-y:auto;background:#fff;border-radius:8px;padding:6px;margin:6px 0;font-weight:400}#cm p{margin:2px 0;word-break:break-all}#ci{flex:1;padding:8px;border:2px solid #e8438f;border-radius:8px;font:inherit}#cs{border:0;border-radius:8px;background:#e8438f;color:#fff;font:700 14px "Noto Sans JP";padding:0 16px;cursor:pointer}
+#cm{height:150px;overflow-y:auto;background:#fff;border-radius:8px;padding:6px;margin:6px 0;font-weight:400}#cm p{margin:2px 0;word-break:break-all}#ci{flex:1;padding:8px;border:2px solid #e8438f;border-radius:8px;font:inherit}#ba{width:110px;padding:8px;border:2px solid #e8438f;border-radius:8px;font:inherit}#bm{min-height:20px;margin-top:4px;color:#d6258a}.bb{padding:8px 16px}
+#md{position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:20}#md[hidden]{display:none}[hidden]{display:none!important}
+.mc{position:relative;background:#fff4d6;border:4px solid #e8438f;border-radius:16px;padding:18px;width:min(92vw,400px);color:#4a1038;font:700 14px "Noto Sans JP"}.mc h3{margin:0 0 10px;color:#d6258a}
+#mx{position:absolute;right:10px;top:6px;border:0;background:none;font-size:26px;cursor:pointer;color:#4a1038}.mc input{width:100%;padding:8px;margin:4px 0;border:2px solid #e8438f;border-radius:8px;font:inherit}#md #ba{width:100%}
+.mc .row{display:flex;gap:8px;margin-top:6px}.mc .bb{flex:1}#bl{max-height:120px;overflow:auto;font-weight:400;font-size:12px;margin-top:8px}
+#cs,.bb{border:0;border-radius:8px;background:#e8438f;color:#fff;font:700 14px "Noto Sans JP";padding:0 16px;cursor:pointer}
 #cf{position:fixed;inset:0;pointer-events:none;z-index:9}
 </style></head><body><main>
 <div class="cab"><div class="sd">ROULETTE PARTY</div><div class="tp"><i class="bt"></i><i class="bt k"></i><i class="bt w"></i><b>タッチ・デ・ルーレットパーティー</b><i class="bt w"></i><i class="bt k"></i><i class="bt"></i></div><div class="sw"><div class="scr" id="sc">
@@ -72,10 +77,14 @@ main{max-width:1000px;margin:0 auto;padding:8px}
 <div class="bx tm" style="left:64%;width:14%"><small>TIME</small><b id="tm">00</b></div>
 <div class="fg">FREEGAME<br><i>★</i><i>★</i><i>★</i></div>
 <div id="fl"></div><div id="bn"></div></div></div>
-<div class="ctl"><button class="rb" id="clr">CLEAR</button><button class="rb" id="re">REBET</button></div><div class="fr"><i class="tr"></i><b>Touch ルーレットパーティー</b><i class="tr"></i></div></div>
+<div class="ctl"><button class="rb" id="clr">CLEAR</button><button class="rb" id="re">REBET</button><button class="rb" id="bank">BANK</button></div><div class="fr"><i class="tr"></i><b>Touch ルーレットパーティー</b><i class="tr"></i></div></div>
 <div class="ol"><div><b>ONLINE</b> <span id="onl">1</span>人　ランキング（最高メダル数）</div><div id="tk"></div><ol id="rk"><li>読み込み中…</li></ol></div>
 <div class="ol"><div><b>今回のラウンド</b>　みんなのBET</div><ul id="oth"><li>読み込み中…</li></ul></div>
 <div class="ol"><b>チャット</b><div id="cm"></div><div style="display:flex;gap:6px"><input id="ci" maxlength="100" placeholder="メッセージ"><button id="cs">送信</button></div></div>
+<div id="md" hidden><div class="mc"><button id="mx">×</button><h3>🏦 BANK</h3>
+<div id="ma"><div>ログインすると、メダルを預けられます。</div><input id="un" placeholder="ユーザー名（英数字と_・3〜12文字）" maxlength="12" autocomplete="username"><input id="pw" type="password" placeholder="パスワード（6文字以上）" autocomplete="current-password"><div class="row"><button class="bb" id="li">ログイン</button><button class="bb" id="su">新規登録</button></div></div>
+<div id="mb" hidden><div>👤 <b id="mn"></b></div><div>バンク残高 <b id="bk">0</b>枚　／　所持メダル <b id="mm">0</b>枚</div><input id="ba" type="number" min="1" placeholder="枚数"><div class="row"><button class="bb" id="bd">預ける</button><button class="bb" id="bw">引き出す</button></div><div id="bl"></div><div class="row"><button class="bb" id="lo">ログアウト</button></div></div>
+<div id="bm"></div></div></div>
 <canvas id="cf"></canvas></main><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const ORD=['?',...Array.from({length:19},(_,i)=>i)],RED=[1,3,5,7,9,12,14,16,18],ST=Math.PI*2/20,TW=Math.PI*2,$=id=>document.getElementById(id);
@@ -173,11 +182,11 @@ else say(tb?`出目 ${n}　残念… -${tb}枚`:`出目 ${n}`);
 cnt(from,medal,()=>{if(medal<=0){medal=500;say('メダルがなくなったので500枚プレゼント！')}ui();saveOnline(win);})}
 function saveOnline(win){const b=Math.max(lg('rp_best',0),medal);sv('rp_best',b);if(window.rpSave)window.rpSave(medal,b,win)}
 window.rpSetMedal=m=>{if(!busy&&!tot()){medal=m;ui()}};
-window.RP={ORD,B,bet:()=>({...bet}),tot:()=>tot(),lock(){busy=true;last={...bet}},unlock(){busy=false;document.querySelectorAll('.win').forEach(e=>e.classList.remove('win'));say('BET受付中！')},spinTo};
+window.RP={ORD,B,bet:()=>({...bet}),tot:()=>tot(),lock(){busy=true;last={...bet}},unlock(){busy=false;document.querySelectorAll('.win').forEach(e=>e.classList.remove('win'));say('BET受付中！')},spinTo,medal:()=>medal,busy:()=>busy,addMedal(d){medal+=d;ui();saveOnline(0)}};
 hh();ui();draw();
 </script><script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getAuth,signInAnonymously,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{getAuth,onAuthStateChanged,signInAnonymously,signInWithEmailAndPassword,createUserWithEmailAndPassword,EmailAuthProvider,linkWithCredential,updateProfile,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import{getFirestore,doc,getDoc,getDocFromServer,setDoc,addDoc,deleteDoc,runTransaction,collection,query,orderBy,limit,where,onSnapshot,serverTimestamp,Timestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp({
   apiKey:"AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
@@ -188,9 +197,9 @@ const app=initializeApp({
   appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"});
 const auth=getAuth(app),db=getFirestore(app),el=id=>document.getElementById(id),t0=Date.now(),RP=window.RP;
 const CYC=36000,BETM=20000,SPINM=9500; // 1ラウンド36秒: BET20秒→回転9.5秒→結果表示
-let uid=null,name=localStorage.getItem('rp_name')||'',unP=null,unB=null,unR=null,off=0,curR=-1,resIdx=null,spun=false,locked=false,asked=0,others={},bt=null;
-const sn=()=>Date.now()+off;
-const nick=()=>{if(!name){name=(prompt('ニックネームを入力（12文字まで）')||'ゲスト').trim().slice(0,12)||'ゲスト';localStorage.setItem('rp_name',name)}return name};
+let uid=null,user=null,name='',unP=null,unB=null,unR=null,unBk=null,unLg=null,off=0,curR=-1,resIdx=null,spun=false,locked=false,asked=0,others={},bt=null,started=false;
+const sn=()=>Date.now()+off,reg=()=>!!user&&!user.isAnonymous,bm=t=>el('bm').textContent=t;
+const nick=()=>{let n=localStorage.getItem('rp_name')||'';if(!n){n=(prompt('ニックネームを入力（12文字まで）')||'ゲスト').trim().slice(0,12)||'ゲスト';localStorage.setItem('rp_name',n)}return n};
 const beat=()=>setDoc(doc(db,'presence',uid),{t:serverTimestamp()}).catch(()=>{});
 function watchPresence(){if(unP)unP();unP=onSnapshot(query(collection(db,'presence'),where('t','>',Timestamp.fromMillis(Date.now()-60000))),s=>{el('onl').textContent=Math.max(1,s.size)})}
 async function sync(){const ref=doc(db,'presence',uid),a=Date.now();await setDoc(ref,{t:serverTimestamp()});const b=Date.now(),s=await getDocFromServer(ref);off=s.data().t.toMillis()-(a+b)/2}
@@ -215,9 +224,40 @@ window.rpSave=(medal,best,win)=>{if(!uid)return;
   if(win>=100)addDoc(collection(db,'feed'),{uid,name,win,t:serverTimestamp()}).catch(()=>{})};
 function send(){const t=el('ci').value.trim().slice(0,100);if(!t||!uid)return;el('ci').value='';addDoc(collection(db,'chat'),{uid,name,text:t,t:serverTimestamp()}).catch(()=>{})}
 el('cs').onclick=send;el('ci').onkeydown=e=>{if(e.key==='Enter')send()};
-async function start(id){uid=id;nick();
-  try{await sync()}catch(e){}
-  try{const s=await getDoc(doc(db,'players',uid));if(s.exists()&&s.data().medal>0)window.rpSetMedal(s.data().medal)}catch(e){}
+// ---- BANK ポップアップ ----
+const show=()=>{el('ma').hidden=reg();el('mb').hidden=!reg();el('mn').textContent=name;el('mm').textContent=RP.medal()};
+el('bank').onclick=()=>{el('md').hidden=false;bm('');show()};
+el('mx').onclick=()=>{el('md').hidden=true};el('md').onclick=e=>{if(e.target===el('md'))el('md').hidden=true};
+const em=n=>n.toLowerCase()+'@roulette.example';
+const EM={'auth/email-already-in-use':'そのユーザー名は使われています','auth/invalid-credential':'ユーザー名かパスワードが違います','auth/wrong-password':'ユーザー名かパスワードが違います','auth/user-not-found':'ユーザー名かパスワードが違います','auth/operation-not-allowed':'Firebaseでメール/パスワードのログインを有効にしてください','auth/weak-password':'パスワードが弱すぎます'};
+async function doAuth(kind){const n=el('un').value.trim(),pw=el('pw').value;
+  if(!/^[A-Za-z0-9_]{3,12}$/.test(n))return bm('ユーザー名は英数字と_の3〜12文字です');if(pw.length<6)return bm('パスワードは6文字以上です');
+  if(RP.busy()||RP.tot())return bm('BETしていないBET受付中に操作してください');
+  try{if(kind==='su'){const cur=auth.currentUser,cred=EmailAuthProvider.credential(em(n),pw);let r;
+      if(cur&&cur.isAnonymous)r=await linkWithCredential(cur,cred);else r=await createUserWithEmailAndPassword(auth,em(n),pw);
+      await updateProfile(r.user,{displayName:n});await setUser(auth.currentUser);bm('登録しました！')}
+    else{await signInWithEmailAndPassword(auth,em(n),pw);bm('ログインしました')}
+    el('pw').value=''}catch(e){bm(EM[e.code]||'失敗しました（'+e.code+'）')}}
+el('li').onclick=()=>doAuth('li');el('su').onclick=()=>doAuth('su');
+el('lo').onclick=()=>{if(RP.busy()||RP.tot())return bm('BETしていないBET受付中に操作してください');signOut(auth)};
+function openLog(){if(unLg)unLg();unLg=null;el('bl').textContent='';if(!reg())return;
+  unLg=onSnapshot(query(collection(db,'bank',uid,'log'),orderBy('t','desc'),limit(8)),s=>{const d=el('bl');d.textContent='';
+    s.docs.forEach(x=>{const v=x.data(),p=document.createElement('div');p.textContent=(v.t?v.t.toDate().toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'…')+'　'+v.type+' '+v.amount+'枚（残高 '+v.balance+'）';d.append(p)})},()=>{})}
+async function bankOp(sg){const n=Math.floor(+el('ba').value);if(!reg())return bm('ログインしてください');if(!(n>0))return bm('枚数を入力してください');if(RP.busy())return bm('BET受付中のみ操作できます');
+  const ref=doc(db,'bank',uid),lg=doc(collection(db,'bank',uid,'log'));
+  try{await runTransaction(db,async tx=>{const s=await tx.get(ref),b=s.exists()?s.data().balance:0,nb=sg>0?b+n:b-n;
+      if(sg>0&&n>RP.medal())throw'メダルが足りません';if(nb<0)throw'バンクの残高が足りません';
+      tx.set(ref,{balance:nb,updated:serverTimestamp()});tx.set(lg,{type:sg>0?'預入':'引出',amount:n,balance:nb,t:serverTimestamp()})});
+    RP.addMedal(-sg*n);el('ba').value='';bm(n+(sg>0?'枚を預けました':'枚を引き出しました'));show()}
+  catch(e){bm(typeof e==='string'?e:'失敗しました')}}
+el('bd').onclick=()=>bankOp(1);el('bw').onclick=()=>bankOp(-1);
+// ---- ユーザー切替・初期化 ----
+async function setUser(u){const old=uid;user=u;uid=u.uid;name=reg()?(u.displayName||'ゲスト').slice(0,12):nick();
+  try{const s=await getDoc(doc(db,'players',uid));if(s.exists()&&s.data().medal>0)window.rpSetMedal(s.data().medal);else if(old&&old!==uid)window.rpSetMedal(301)}catch(e){}
+  if(unBk)unBk();unBk=null;el('bk').textContent='0';
+  if(reg())unBk=onSnapshot(doc(db,'bank',uid),s=>{el('bk').textContent=s.exists()?s.data().balance:0},()=>{});
+  openLog();show();if(!started){started=true;initOnce()}}
+async function initOnce(){try{await sync()}catch(e){}
   beat();setInterval(beat,20000);watchPresence();setInterval(watchPresence,30000);
   onSnapshot(query(collection(db,'players'),orderBy('best','desc'),limit(5)),s=>{const ol=el('rk');ol.textContent='';
     s.docs.forEach((d,i)=>{const li=document.createElement('li'),b=document.createElement('b');li.append((i+1)+'. '+d.data().name);b.textContent=d.data().best;li.append(b);ol.append(li)});
@@ -227,7 +267,6 @@ async function start(id){uid=id;nick();
   onSnapshot(query(collection(db,'chat'),orderBy('t','desc'),limit(30)),s=>{const c=el('cm');c.textContent='';[...s.docs].reverse().forEach(d=>{const x=d.data(),p=document.createElement('p'),b=document.createElement('b');b.textContent=x.name+'：';p.append(b,x.text);c.append(p)});c.scrollTop=c.scrollHeight});
   tick();setInterval(tick,200)}
 const LID=()=>{let i=localStorage.getItem('rp_uid');if(!i){i='L'+Math.random().toString(36).slice(2,12);localStorage.setItem('rp_uid',i)}return i};
-onAuthStateChanged(auth,u=>{if(u&&!uid)start(u.uid)});
-signInAnonymously(auth).catch(()=>{if(!uid)start(LID())});
+onAuthStateChanged(auth,u=>{if(u)setUser(u);else signInAnonymously(auth).catch(()=>{if(!uid)setUser({uid:LID(),isAnonymous:true,displayName:null})})});
 </script>
 </body></html>
