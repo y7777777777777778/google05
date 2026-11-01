@@ -186,7 +186,6 @@ window.RP={ORD,B,bet:()=>({...bet}),tot:()=>tot(),lock(){busy=true;last={...bet}
 hh();ui();draw();
 </script><script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getAuth,onAuthStateChanged,signInAnonymously,signInWithEmailAndPassword,createUserWithEmailAndPassword,EmailAuthProvider,linkWithCredential,updateProfile,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import{getFirestore,doc,getDoc,getDocFromServer,setDoc,addDoc,deleteDoc,runTransaction,collection,query,orderBy,limit,where,onSnapshot,serverTimestamp,Timestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp({
   apiKey:"AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
@@ -195,10 +194,10 @@ const app=initializeApp({
   storageBucket:"fir-66339.firebasestorage.app",
   messagingSenderId:"876017617963",
   appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"});
-const auth=getAuth(app),db=getFirestore(app),el=id=>document.getElementById(id),t0=Date.now(),RP=window.RP;
+const db=getFirestore(app),el=id=>document.getElementById(id),t0=Date.now(),RP=window.RP;
 const CYC=36000,BETM=20000,SPINM=9500; // 1ラウンド36秒: BET20秒→回転9.5秒→結果表示
-let uid=null,user=null,name='',unP=null,unB=null,unR=null,unBk=null,unLg=null,off=0,curR=-1,resIdx=null,spun=false,locked=false,asked=0,others={},bt=null,started=false;
-const sn=()=>Date.now()+off,reg=()=>!!user&&!user.isAnonymous,bm=t=>el('bm').textContent=t;
+let uid=null,acct=null,name='',unP=null,unB=null,unR=null,unBk=null,unLg=null,off=0,curR=-1,resIdx=null,spun=false,locked=false,asked=0,others={},bt=null,started=false;
+const sn=()=>Date.now()+off,reg=()=>!!acct,bm=t=>el('bm').textContent=t;
 const nick=()=>{let n=localStorage.getItem('rp_name')||'';if(!n){n=(prompt('ニックネームを入力（12文字まで）')||'ゲスト').trim().slice(0,12)||'ゲスト';localStorage.setItem('rp_name',n)}return n};
 const beat=()=>setDoc(doc(db,'presence',uid),{t:serverTimestamp()}).catch(()=>{});
 function watchPresence(){if(unP)unP();unP=onSnapshot(query(collection(db,'presence'),where('t','>',Timestamp.fromMillis(Date.now()-60000))),s=>{el('onl').textContent=Math.max(1,s.size)})}
@@ -225,26 +224,25 @@ window.rpSave=(medal,best,win)=>{if(!uid)return;
 function send(){const t=el('ci').value.trim().slice(0,100);if(!t||!uid)return;el('ci').value='';addDoc(collection(db,'chat'),{uid,name,text:t,t:serverTimestamp()}).catch(()=>{})}
 el('cs').onclick=send;el('ci').onkeydown=e=>{if(e.key==='Enter')send()};
 // ---- BANK ポップアップ ----
-const show=()=>{el('ma').hidden=reg();el('mb').hidden=!reg();el('mn').textContent=name;el('mm').textContent=RP.medal()};
+const show=()=>{el('ma').hidden=reg();el('mb').hidden=!reg();el('mn').textContent=acct?acct.u:'';el('mm').textContent=RP.medal()};
 el('bank').onclick=()=>{el('md').hidden=false;bm('');show()};
 el('mx').onclick=()=>{el('md').hidden=true};el('md').onclick=e=>{if(e.target===el('md'))el('md').hidden=true};
-const em=n=>n.toLowerCase()+'@roulette.example';
-const EM={'auth/email-already-in-use':'そのユーザー名は使われています','auth/invalid-credential':'ユーザー名かパスワードが違います','auth/wrong-password':'ユーザー名かパスワードが違います','auth/user-not-found':'ユーザー名かパスワードが違います','auth/operation-not-allowed':'Firebaseでメール/パスワードのログインを有効にしてください','auth/weak-password':'パスワードが弱すぎます'};
+const hashPw=async(n,pw)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ru-bank:'+n+':'+pw)))].map(x=>x.toString(16).padStart(2,'0')).join('');
+const keep=a=>{acct=a;a?localStorage.setItem('rp_acct',JSON.stringify(a)):localStorage.removeItem('rp_acct')};
 async function doAuth(kind){const n=el('un').value.trim(),pw=el('pw').value;
   if(!/^[0-9]{4,12}$/.test(n))return bm('ユーザー名は数字の4〜12桁です（例 20261031）');if(!/^[0-9]{4}$/.test(pw))return bm('パスワードは4桁の数字です');
   if(RP.busy()||RP.tot())return bm('BETしていないBET受付中に操作してください');
-  try{if(kind==='su'){const cur=auth.currentUser,cred=EmailAuthProvider.credential(em(n),'ru'+pw);let r;
-      if(cur&&cur.isAnonymous)r=await linkWithCredential(cur,cred);else r=await createUserWithEmailAndPassword(auth,em(n),'ru'+pw);
-      await updateProfile(r.user,{displayName:n});await setUser(auth.currentUser);bm('登録しました！')}
-    else{await signInWithEmailAndPassword(auth,em(n),'ru'+pw);bm('ログインしました')}
-    el('pw').value=''}catch(e){bm(EM[e.code]||'失敗しました（'+e.code+'）')}}
+  try{const h=await hashPw(n,pw),ref=doc(db,'users',n);
+    if(kind==='su'){await runTransaction(db,async tx=>{if((await tx.get(ref)).exists())throw'そのユーザー名は使われています';tx.set(ref,{pwHash:h,createdAt:serverTimestamp()})});keep({u:n,h});await setUser(true);bm('登録しました！')}
+    else{const d=await getDoc(ref);if(!d.exists()||d.data().pwHash!==h)throw'ユーザー名かパスワードが違います';keep({u:n,h});await setUser(false);bm('ログインしました')}
+    el('pw').value=''}catch(e){bm(typeof e==='string'?e:'失敗しました（'+(e.code||e)+'）')}}
 el('li').onclick=()=>doAuth('li');el('su').onclick=()=>doAuth('su');
-el('lo').onclick=()=>{if(RP.busy()||RP.tot())return bm('BETしていないBET受付中に操作してください');signOut(auth)};
+el('lo').onclick=async()=>{if(RP.busy()||RP.tot())return bm('BETしていないBET受付中に操作してください');keep(null);await setUser(false);bm('ログアウトしました')};
 function openLog(){if(unLg)unLg();unLg=null;el('bl').textContent='';if(!reg())return;
-  unLg=onSnapshot(query(collection(db,'bank',uid,'log'),orderBy('t','desc'),limit(8)),s=>{const d=el('bl');d.textContent='';
+  unLg=onSnapshot(query(collection(db,'bank',acct.u,'log'),orderBy('t','desc'),limit(8)),s=>{const d=el('bl');d.textContent='';
     s.docs.forEach(x=>{const v=x.data(),p=document.createElement('div');p.textContent=(v.t?v.t.toDate().toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'…')+'　'+v.type+' '+v.amount+'枚（残高 '+v.balance+'）';d.append(p)})},()=>{})}
 async function bankOp(sg){const n=Math.floor(+el('ba').value);if(!reg())return bm('ログインしてください');if(!(n>0))return bm('枚数を入力してください');if(RP.busy())return bm('BET受付中のみ操作できます');
-  const ref=doc(db,'bank',uid),lg=doc(collection(db,'bank',uid,'log'));
+  const ref=doc(db,'bank',acct.u),lg=doc(collection(db,'bank',acct.u,'log'));
   try{await runTransaction(db,async tx=>{const s=await tx.get(ref),b=s.exists()?s.data().balance:0,nb=sg>0?b+n:b-n;
       if(sg>0&&n>RP.medal())throw'メダルが足りません';if(nb<0)throw'バンクの残高が足りません';
       tx.set(ref,{balance:nb,updated:serverTimestamp()});tx.set(lg,{type:sg>0?'預入':'引出',amount:n,balance:nb,t:serverTimestamp()})});
@@ -252,10 +250,10 @@ async function bankOp(sg){const n=Math.floor(+el('ba').value);if(!reg())return b
   catch(e){bm(typeof e==='string'?e:'失敗しました')}}
 el('bd').onclick=()=>bankOp(1);el('bw').onclick=()=>bankOp(-1);
 // ---- ユーザー切替・初期化 ----
-async function setUser(u){const old=uid;user=u;uid=u.uid;name=reg()?(u.displayName||'ゲスト').slice(0,12):nick();
-  try{const s=await getDoc(doc(db,'players',uid));if(s.exists()&&s.data().medal>0)window.rpSetMedal(s.data().medal);else if(old&&old!==uid)window.rpSetMedal(301)}catch(e){}
+async function setUser(keepMedal){const old=uid;uid=acct?'u'+acct.u:LID();name=nick();
+  try{const d=await getDoc(doc(db,'players',uid));if(d.exists()&&d.data().medal>0)window.rpSetMedal(d.data().medal);else if(keepMedal)RP.addMedal(0);else if(old&&old!==uid)window.rpSetMedal(301)}catch(e){}
   if(unBk)unBk();unBk=null;el('bk').textContent='0';
-  if(reg())unBk=onSnapshot(doc(db,'bank',uid),s=>{el('bk').textContent=s.exists()?s.data().balance:0},()=>{});
+  if(reg())unBk=onSnapshot(doc(db,'bank',acct.u),d=>{el('bk').textContent=d.exists()?d.data().balance:0},()=>{});
   openLog();show();if(!started){started=true;initOnce()}}
 async function initOnce(){try{await sync()}catch(e){}
   beat();setInterval(beat,20000);watchPresence();setInterval(watchPresence,30000);
@@ -267,6 +265,6 @@ async function initOnce(){try{await sync()}catch(e){}
   onSnapshot(query(collection(db,'chat'),orderBy('t','desc'),limit(30)),s=>{const c=el('cm');c.textContent='';[...s.docs].reverse().forEach(d=>{const x=d.data(),p=document.createElement('p'),b=document.createElement('b');b.textContent=x.name+'：';p.append(b,x.text);c.append(p)});c.scrollTop=c.scrollHeight});
   tick();setInterval(tick,200)}
 const LID=()=>{let i=localStorage.getItem('rp_uid');if(!i){i='L'+Math.random().toString(36).slice(2,12);localStorage.setItem('rp_uid',i)}return i};
-onAuthStateChanged(auth,u=>{if(u)setUser(u);else signInAnonymously(auth).catch(()=>{if(!uid)setUser({uid:LID(),isAnonymous:true,displayName:null})})});
+(async()=>{try{const a=JSON.parse(localStorage.getItem('rp_acct')||'null');if(a){const d=await getDoc(doc(db,'users',a.u));if(d.exists()&&d.data().pwHash===a.h)acct=a;else localStorage.removeItem('rp_acct')}}catch(e){}await setUser(false)})();
 </script>
 </body></html>
