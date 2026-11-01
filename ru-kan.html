@@ -10,13 +10,13 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{border-bottom:1px
 input{width:90px;padding:4px}button{padding:4px 10px;cursor:pointer}small{opacity:.6;word-break:break-all}
 #msg{color:#d33;font-weight:700}ul{padding-left:18px;margin:4px 0}#cl li{display:flex;gap:8px;margin:2px 0}
 </style></head><body>
-<header><h1>🎰 ルーカン（ルーレット＆バンク管理）</h1><a href="ru.html">ゲームを開く</a><span id="who"></span><input id="au" placeholder="ユーザー名" style="width:120px"><input id="ap" type="password" placeholder="パスワード" style="width:120px"><button id="login">ログイン</button><button id="logout" hidden>ログアウト</button></header>
+<header><h1>🎰 ルーカン（ルーレット＆バンク管理）</h1><a href="ru.html">ゲームを開く</a><span id="who"></span></header>
 <p id="msg"></p>
-<div id="app" hidden>
+<div id="app">
 <section><h2>ルーレット</h2><div id="ri"></div><div>今回の出目：<b id="rr">未確定</b></div><div>今回のBET：<ul id="rb"></ul></div><div>直近の出目：<span id="rh"></span></div></section>
 <section><h2>全ユーザーとバンク　アカウント：<span id="uc">0</span>　バンク合計：<span id="bt">0</span>枚</h2>
 <table><thead><tr><th>ユーザー名</th><th>バンク残高</th><th>残高の変更</th><th>その他</th></tr></thead><tbody id="pb"></tbody></table>
-<pre id="lg"></pre><small>管理者にするには、Firestoreの users/{ユーザー名} に isAdmin: true を追加します（👑が付きます）。</small></section>
+<pre id="lg"></pre><small>このページは誰でも操作できます（制限なし）。</small></section>
 <section><h2>チャット</h2><ul id="cl"></ul></section>
 </div>
 <script type="module">
@@ -33,11 +33,7 @@ const db=getFirestore(app),$=id=>document.getElementById(id),CYC=36000,BETM=2000
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let P={},Bk={},rn=-1,unR,unB,started=false;
 const hashPw=async(n,pw)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ru-bank:'+n+':'+pw)))].map(x=>x.toString(16).padStart(2,'0')).join('');
-function enter(n){$('login').hidden=true;$('au').hidden=true;$('ap').hidden=true;$('logout').hidden=false;$('who').textContent='管理者：'+n;say('');$('app').hidden=false;run()}
-async function tryLogin(n,h){try{const d=await getDoc(doc(db,'users',n));if(d.exists()&&d.data().pwHash===h&&d.data().isAdmin===true){sessionStorage.setItem('rk',JSON.stringify({n,h}));enter(n);return true}}catch(e){say('失敗：'+(e.code||e))}return false}
-$('login').onclick=async()=>{const n=$('au').value.trim();if(!(await tryLogin(n,await hashPw(n,$('ap').value))))say('ユーザー名かパスワードが違う、または管理者ではありません（Firestoreの users の該当ドキュメントに isAdmin: true を追加してください）')};
-$('logout').onclick=()=>{sessionStorage.removeItem('rk');location.reload()};
-(async()=>{try{const a=JSON.parse(sessionStorage.getItem('rk')||'null');if(a)await tryLogin(a.n,a.h)}catch(e){}})();
+$('app').hidden=false;
 let U={};
 function drawP(){if(document.activeElement&&$('pb').contains(document.activeElement))return;
   const ids=Object.keys(U).sort((a,b)=>((U[b].createdAt||{}).seconds||0)-((U[a].createdAt||{}).seconds||0));let tot=0;
@@ -66,4 +62,5 @@ function run(){if(started)return;started=true;
     if(s.empty)ul.innerHTML='<li>なし</li>'});
   onSnapshot(query(collection(db,'rounds'),orderBy('t','desc'),limit(10)),s=>{$('rh').textContent=s.docs.map(d=>d.data().idx-1).join('　')||'なし'});
   tick();setInterval(tick,500)}
+run();
 </script></body></html>
