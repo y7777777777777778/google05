@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TETRIS</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
 :root {
     --bg:#05050a;
@@ -45,7 +47,7 @@ body{
 .mode-card{text-align:center;animation:card-in .4s cubic-bezier(.22,.6,.3,1);}
 .mode-title{font-family:var(--font-title);font-size:clamp(40px,8vw,72px);letter-spacing:18px;color:#fff;text-shadow:0 0 18px rgba(123,111,255,0.9),0 0 60px rgba(123,111,255,0.4);margin-bottom:6px;}
 .mode-sub{font-size:11px;letter-spacing:5px;color:var(--text-dim);text-transform:uppercase;margin-bottom:48px;font-weight:600;}
-.mode-btns{display:flex;gap:20px;justify-content:center;}
+.mode-btns{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;}
 .mode-btn{
     font-family:var(--font-ui);font-size:14px;font-weight:700;letter-spacing:3px;
     text-transform:uppercase;color:#fff;
@@ -62,6 +64,29 @@ body{
 .mode-btn .mb-sub{font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.45);font-weight:400;}
 .mode-btn.vs{background:linear-gradient(180deg,rgba(255,77,106,0.7),rgba(255,77,106,0.4));border-color:rgba(255,77,106,0.5);}
 .mode-btn.vs:hover{box-shadow:0 6px 36px rgba(255,77,106,0.5);}
+.mode-btn.on{background:linear-gradient(180deg,rgba(0,229,255,0.55),rgba(0,229,255,0.25));border-color:rgba(0,229,255,0.5);}
+.mode-btn.on:hover{box-shadow:0 6px 36px rgba(0,229,255,0.45);}
+
+/* ── ONLINE LOBBY ── */
+#lobby{position:fixed;inset:0;z-index:310;display:flex;justify-content:center;align-items:center;background:rgba(5,5,10,0.97);overflow:auto;}
+#lobby.hidden{display:none;}
+.lb-card{width:min(440px,92vw);text-align:center;animation:card-in .35s cubic-bezier(.22,.6,.3,1);padding:20px 0;}
+.lb-title{font-family:var(--font-title);font-size:48px;letter-spacing:12px;color:#fff;text-shadow:0 0 18px rgba(0,229,255,0.7);}
+.lb-sub{font-size:12px;letter-spacing:2px;color:var(--text-dim);margin:4px 0 22px;font-weight:600;}
+.lb-tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px;}
+.lb-tab,.lb-main,.lb-mini,.lb-back{font-family:var(--font-ui);font-weight:700;letter-spacing:2px;color:#fff;border:1px solid rgba(123,111,255,0.5);border-radius:6px;cursor:pointer;background:linear-gradient(180deg,rgba(123,111,255,0.75),rgba(123,111,255,0.45));padding:10px 18px;font-size:13px;}
+.lb-tab{opacity:.55;padding:8px 12px;font-size:12px;}
+.lb-tab.active{opacity:1;}
+.lb-mini{padding:4px 12px;font-size:11px;margin:4px 0 12px;}
+.lb-main{margin-top:6px;}
+.lb-back{background:linear-gradient(180deg,rgba(60,60,90,0.7),rgba(40,40,70,0.5));border-color:rgba(80,80,120,0.4);margin-top:16px;}
+.lb-pane{display:none;text-align:left;}
+.lb-step{font-size:12px;color:var(--text);margin:8px 0 4px;font-weight:600;}
+#lobby textarea{width:100%;height:64px;resize:none;user-select:text;background:var(--board-bg);color:var(--accent2);border:1px solid var(--border);border-radius:5px;padding:6px;font-size:11px;font-family:monospace;word-break:break-all;}
+.lb-status{min-height:20px;margin-top:12px;font-size:13px;color:var(--gold);}
+.lb-room{font-family:var(--font-title);font-size:44px;letter-spacing:12px;color:var(--accent2);text-shadow:0 0 14px rgba(0,229,255,0.6);text-align:center;min-height:52px;user-select:text;}
+#roomInput{width:100%;text-align:center;font-family:var(--font-title);font-size:30px;letter-spacing:10px;text-transform:uppercase;background:var(--board-bg);color:#fff;border:1px solid var(--border);border-radius:5px;padding:6px;user-select:text;}
+.lb-or{text-align:center;color:var(--text-dim);font-size:12px;margin:14px 0 8px;letter-spacing:3px;}
 
 /* ── GAME WRAPPER ── */
 #gameWrapper{
@@ -175,6 +200,7 @@ body{
 .go-btn::after{content:'';position:absolute;top:0;left:-110%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent);transition:left .45s;}
 .go-btn:hover{box-shadow:0 4px 32px rgba(123,111,255,0.5);transform:translateY(-1px);}
 .go-btn:hover::after{left:150%;}
+.go-btn:disabled{opacity:.5;cursor:default;transform:none;}
 .go-btn.menu{background:linear-gradient(180deg,rgba(60,60,90,0.7),rgba(40,40,70,0.5));border-color:rgba(80,80,120,0.4);}
 </style>
 </head>
@@ -200,7 +226,58 @@ body{
         <span>VS CPU</span>
         <span class="mb-sub">Battle Mode</span>
       </button>
+      <button class="mode-btn on" id="btnOn">
+        <span class="mb-icon">🌐</span>
+        <span>ONLINE</span>
+        <span class="mb-sub">VS Friend</span>
+      </button>
     </div>
+  </div>
+</div>
+
+<!-- ONLINE LOBBY -->
+<div id="lobby" class="hidden">
+  <div class="lb-card">
+    <div class="lb-title">ONLINE</div>
+    <div class="lb-sub">2分間 ・ 同時プレイでスコアを競う</div>
+    <div class="lb-tabs">
+      <button class="lb-tab" id="tabQuick">自動マッチ</button>
+      <button class="lb-tab" id="tabAuto">ルーム番号</button>
+      <button class="lb-tab" id="tabHost">手動:作る</button>
+      <button class="lb-tab" id="tabJoin">手動:参加</button>
+    </div>
+    <div class="lb-pane" id="paneQuick" style="text-align:center">
+      <div class="lb-step">ランダムな相手と自動でマッチングします。<br>2分間、同時にプレイして高スコアの方が勝ちです。</div>
+      <button class="lb-main" id="quickStart" style="margin-top:14px">対戦相手を探す</button><br>
+      <button class="lb-back" id="quickCancel" style="margin-top:10px">キャンセル</button>
+    </div>
+    <div class="lb-pane" id="paneAuto">
+      <div class="lb-step">ルームを作る → 表示された番号を相手に伝える</div>
+      <div class="lb-room" id="roomCode"></div>
+      <button class="lb-main" id="roomCreate">ルームを作る</button>
+      <div class="lb-or">OR</div>
+      <div class="lb-step">相手から聞いたルーム番号を入力</div>
+      <input id="roomInput" maxlength="5" autocomplete="off" spellcheck="false">
+      <button class="lb-main" id="roomJoin">参加する</button>
+    </div>
+    <div class="lb-pane" id="paneHost">
+      <div class="lb-step">① このコードを相手に送る</div>
+      <textarea id="hostCode" readonly></textarea>
+      <button class="lb-mini" data-copy="hostCode">コピー</button>
+      <div class="lb-step">② 相手から届いた返信コードを貼り付けて接続</div>
+      <textarea id="hostAnswer"></textarea>
+      <button class="lb-main" id="hostConnect">接続する</button>
+    </div>
+    <div class="lb-pane" id="paneJoin">
+      <div class="lb-step">① ホストから届いたコードを貼り付ける</div>
+      <textarea id="guestOffer"></textarea>
+      <button class="lb-main" id="guestMake">返信コードを作る</button>
+      <div class="lb-step">② この返信コードをホストに送る(送ると自動で接続)</div>
+      <textarea id="guestAnswer" readonly></textarea>
+      <button class="lb-mini" data-copy="guestAnswer">コピー</button>
+    </div>
+    <div class="lb-status" id="lbStatus"></div>
+    <button class="lb-back" id="lbBack">戻る</button>
   </div>
 </div>
 
@@ -234,55 +311,57 @@ body{
 // ═══════════════════════════════════════════
 const ROWS = 20, COLS = 10;
 
-const COLORS = [null,
-  '#00f0f0','#f0f000','#a000f0','#00f000',
-  '#f00000','#4080ff','#f0a000','#445566'
-];
-const LIGHT = [null,
-  '#66ffff','#ffff66','#d466ff','#66ff66',
-  '#ff6666','#80b0ff','#ffcc66','#667788'
-];
-const DARK = [null,
-  '#006666','#666600','#440066','#006600',
-  '#660000','#1a3d80','#664400','#222233'
-];
-const GLOW = [null,
-  'rgba(0,240,240,.5)','rgba(240,240,0,.5)','rgba(160,0,240,.5)','rgba(0,240,0,.5)',
-  'rgba(240,0,0,.5)','rgba(64,128,255,.5)','rgba(240,160,0,.5)','rgba(40,60,80,.4)'
-];
+const COLORS = [null,'#00f0f0','#f0f000','#a000f0','#00f000','#f00000','#4080ff','#f0a000','#445566'];
+const LIGHT  = [null,'#66ffff','#ffff66','#d466ff','#66ff66','#ff6666','#80b0ff','#ffcc66','#667788'];
+const DARK   = [null,'#006666','#666600','#440066','#006600','#660000','#1a3d80','#664400','#222233'];
+const GLOW   = [null,'rgba(0,240,240,.5)','rgba(240,240,0,.5)','rgba(160,0,240,.5)','rgba(0,240,0,.5)','rgba(240,0,0,.5)','rgba(64,128,255,.5)','rgba(240,160,0,.5)','rgba(40,60,80,.4)'];
 
 // Piece shapes [type][rotation]
 const SHAPES = [
   null,
-  // I
   [[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
    [[0,0,1,0],[0,0,1,0],[0,0,1,0],[0,0,1,0]],
    [[0,0,0,0],[0,0,0,0],[1,1,1,1],[0,0,0,0]],
    [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]]],
-  // O
   [[[2,2],[2,2]],[[2,2],[2,2]],[[2,2],[2,2]],[[2,2],[2,2]]],
-  // T
   [[[0,3,0],[3,3,3],[0,0,0]],[[0,3,0],[0,3,3],[0,3,0]],[[0,0,0],[3,3,3],[0,3,0]],[[0,3,0],[3,3,0],[0,3,0]]],
-  // S
   [[[0,4,4],[4,4,0],[0,0,0]],[[0,4,0],[0,4,4],[0,0,4]],[[0,0,0],[0,4,4],[4,4,0]],[[4,0,0],[4,4,0],[0,4,0]]],
-  // Z
   [[[5,5,0],[0,5,5],[0,0,0]],[[0,0,5],[0,5,5],[0,5,0]],[[0,0,0],[5,5,0],[0,5,5]],[[0,5,0],[5,5,0],[5,0,0]]],
-  // J
   [[[6,0,0],[6,6,6],[0,0,0]],[[0,6,6],[0,6,0],[0,6,0]],[[0,0,0],[6,6,6],[0,0,6]],[[0,6,0],[0,6,0],[6,6,0]]],
-  // L
   [[[0,0,7],[7,7,7],[0,0,0]],[[0,7,0],[0,7,0],[0,7,7]],[[0,0,0],[7,7,7],[7,0,0]],[[7,7,0],[0,7,0],[0,7,0]]]
 ];
 
-// SRS kick tables
-const KJ = [[[0,0],[-1,0],[-1,1],[0,-2],[-1,-2]],[[0,0],[1,0],[1,-1],[0,2],[1,2]],[[0,0],[1,0],[1,1],[0,-2],[1,-2]],[[0,0],[-1,0],[-1,-1],[0,2],[-1,2]]];
-const KI = [[[0,0],[-2,0],[1,0],[-2,-1],[1,2]],[[0,0],[-1,0],[2,0],[-1,2],[2,-1]],[[0,0],[2,0],[-1,0],[2,1],[-1,-2]],[[0,0],[1,0],[-2,0],[1,-2],[-2,1]]];
+// SRS offset tables (y-up). Kick = offset[from] - offset[to], y flipped in rotate().
+const KJ = [
+  [[0,0],[0,0],[0,0],[0,0],[0,0]],
+  [[0,0],[1,0],[1,-1],[0,2],[1,2]],
+  [[0,0],[0,0],[0,0],[0,0],[0,0]],
+  [[0,0],[-1,0],[-1,-1],[0,2],[-1,2]]
+];
+const KI = [
+  [[0,0],[-1,0],[2,0],[-1,0],[2,0]],
+  [[-1,0],[0,0],[0,0],[0,1],[0,-2]],
+  [[-1,1],[1,1],[-2,1],[1,0],[-2,0]],
+  [[0,1],[0,1],[0,1],[0,-1],[0,2]]
+];
+
+// seeded RNG（オンライン対戦で同じミノ順にするため）
+function mulberry(a) {
+  return () => {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function randSeed() { return (Math.random() * 4294967296) >>> 0; }
 
 // ═══════════════════════════════════════════
 //  HIGH SCORE
 // ═══════════════════════════════════════════
 const HS_KEY = 'tetris_hs_v2';
 function loadScores() { try { return JSON.parse(localStorage.getItem(HS_KEY)) || []; } catch(e) { return []; } }
-function saveScores(a) { localStorage.setItem(HS_KEY, JSON.stringify(a.slice(0,5))); }
+function saveScores(a) { try { localStorage.setItem(HS_KEY, JSON.stringify(a.slice(0,5))); } catch(e) {} }
 function addScore(s) {
   if (s <= 0) return -1;
   const a = loadScores(); a.push(s); a.sort((a,b) => b-a);
@@ -365,6 +444,11 @@ function startConfetti() {
   })();
 }
 function stopFx() { goActive = false; cfActive = false; }
+function hideGo() {
+  getEl('goOverlay').classList.remove('show');
+  stopFx();
+  setTimeout(() => { goX.clearRect(0,0,goC.width,goC.height); cfX.clearRect(0,0,cfC.width,cfC.height); }, 50);
+}
 
 // ═══════════════════════════════════════════
 //  BLOCK DRAW
@@ -423,17 +507,17 @@ class Piece {
     return gy;
   }
   rotate(dir, board) {
-    const prevRot = this.rot;
-    const newRot = (prevRot + dir + 4) % 4;
-    const prevShape = this.shape.map(r => [...r]);
-    this.setRot(newRot);
-    const kicks = this.type === 1 ? KI : KJ;
-    for (const [kx, ky] of kicks[prevRot]) {
+    const p = this.rot, n = (p + dir + 4) % 4, ps = this.shape;
+    this.setRot(n);
+    const ks = this.type === 1 ? KI : KJ;
+    for (let i = 0; i < 5; i++) {
+      const kx = ks[p][i][0] - ks[n][i][0];
+      const ky = -(ks[p][i][1] - ks[n][i][1]); // 画面座標(下が正)に反転
       this.x += kx; this.y += ky;
       if (!this.collides(board)) return true;
       this.x -= kx; this.y -= ky;
     }
-    this.rot = prevRot; this.shape = prevShape; return false;
+    this.rot = p; this.shape = ps; return false;
   }
   merge(board) {
     for (let y = 0; y < this.shape.length; y++)
@@ -450,17 +534,15 @@ class Piece {
         if (this.shape[y][x])
           drawBlock(ctx, B, (this.x + x + offX)*B, (this.y + y + offY)*B, this.shape[y][x], alpha);
   }
+  // ブロックのある範囲の中心に合わせて描画
   drawAt(ctx, B, cw, ch) {
-    const cols = this.shape[0].length, rows = this.shape.length;
-    const ox = (cw/B - cols) / 2, oy = (ch/B - rows) / 2;
-    for (let y = 0; y < rows; y++)
-      for (let x = 0; x < cols; x++)
-        if (this.shape[y][x])
-          drawBlock(ctx, B, (x + ox)*B, (y + oy)*B, this.shape[y][x], 1);
+    let x0=9, x1=-1, y0=9, y1=-1;
+    this.shape.forEach((r,y) => r.forEach((v,x) => { if (v) { x0=Math.min(x0,x); x1=Math.max(x1,x); y0=Math.min(y0,y); y1=Math.max(y1,y); } }));
+    const ox = (cw/B - (x1-x0+1)) / 2 - x0, oy = (ch/B - (y1-y0+1)) / 2 - y0;
+    this.shape.forEach((r,y) => r.forEach((v,x) => { if (v) drawBlock(ctx, B, (x+ox)*B, (y+oy)*B, v, 1); }));
   }
 }
 
-function randomPiece() { return new Piece(Math.floor(Math.random()*7)+1); }
 function makeBoard() { return Array.from({length:ROWS}, () => Array(COLS).fill(0)); }
 
 // ═══════════════════════════════════════════
@@ -468,7 +550,6 @@ function makeBoard() { return Array.from({length:ROWS}, () => Array(COLS).fill(0
 // ═══════════════════════════════════════════
 class TetrisGame {
   constructor(cfg) {
-    // cfg: { canvas, nextCanvas, holdCanvas, holdWrapEl, frameInnerEl, scoreEl, levelEl, linesEl, B }
     this.cfg = cfg;
     this.B = cfg.B;
     const {canvas, nextCanvas, holdCanvas, B} = cfg;
@@ -483,7 +564,9 @@ class TetrisGame {
     this.nw = nw; this.nh = nh;
     this.reset();
   }
-  reset() {
+  reset(seed) {
+    this.rng     = mulberry(seed === undefined ? randSeed() : seed);
+    this.bag     = [];
     this.board   = makeBoard();
     this.cur     = null;
     this.nxt     = null;
@@ -504,10 +587,21 @@ class TetrisGame {
     this.drawHold();
     this.updateUI();
   }
+  // 7-bag：7種を1巡するまで同じミノは出ない
+  draw7() {
+    if (!this.bag.length) {
+      this.bag = [1,2,3,4,5,6,7];
+      for (let i = 6; i > 0; i--) {
+        const j = Math.floor(this.rng() * (i+1));
+        [this.bag[i], this.bag[j]] = [this.bag[j], this.bag[i]];
+      }
+    }
+    return new Piece(this.bag.pop());
+  }
   spawn() {
-    if (!this.nxt) this.nxt = randomPiece();
+    if (!this.nxt) this.nxt = this.draw7();
     this.cur = this.nxt;
-    this.nxt = randomPiece();
+    this.nxt = this.draw7();
     this.canHold = true;
     if (this.cfg.holdWrapEl) this.cfg.holdWrapEl.classList.remove('locked');
     this.drawNext();
@@ -522,10 +616,7 @@ class TetrisGame {
     if (this.cfg.holdWrapEl) this.cfg.holdWrapEl.classList.add('locked');
     this.drawHold();
   }
-  clearBoard(ctx, w, h) {
-    ctx.fillStyle = '#0b0b14';
-    ctx.fillRect(0, 0, w, h);
-  }
+  clearBoard(ctx, w, h) { ctx.fillStyle = '#0b0b14'; ctx.fillRect(0, 0, w, h); }
   drawGrid(ctx, w, h, B) {
     ctx.strokeStyle = 'rgba(123,111,255,0.04)';
     ctx.lineWidth = 1;
@@ -540,7 +631,6 @@ class TetrisGame {
     for (let y = 0; y < ROWS; y++)
       for (let x = 0; x < COLS; x++)
         if (this.board[y][x]) drawBlock(ctx, B, x*B, y*B, this.board[y][x]);
-    // ghost
     if (this.cur) {
       const gy = this.cur.ghostY(this.board);
       if (gy !== this.cur.y) {
@@ -554,15 +644,13 @@ class TetrisGame {
   }
   drawNext() {
     if (!this.nxCtx || !this.nxt) return;
-    const ctx = this.nxCtx;
-    this.clearBoard(ctx, this.nw, this.nh);
-    this.nxt.drawAt(ctx, this.B, this.nw, this.nh);
+    this.clearBoard(this.nxCtx, this.nw, this.nh);
+    this.nxt.drawAt(this.nxCtx, this.B, this.nw, this.nh);
   }
   drawHold() {
     if (!this.hdCtx) return;
-    const ctx = this.hdCtx;
-    this.clearBoard(ctx, this.nw, this.nh);
-    if (this.held) this.held.drawAt(ctx, this.B, this.nw, this.nh);
+    this.clearBoard(this.hdCtx, this.nw, this.nh);
+    if (this.held) this.held.drawAt(this.hdCtx, this.B, this.nw, this.nh);
   }
   flashLine(row) {
     if (!this.cfg.frameInnerEl) return;
@@ -608,11 +696,18 @@ class TetrisGame {
       this.combo = -1;
     }
   }
+  // お邪魔ライン受信。押し出されて天井を超えたら dead
   sendGarbage(n) {
     for (let i = 0; i < n; i++) {
+      if (this.board[0].some(v => v)) this.dead = true;
       this.board.shift();
       const gap = Math.floor(Math.random() * COLS);
       this.board.push(Array.from({length:COLS}, (_, x) => x === gap ? 0 : 8));
+    }
+    if (this.cur) {
+      let k = 0;
+      while (this.cur.collides(this.board) && k < n) { this.cur.y--; k++; }
+      if (this.cur.collides(this.board)) this.dead = true;
     }
   }
   popEl(el) { if (!el) return; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
@@ -624,9 +719,8 @@ class TetrisGame {
     if (scoreEl && this.score !== this._pScore) { this.popEl(scoreEl); this._pScore = this.score; }
     if (levelEl && this.level !== this._pLevel) { this.popEl(levelEl); this._pLevel = this.level; }
   }
-  // Returns true if died
   tick(dt, garbageCb) {
-    if (this.dead) return false;
+    if (this.dead) return;
     this.dropCnt += dt;
     if (this.dropCnt >= this.dropInt) {
       this.dropCnt = 0;
@@ -634,18 +728,15 @@ class TetrisGame {
         this.cur.merge(this.board);
         this.clearLines(garbageCb);
         this.spawn();
-        if (this.cur.collides(this.board)) { this.dead = true; return true; }
+        if (this.cur.collides(this.board)) this.dead = true;
       }
     }
-    return false;
   }
 }
 
 // ═══════════════════════════════════════════
 //  CPU AI
 // ═══════════════════════════════════════════
-
-// Place a piece on a board copy and clear lines, return {board, cleared}
 function placePiece(board, piece, rot, col) {
   const p = piece.clone();
   p.setRot(rot);
@@ -661,50 +752,39 @@ function placePiece(board, piece, rot, col) {
   return { board: b, cleared };
 }
 
-// Score a board state — higher = better for CPU
 function scoreBoard(b, cleared) {
   const heights = Array(COLS).fill(0);
   for (let x = 0; x < COLS; x++)
     for (let y = 0; y < ROWS; y++) { if (b[y][x]) { heights[x] = ROWS - y; break; } }
   const hSum = heights.reduce((s,v) => s+v, 0);
   const maxH = Math.max(...heights);
-  let holes = 0, coveredHoles = 0;
+  let holes = 0;
   for (let x = 0; x < COLS; x++) {
     let found = false;
     for (let y = 0; y < ROWS; y++) {
       if (b[y][x]) found = true;
-      else if (found) { holes++; coveredHoles += heights[x]; }
+      else if (found) holes++;
     }
   }
   let bump = 0;
   for (let x = 0; x < COLS-1; x++) bump += Math.abs(heights[x] - heights[x+1]);
-  // Well depth (good for I-piece setups)
   let wells = 0;
   for (let x = 0; x < COLS; x++) {
-    const left  = x > 0       ? heights[x-1] : 99;
-    const right = x < COLS-1  ? heights[x+1] : 99;
+    const left  = x > 0      ? heights[x-1] : 99;
+    const right = x < COLS-1 ? heights[x+1] : 99;
     const depth = Math.min(left, right) - heights[x];
     if (depth > 0) wells += depth;
   }
-  return (
-    -0.51 * hSum
-    + 0.76 * cleared
-    - 0.36 * holes
-    - 0.18 * bump
-    - 0.35 * maxH
-    - 0.12 * wells
-  );
+  return -0.51*hSum + 0.76*cleared - 0.36*holes - 0.18*bump - 0.35*maxH - 0.12*wells;
 }
 
-// All valid placements for a piece on a board
 function allMoves(board, piece) {
   const moves = [];
-  for (let rot = 0; rot < 4; rot++) {
+  for (let rot = 0; rot < 4; rot++)
     for (let col = -2; col < COLS + 2; col++) {
       const result = placePiece(board, piece, rot, col);
       if (result !== null) moves.push({ rot, col, ...result });
     }
-  }
   return moves;
 }
 
@@ -712,11 +792,8 @@ function cpuBestMove(board, piece, nextPiece) {
   const profile = getCpuProfile();
   const moves = allMoves(board, piece);
   if (moves.length === 0) return null;
-
   let scored;
-
   if (profile.lookahead && nextPiece) {
-    // 2-ply: score each move by the best follow-up with nextPiece
     scored = moves.map(m => {
       const nextMoves = allMoves(m.board, nextPiece);
       let bestNext = -Infinity;
@@ -724,43 +801,319 @@ function cpuBestMove(board, piece, nextPiece) {
         const s = scoreBoard(n.board, m.cleared + n.cleared);
         if (s > bestNext) bestNext = s;
       }
-      // Fall back to 1-ply score if no next moves
       const s1 = scoreBoard(m.board, m.cleared);
       return { rot: m.rot, col: m.col, score: nextMoves.length ? bestNext : s1 };
     });
   } else {
-    // 1-ply
     scored = moves.map(m => ({ rot: m.rot, col: m.col, score: scoreBoard(m.board, m.cleared) }));
   }
-
   scored.sort((a, b) => b.score - a.score);
-
-  // Easy/Normal: occasionally pick a suboptimal move
   const { mistakeRate, mistakePool } = profile;
   if (mistakeRate > 0 && Math.random() < mistakeRate) {
-    // Pick from the worst `mistakePool` fraction
     const cutoff = Math.max(1, Math.floor(scored.length * mistakePool));
     const pool = scored.slice(scored.length - cutoff);
     return pool[Math.floor(Math.random() * pool.length)];
   }
-
   return scored[0];
+}
+
+// ═══════════════════════════════════════════
+//  ONLINE (WebRTC DataChannel / 手動シグナリング)
+// ═══════════════════════════════════════════
+const ICE = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+const net = { pc: null, dc: null, host: false, open: false, myReady: false, peerReady: false };
+
+function enc(d) { return btoa(JSON.stringify(d)); }
+function dec(s) { return JSON.parse(atob(s.trim())); }
+function waitIce(pc) {
+  return new Promise(res => {
+    if (pc.iceGatheringState === 'complete') return res();
+    const f = () => { if (pc.iceGatheringState === 'complete') { pc.removeEventListener('icegatheringstatechange', f); res(); } };
+    pc.addEventListener('icegatheringstatechange', f);
+    setTimeout(res, 4000);
+  });
+}
+function netSend(o) { if (net.dc && net.dc.readyState === 'open') net.dc.send(JSON.stringify(o)); }
+function closeNet() {
+  if (net.dc) { net.dc.onopen = net.dc.onclose = net.dc.onmessage = null; try { net.dc.close(); } catch(e) {} }
+  if (net.pc) { net.pc.onconnectionstatechange = null; net.pc.ondatachannel = null; try { net.pc.close(); } catch(e) {} }
+  net.pc = null; net.dc = null; net.open = false; net.host = false; net.myReady = false; net.peerReady = false;
+}
+function setupDC(dc) {
+  net.dc = dc;
+  dc.onopen = onNetOpen;
+  dc.onclose = onNetClose;
+  dc.onmessage = e => { try { onNetMsg(JSON.parse(e.data)); } catch(err) {} };
+}
+function watchPc(pc) {
+  pc.onconnectionstatechange = () => {
+    if (pc.connectionState === 'failed') lbStatus('接続に失敗しました。ネットワーク環境により繋がらない場合があります。');
+  };
+}
+async function hostCreate() {
+  closeNet(); net.host = true;
+  const pc = net.pc = new RTCPeerConnection(ICE); watchPc(pc);
+  setupDC(pc.createDataChannel('g'));
+  await pc.setLocalDescription(await pc.createOffer());
+  await waitIce(pc);
+  return enc(pc.localDescription);
+}
+async function hostAccept(code) { await net.pc.setRemoteDescription(dec(code)); }
+async function guestJoin(code) {
+  closeNet();
+  const pc = net.pc = new RTCPeerConnection(ICE); watchPc(pc);
+  pc.ondatachannel = e => setupDC(e.channel);
+  await pc.setRemoteDescription(dec(code));
+  await pc.setLocalDescription(await pc.createAnswer());
+  await waitIce(pc);
+  return enc(pc.localDescription);
+}
+
+function onNetOpen() {
+  net.open = true;
+  roomCleanup();
+  getEl('lobby').classList.add('hidden');
+  getEl('modeScreen').classList.add('hidden');
+  initGame('on');
+  if (net.host) {
+    setTimeout(() => {
+      if (net.open && mode === 'on' && g1) { const seed = randSeed(); netSend({ t: 'start', seed }); startGame(seed); }
+    }, 400);
+  }
+}
+function onNetClose() {
+  const was = net.open;
+  net.open = false;
+  if (mode === 'on' && g1) {
+    if (running) endGame('p1-win', 'Opponent disconnected');
+    else getEl('goRestart').style.display = 'none';
+  } else if (!was) {
+    lbStatus('接続が切れました。');
+  }
+}
+function onNetMsg(m) {
+  if (!m || typeof m !== 'object') return;
+  switch (m.t) {
+    case 's': if (running && mode === 'on') applyRemote(m); break;
+    case 'final': if (running && mode === 'on') { peerDone = true; peerFinal = m.sc | 0; } break;
+    case 'rematch': net.peerReady = true; tryRematch(); break;
+    case 'start':
+      if (mode === 'on' && g1 && !net.host) { net.myReady = net.peerReady = false; hideGo(); startGame(m.seed >>> 0); }
+      break;
+  }
+}
+function tryRematch() {
+  if (net.host && net.myReady && net.peerReady) {
+    net.myReady = net.peerReady = false;
+    hideGo();
+    const seed = randSeed();
+    netSend({ t: 'start', seed });
+    startGame(seed);
+  }
+}
+function sendSnap() {
+  const c = g1.cur;
+  if (!c) return;
+  netSend({ t: 's', b: g1.board.map(r => r.join('')).join(''), c: [c.type, c.rot, c.x, c.y], sc: g1.score, ln: g1.lines });
+}
+function applyRemote(s) {
+  if (!g2 || typeof s.b !== 'string' || s.b.length !== ROWS*COLS || !Array.isArray(s.c) || s.c.length !== 4) return;
+  const t = s.c[0], r = s.c[1];
+  if (!(t >= 1 && t <= 7) || !(r >= 0 && r <= 3)) return;
+  const b = [];
+  for (let y = 0; y < ROWS; y++) b.push(s.b.slice(y*COLS, (y+1)*COLS).split('').map(v => Math.min(8, Number(v) || 0)));
+  g2.board = b;
+  const p = new Piece(t); p.setRot(r); p.x = s.c[2] | 0; p.y = s.c[3] | 0;
+  g2.cur = p;
+  g2.score = s.sc | 0; g2.lines = s.ln | 0;
+  g2.updateUI();
+}
+
+// ── Firebase(Firestore)でルーム番号を使った自動シグナリング ──
+// Firestoreには接続情報(SDP)を一時的に置くだけ。ゲームの通信自体はP2Pのまま。
+const firebaseConfig = {
+  apiKey:            "AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
+  authDomain:        "fir-66339.firebaseapp.com",
+  projectId:         "fir-66339",
+  storageBucket:     "fir-66339.firebasestorage.app",
+  messagingSenderId: "876017617963",
+  appId:             "1:876017617963:web:5ba304f8f6e0d9dff0ae6e"
+};
+let fbDb = null, roomRef = null, roomUnsub = null, roomGot = false, waitingCode = null, hbTimer = null, connTimer = null;
+try { firebase.initializeApp(firebaseConfig); fbDb = firebase.firestore(); } catch(e) { fbDb = null; }
+
+function genRoom() {
+  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 紛らわしい文字を除外
+  let s = ''; for (let i = 0; i < 5; i++) s += c[Math.floor(Math.random() * c.length)];
+  return s;
+}
+function roomCleanup() {
+  if (roomUnsub) { roomUnsub(); roomUnsub = null; }
+  if (roomRef) { roomRef.delete().catch(() => {}); roomRef = null; }
+  clearInterval(hbTimer); hbTimer = null;
+  clearTimeout(connTimer); connTimer = null;
+  if (waitingCode && fbDb) {
+    const c = waitingCode; waitingCode = null;
+    const w = fbDb.collection('lobby').doc('waiting');
+    fbDb.runTransaction(async tx => {
+      const sn = await tx.get(w);
+      if (sn.exists && sn.data().code === c) tx.set(w, { code: null, ts: Date.now() });
+    }).catch(() => {});
+  }
+  roomGot = false;
+}
+function clearManual() { ['hostCode','hostAnswer','guestOffer','guestAnswer'].forEach(id => getEl(id).value = ''); }
+
+async function roomCreate() {
+  if (!fbDb) { lbStatus('Firebaseに接続できません(SDPの読み込み失敗)。手動タブを使ってください'); return; }
+  roomCleanup(); clearManual();
+  lbStatus('ルームを作成中…');
+  try {
+    const offer = await hostCreate();
+    let code, ref;
+    for (let i = 0; i < 5; i++) {
+      code = genRoom(); ref = fbDb.collection('rooms').doc(code);
+      if (!(await ref.get()).exists) break;
+    }
+    await ref.set({ offer, answer: null, created: firebase.firestore.FieldValue.serverTimestamp() });
+    roomRef = ref;
+    getEl('roomCode').textContent = code;
+    lbStatus('この番号を相手に伝えてください。待機中…');
+    roomUnsub = ref.onSnapshot(async snap => {
+      const d = snap.data();
+      if (d && d.answer && !roomGot) {
+        roomGot = true;
+        try { await hostAccept(d.answer); lbStatus('接続中…'); armConnTimer(); }
+        catch(e) { lbStatus('接続に失敗しました。もう一度ルームを作ってください'); }
+      }
+    });
+  } catch(e) { lbStatus('作成に失敗: ' + e.message); }
+}
+async function roomJoin() {
+  if (!fbDb) { lbStatus('Firebaseに接続できません。手動タブを使ってください'); return; }
+  const code = getEl('roomInput').value.trim().toUpperCase();
+  if (code.length !== 5) { lbStatus('5文字のルーム番号を入力してください'); return; }
+  roomCleanup(); clearManual();
+  lbStatus('ルームを探しています…');
+  try {
+    const ref = fbDb.collection('rooms').doc(code);
+    const snap = await ref.get();
+    const d = snap.data();
+    if (!snap.exists || !d.offer) { lbStatus('ルームが見つかりません'); return; }
+    if (d.answer) { lbStatus('このルームはすでに埋まっています'); return; }
+    const answer = await guestJoin(d.offer);
+    await ref.update({ answer });
+    roomRef = ref;
+    lbStatus('接続中…'); armConnTimer();
+  } catch(e) { lbStatus('参加に失敗: ' + e.message); }
+}
+
+// ── 自動マッチング(待機スロット lobby/waiting を使う) ──
+const WAIT_FRESH = 30000;
+function waitRef() { return fbDb.collection('lobby').doc('waiting'); }
+function claimWaiting() {
+  const w = waitRef();
+  return fbDb.runTransaction(async tx => {
+    const sn = await tx.get(w); const d = sn.exists ? sn.data() : null;
+    if (d && d.code && Date.now() - d.ts < WAIT_FRESH) { tx.set(w, { code: null, ts: Date.now() }); return d.code; }
+    return null;
+  });
+}
+function publishWaiting(code) {
+  const w = waitRef();
+  return fbDb.runTransaction(async tx => {
+    const sn = await tx.get(w); const d = sn.exists ? sn.data() : null;
+    if (d && d.code && Date.now() - d.ts < WAIT_FRESH) return false;
+    tx.set(w, { code, ts: Date.now() }); return true;
+  });
+}
+function heartbeat(code) {
+  const w = waitRef();
+  fbDb.runTransaction(async tx => {
+    const sn = await tx.get(w);
+    if (sn.exists && sn.data().code === code) tx.update(w, { ts: Date.now() });
+  }).catch(() => {});
+}
+function armConnTimer() {
+  clearTimeout(connTimer);
+  connTimer = setTimeout(() => {
+    if (!net.open) { roomCleanup(); closeNet(); lbStatus('接続できませんでした。もう一度お試しください'); }
+  }, 20000);
+}
+async function joinRoomCode(code) {
+  const ref = fbDb.collection('rooms').doc(code);
+  const sn = await ref.get(); const d = sn.data();
+  if (!sn.exists || !d.offer || d.answer) return false;
+  const answer = await guestJoin(d.offer);
+  await ref.update({ answer });
+  roomRef = ref; armConnTimer();
+  return true;
+}
+function watchRoom(ref) {
+  roomUnsub = ref.onSnapshot(async snap => {
+    const d = snap.data();
+    if (d && d.answer && !roomGot) {
+      roomGot = true;
+      try { await hostAccept(d.answer); lbStatus('相手が見つかりました。接続中…'); armConnTimer(); }
+      catch(e) { lbStatus('接続に失敗しました。もう一度お試しください'); }
+    }
+  });
+}
+async function quickMatch() {
+  if (!fbDb) { lbStatus('Firebaseに接続できません。手動タブを使ってください'); return; }
+  roomCleanup(); clearManual();
+  lbStatus('対戦相手を探しています…');
+  try {
+    for (let i = 0; i < 4; i++) {
+      const target = await claimWaiting();
+      if (target) {
+        if (await joinRoomCode(target)) { lbStatus('相手が見つかりました。接続中…'); return; }
+        continue;
+      }
+      const offer = await hostCreate();
+      const code = genRoom();
+      const ref = fbDb.collection('rooms').doc(code);
+      await ref.set({ offer, answer: null, created: firebase.firestore.FieldValue.serverTimestamp() });
+      if (!(await publishWaiting(code))) { ref.delete().catch(() => {}); continue; }
+      roomRef = ref; waitingCode = code;
+      hbTimer = setInterval(() => heartbeat(code), 10000);
+      lbStatus('相手を待っています…(誰かが検索すると自動で始まります)');
+      watchRoom(ref);
+      return;
+    }
+    lbStatus('マッチングに失敗しました。もう一度お試しください');
+  } catch(e) { lbStatus('エラー: ' + e.message); }
+}
+
+// ── Lobby UI ──
+function lbStatus(t) { getEl('lbStatus').textContent = t; }
+function showPane(n) {
+  const P = { quick:['paneQuick','tabQuick'], auto:['paneAuto','tabAuto'], host:['paneHost','tabHost'], join:['paneJoin','tabJoin'] };
+  Object.keys(P).forEach(k => {
+    getEl(P[k][0]).style.display = n === k ? 'block' : 'none';
+    getEl(P[k][1]).classList.toggle('active', n === k);
+  });
+}
+function resetLobby() {
+  ['hostCode','hostAnswer','guestOffer','guestAnswer'].forEach(id => getEl(id).value = '');
+  document.querySelectorAll('[data-copy]').forEach(b => b.textContent = 'コピー');
+  getEl('roomCode').textContent = ''; getEl('roomInput').value = '';
+  roomCleanup(); showPane('quick'); lbStatus('');
 }
 
 // ═══════════════════════════════════════════
 //  RESPONSIVE BLOCK SIZE
 // ═══════════════════════════════════════════
-function calcB(mode) {
+function calcB(m) {
   const vw = window.innerWidth, vh = window.innerHeight;
-  if (mode === '2p') {
+  if (m !== '1p') {
     const byH = Math.floor((vh - 160) / ROWS);
     const byW = Math.floor((vw - 560) / (COLS * 2));
     return Math.max(14, Math.min(22, byH, byW));
-  } else {
-    const byH = Math.floor((vh - 130) / ROWS);
-    const byW = Math.floor((vw - 340) / COLS);
-    return Math.max(18, Math.min(30, byH, byW));
   }
+  const byH = Math.floor((vh - 130) / ROWS);
+  const byW = Math.floor((vw - 340) / COLS);
+  return Math.max(18, Math.min(30, byH, byW));
 }
 
 // ═══════════════════════════════════════════
@@ -771,15 +1124,15 @@ function frameHTML(id, fi_id, cpu) {
   return `<div class="frame-outer ${cpu?'cpu-frame':''}" id="${id}">${corner()}<div class="frame-inner" id="${fi_id}"><canvas id="tc_${id}"></canvas><div class="scanlines"></div><div class="pause-overlay" id="po_${id}"><span>PAUSED</span></div></div></div>`;
 }
 
-function buildUI(mode) {
-  const B = calcB(mode);
+function buildUI(m) {
+  const B = calcB(m);
   const NW = Math.round(B*4.6), NH = Math.round(B*3.6);
+  const online = m === 'on';
   const wrapper = document.getElementById('gameWrapper');
   wrapper.innerHTML = '';
-  wrapper.style.gap = mode === '2p' ? '12px' : '16px';
+  wrapper.style.gap = m === '1p' ? '16px' : '12px';
 
-  if (mode === '1p') {
-    // LEFT
+  if (m === '1p') {
     const left = document.createElement('div');
     left.className = 'side';
     left.style.width = '128px';
@@ -803,22 +1156,16 @@ function buildUI(mode) {
       <button class="btn" id="pauseBtn" style="display:none">Pause</button>
       <button class="btn btn-menu" id="menuBtn">Menu</button>
     `;
-    // CENTER
     const center = document.createElement('div');
     center.className = 'board-wrap';
     center.innerHTML = `<div class="title-wrap"><div class="game-title">TETRIS</div></div>${frameHTML('f1','fi1',false)}`;
-    // RIGHT
     const right = document.createElement('div');
     right.className = 'side';
     right.style.width = '128px';
     right.innerHTML = `<div class="card"><div class="card__label">Next</div><div class="card__cvwrap"><canvas id="nextC" width="${NW}" height="${NH}"></canvas></div></div>`;
-
-    wrapper.appendChild(left);
-    wrapper.appendChild(center);
-    wrapper.appendChild(right);
+    wrapper.appendChild(left); wrapper.appendChild(center); wrapper.appendChild(right);
 
   } else {
-    // 2P: LEFT PANEL | P1 BOARD | VS | P2 BOARD | RIGHT PANEL
     const left = document.createElement('div');
     left.className = 'side';
     left.style.width = '112px';
@@ -830,11 +1177,11 @@ function buildUI(mode) {
       <div class="ctrl">
         <div class="ctrl__title">Keys</div>
         <div class="ctrl__row"><span class="ctrl__key">← →</span><span>Move</span></div>
-        <div class="ctrl__row"><span class="ctrl__key">↑</span><span>Rotate</span></div>
+        <div class="ctrl__row"><span class="ctrl__key">↑ / Z</span><span>Rotate</span></div>
         <div class="ctrl__row"><span class="ctrl__key">↓</span><span>Soft</span></div>
         <div class="ctrl__row"><span class="ctrl__key">SPC</span><span>Drop</span></div>
         <div class="ctrl__row"><span class="ctrl__key">C</span><span>Hold</span></div>
-        <div class="ctrl__row"><span class="ctrl__key">P</span><span>Pause</span></div>
+        ${online ? '' : '<div class="ctrl__row"><span class="ctrl__key">P</span><span>Pause</span></div>'}
       </div>
       <button class="btn btn-menu" id="menuBtn">Menu</button>
     `;
@@ -844,38 +1191,33 @@ function buildUI(mode) {
 
     const vsdiv = document.createElement('div');
     vsdiv.className = 'vs-wrap';
-    vsdiv.innerHTML = `<div class="vs-line"></div><div class="vs-text">VS</div><div class="vs-line"></div>`;
+    vsdiv.innerHTML = `<div class="vs-line"></div><div class="vs-text">VS</div>${online ? '<div class="vs-text" id="timerEl" style="font-size:22px;color:#fff;text-shadow:0 0 12px rgba(123,111,255,.6)">2:00</div>' : ''}<div class="vs-line"></div>`;
 
     const p2wrap = document.createElement('div');
     p2wrap.className = 'board-wrap';
-    p2wrap.innerHTML = `<div class="player-label cpu-lbl">CPU</div>${frameHTML('f2','fi2',true)}`;
+    p2wrap.innerHTML = `<div class="player-label cpu-lbl">${online ? 'OPPONENT' : 'CPU'}</div>${frameHTML('f2','fi2',true)}`;
 
     const right = document.createElement('div');
     right.className = 'side';
     right.style.width = '130px';
+    const nm = online ? 'OPP' : 'CPU';
     right.innerHTML = `
       <div class="card"><div class="card__label">Next</div><div class="card__cvwrap"><canvas id="nextC" width="${NW}" height="${NH}"></canvas></div></div>
       <div class="card">
-        <div class="cpu-badge">CPU</div>
-        <div class="diff-label">Difficulty</div>
+        <div class="cpu-badge">${nm}</div>
+        ${online ? '' : `<div class="diff-label">Difficulty</div>
         <div class="diff-btns">
           <button class="diff-btn" data-d="easy">Easy</button>
           <button class="diff-btn active" data-d="normal">Norm</button>
           <button class="diff-btn" data-d="hard">Hard</button>
           <button class="diff-btn diff-btn--insane" data-d="insane">💀</button>
-        </div>
+        </div>`}
       </div>
-      <div class="card"><div class="card__label">CPU Score</div><div class="card__val" id="score2El">0</div></div>
-      <div class="card"><div class="card__label">CPU Lines</div><div class="card__val" id="lines2El">0</div></div>
-      <button class="btn" id="startBtn">Start</button>
-      <button class="btn" id="pauseBtn" style="display:none">Pause</button>
+      <div class="card"><div class="card__label">${nm} Score</div><div class="card__val" id="score2El">0</div></div>
+      <div class="card"><div class="card__label">${nm} Lines</div><div class="card__val" id="lines2El">0</div></div>
+      ${online ? '' : '<button class="btn" id="startBtn">Start</button><button class="btn" id="pauseBtn" style="display:none">Pause</button>'}
     `;
-
-    wrapper.appendChild(left);
-    wrapper.appendChild(p1wrap);
-    wrapper.appendChild(vsdiv);
-    wrapper.appendChild(p2wrap);
-    wrapper.appendChild(right);
+    wrapper.appendChild(left); wrapper.appendChild(p1wrap); wrapper.appendChild(vsdiv); wrapper.appendChild(p2wrap); wrapper.appendChild(right);
   }
 
   wrapper.classList.add('ready');
@@ -885,102 +1227,87 @@ function buildUI(mode) {
 // ═══════════════════════════════════════════
 //  GAME CONTROLLER
 // ═══════════════════════════════════════════
-let mode = '1p';
+let mode = '1p';   // '1p' | '2p'(VS CPU) | 'on'(オンライン)
 let g1 = null, g2 = null;
 let rafId = null;
 let running = false;
 let paused = false;
-let lastT = 0;
-let cpuTimer = 0;
-let cpuPlan = null; // {rot, col, done}
-let cpuDiff = 'normal'; // current difficulty key
+let lastT = 0, lastSend = 0;
+let cpuPlan = null;
+let cpuDiff = 'normal';
 
-// ── Difficulty profiles ──
-// mistakeRate : probability of picking a bad move instead of optimal
-// mistakePool : fraction of worst moves to pick from when making a mistake (1.0 = fully random)
-// lookahead   : whether to consider the next piece (2-ply search)
-// garbageBonus: extra garbage lines added when CPU clears 2+ rows
-// lockRows    : how many natural gravity steps (rows) to wait before locking.
-//   easy   = 18 rows  → piece almost reaches the floor on its own before locking
-//   normal = 10 rows  → locks around the midpoint of the board
-//   hard   = 2 rows   → locks quickly after spawning (~2 gravity ticks)
-//   insane = 0 rows   → hard-drops immediately
+// mistakeRate : 最善手を外す確率
+// mistakePool : ミスのとき、悪い手の下位何割から選ぶか
+// lookahead   : 次のミノまで読むか
+// garbageBonus: CPUが2ライン以上消した時の追加お邪魔ライン数
+// lockRows    : 配置位置に瞬間移動した後、何段自然落下してからハードドロップするか
 const DIFF_PROFILES = {
   easy:   { mistakeRate: 0.05, mistakePool: 1.0,  lookahead: false, garbageBonus: 0, lockRows: 4 },
   normal: { mistakeRate: 0.04, mistakePool: 0.5,  lookahead: false, garbageBonus: 0, lockRows: 2 },
   hard:   { mistakeRate: 0.02, mistakePool: 0.25, lookahead: true,  garbageBonus: 1, lockRows: 1 },
   insane: { mistakeRate: 0.01, mistakePool: 0.25, lookahead: true,  garbageBonus: 2, lockRows: 0 },
 };
-
 function getCpuProfile() { return DIFF_PROFILES[cpuDiff] || DIFF_PROFILES.normal; }
-
 function getEl(id) { return document.getElementById(id); }
+
+// ボタンにフォーカスを残さない（スペースキーでの誤作動防止）
+function bind(el, fn) { if (el) el.addEventListener('click', () => { el.blur(); fn(); }); }
 
 function initGame(m) {
   mode = m;
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-  running = false; paused = false;
+  running = false; paused = false; cpuPlan = null;
 
   const B = buildUI(m);
+  g1 = new TetrisGame({
+    canvas: getEl('tc_f1'), nextCanvas: getEl('nextC'), holdCanvas: getEl('holdC'),
+    holdWrapEl: getEl('holdWrap'), frameInnerEl: getEl('fi1'),
+    scoreEl: getEl('scoreEl'), levelEl: getEl('levelEl'), linesEl: getEl('linesEl'), B
+  });
 
-  const scoreEl = getEl('scoreEl');
-  const levelEl = getEl('levelEl');
-  const linesEl = getEl('linesEl');
-  const holdWrapEl = getEl('holdWrap');
-  const fi1 = getEl('fi1');
-  const canvas1 = getEl('tc_f1');
-  const nextC = getEl('nextC');
-  const holdC = getEl('holdC');
-
-  g1 = new TetrisGame({ canvas: canvas1, nextCanvas: nextC, holdCanvas: holdC, holdWrapEl, frameInnerEl: fi1, scoreEl, levelEl, linesEl, B });
+  if (m !== '1p') {
+    g2 = new TetrisGame({
+      canvas: getEl('tc_f2'), nextCanvas: null, holdCanvas: null, holdWrapEl: null,
+      frameInnerEl: getEl('fi2'), scoreEl: getEl('score2El'), levelEl: null, linesEl: getEl('lines2El'), B
+    });
+  } else g2 = null;
 
   if (m === '2p') {
-    const canvas2 = getEl('tc_f2');
-    const fi2 = getEl('fi2');
-    const score2El = getEl('score2El');
-    const lines2El = getEl('lines2El');
-    g2 = new TetrisGame({ canvas: canvas2, nextCanvas: null, holdCanvas: null, holdWrapEl: null, frameInnerEl: fi2, scoreEl: score2El, levelEl: null, linesEl: lines2El, B });
-
-    // difficulty buttons
+    cpuDiff = 'normal';
     document.querySelectorAll('.diff-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        btn.blur();
         cpuDiff = btn.dataset.d;
         document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        // reset cpu plan on difficulty change
-        cpuPlan = null; cpuTimer = 0;
-        // also adjust cpu drop interval if game is running
+        cpuPlan = null;
       });
     });
-    cpuDiff = 'normal';
-  } else {
-    g2 = null;
   }
 
-  getEl('startBtn').addEventListener('click', startGame);
-  getEl('pauseBtn').addEventListener('click', togglePause);
-  getEl('menuBtn').addEventListener('click', goMenu);
+  bind(getEl('startBtn'), () => startGame());
+  bind(getEl('pauseBtn'), togglePause);
+  bind(getEl('menuBtn'), goMenu);
 
   g1.drawBoard();
   if (g2) g2.drawBoard();
 }
 
-function startGame() {
-  if (running) { g1.reset(); if (g2) g2.reset(); }
-  running = true; paused = false;
-  cpuPlan = null; cpuTimer = 0;
-  g1.reset();
-  if (g2) {
-    g2.reset();
-    // apply CPU drop speed profile
-  }
+function startGame(seed) {
+  if (!g1) return;
+  const s = seed === undefined ? randSeed() : seed;
+  running = true; paused = false; cpuPlan = null; lastSend = 0;
+  myDone = false; peerDone = false; peerFinal = 0; matchEnd = performance.now() + MATCH_MS;
+  { const po0 = getEl('po_f1'); if (po0) { po0.classList.remove('show'); const sp = po0.querySelector('span'); if (sp) sp.textContent = 'PAUSED'; } }
+  g1.reset(s);
+  if (g2) g2.reset(mode === 'on' ? s : (s ^ 0x9e3779b9) >>> 0);
 
-  // Update best
   const bestEl = getEl('bestEl');
   if (bestEl) bestEl.textContent = loadScores()[0] || 0;
 
-  getEl('startBtn').style.display = 'none';
-  getEl('pauseBtn').style.display = '';
+  const sb = getEl('startBtn'), pb = getEl('pauseBtn');
+  if (sb) sb.style.display = 'none';
+  if (pb) { pb.style.display = ''; pb.textContent = 'Pause'; }
   const po = getEl('po_f1');
   if (po) po.classList.remove('show');
 
@@ -989,69 +1316,97 @@ function startGame() {
   rafId = requestAnimationFrame(loop);
 }
 
+// CPUの1フレーム分の処理
+function cpuStep(dt) {
+  if (!g2.cur || g2.dead) return;
+  const prof = getCpuProfile();
+
+  if (!cpuPlan) {
+    cpuPlan = cpuBestMove(g2.board, g2.cur, g2.nxt);
+    if (cpuPlan) {
+      g2.cur.setRot(cpuPlan.rot);
+      for (let i = 0; i < COLS + 4; i++) {
+        if (g2.cur.x === cpuPlan.col) break;
+        if (!g2.cur.move(cpuPlan.col > g2.cur.x ? 1 : -1, g2.board)) break;
+      }
+      cpuPlan.rowsFallen = 0;
+    }
+  }
+
+  g2.dropCnt += dt;
+  if (g2.dropCnt >= g2.dropInt) {
+    g2.dropCnt = 0;
+    const fell = g2.cur.fall(g2.board);
+    if (fell && cpuPlan) cpuPlan.rowsFallen++;
+    if (!fell || (cpuPlan && cpuPlan.rowsFallen >= prof.lockRows)) {
+      if (fell) g2.cur.hardDrop(g2.board);
+      g2.cur.merge(g2.board);
+      g2.clearLines(n => g1.sendGarbage(n + prof.garbageBonus));
+      g2.spawn();
+      if (g2.cur.collides(g2.board)) g2.dead = true;
+      cpuPlan = null;
+    }
+  }
+}
+
+// 自分がラインを消したときの攻撃
+function onP1Clear(n) {
+  if (mode === 'on') return; // オンラインはスコア勝負(お邪魔なし)
+  if (g2) g2.sendGarbage(n);
+}
+
+// ── オンライン:2分間のスコアアタック(同時プレイ) ──
+const MATCH_MS = 120000;
+let matchEnd = 0, myDone = false, peerDone = false, peerFinal = 0;
+function finishMine() {
+  myDone = true;
+  sendSnap();
+  netSend({ t: 'final', sc: g1.score });
+  const po = getEl('po_f1');
+  if (po) { const sp = po.querySelector('span'); if (sp) sp.textContent = 'FINISHED'; po.classList.add('show'); }
+}
+// true を返したら試合終了
+function onlineStep(t, dt) {
+  if (!myDone) {
+    g1.tick(dt, null);
+    if (t - lastSend > 80) { lastSend = t; sendSnap(); }
+    if (g1.dead || t >= matchEnd) finishMine();
+  }
+  const left = Math.max(0, matchEnd - t), sec = Math.ceil(left / 1000);
+  const te = getEl('timerEl');
+  if (te) te.textContent = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+  if (myDone && (peerDone || t > matchEnd + 8000)) {
+    const me = g1.score, op = peerDone ? peerFinal : g2.score;
+    const sub = `Opponent: ${op.toLocaleString()}`;
+    endGame(me > op ? 'p1-win' : me < op ? 'cpu-win' : 'draw', sub);
+    return true;
+  }
+  return false;
+}
+
 function loop(t) {
   if (!running) { rafId = null; return; }
-  const dt = Math.min(t - lastT, 100); // cap at 100ms
+  const dt = Math.min(t - lastT, 100);
   lastT = t;
 
   if (!paused) {
-    const p1died = g1.tick(dt, lines => { if (g2) g2.sendGarbage(lines); });
-    if (p1died) { endGame(mode === '2p' ? 'cpu-win' : 'over'); return; }
-
-    if (g2 && mode === '2p') {
-      if (g2.cur && !g2.dead) {
-        const prof = getCpuProfile();
-
-        // New piece spawned — decide best placement and teleport there instantly
-        if (!cpuPlan) {
-          cpuPlan = cpuBestMove(g2.board, g2.cur, g2.nxt);
-          if (cpuPlan) {
-            g2.cur.setRot(cpuPlan.rot);
-            const targetX = cpuPlan.col;
-            for (let i = 0; i < COLS + 4; i++) {
-              if (g2.cur.x === targetX) break;
-              if (!g2.cur.move(targetX > g2.cur.x ? 1 : -1, g2.board)) break;
-            }
-            cpuPlan.rowsFallen = 0; // track how many gravity rows have ticked
-          }
-        }
-
-        // Gravity tick (manual, same speed as player)
-        g2.dropCnt += dt;
-        if (g2.dropCnt >= g2.dropInt) {
-          g2.dropCnt = 0;
-          const fell = g2.cur.fall(g2.board);
-          if (fell && cpuPlan) cpuPlan.rowsFallen++;
-
-          if (!fell) {
-            // Piece hit the floor naturally — lock immediately regardless of lockRows
-            g2.cur.merge(g2.board);
-            g2.clearLines(lines => { if (lines > 0) g1.sendGarbage(lines + prof.garbageBonus); });
-            g2.spawn();
-            if (g2.cur.collides(g2.board)) { g2.dead = true; endGame('p1-win'); return; }
-            cpuPlan = null;
-          } else if (cpuPlan && cpuPlan.rowsFallen >= prof.lockRows) {
-            // Waited enough rows — hard drop and lock
-            g2.cur.hardDrop(g2.board);
-            g2.cur.merge(g2.board);
-            g2.clearLines(lines => { if (lines > 0) g1.sendGarbage(lines + prof.garbageBonus); });
-            g2.spawn();
-            if (g2.cur.collides(g2.board)) { g2.dead = true; endGame('p1-win'); return; }
-            cpuPlan = null;
-          }
-        }
-      }
+    if (mode === 'on') {
+      if (onlineStep(t, dt)) return;
+    } else {
+      g1.tick(dt, onP1Clear);
+      if (mode === '2p') cpuStep(dt);
+      if (g1.dead) { endGame(mode === '1p' ? 'over' : 'cpu-win'); return; }
+      if (mode === '2p' && g2.dead) { endGame('p1-win'); return; }
     }
 
     g1.drawBoard();
     if (g2) g2.drawBoard();
   }
-
   rafId = requestAnimationFrame(loop);
 }
 
 function togglePause() {
-  if (!running) return;
+  if (!running || mode === 'on') return;
   paused = !paused;
   const btn = getEl('pauseBtn');
   if (btn) btn.textContent = paused ? 'Resume' : 'Pause';
@@ -1060,30 +1415,32 @@ function togglePause() {
   if (!paused) lastT = performance.now();
 }
 
-function endGame(result) {
+function endGame(result, subOverride) {
   running = false;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   const pauseBtn = getEl('pauseBtn');
   if (pauseBtn) pauseBtn.style.display = 'none';
 
-  const titleEl = getEl('goTitle');
-  const subEl   = getEl('goSub');
-  const scoreEl = getEl('goScore');
-  const recEl   = getEl('goRecord');
-  const rankEl  = getEl('goRanking');
+  const titleEl = getEl('goTitle'), subEl = getEl('goSub'), scoreEl = getEl('goScore');
+  const recEl = getEl('goRecord'), rankEl = getEl('goRanking'), rb = getEl('goRestart');
+  const foe = mode === 'on' ? 'Opponent' : 'CPU';
 
-  let title = 'GAME OVER', sub = 'Better luck next time';
-  let isWin = false;
-  if (result === 'p1-win') { title = 'YOU WIN!'; sub = 'CPU has been defeated!'; isWin = true; }
-  else if (result === 'cpu-win') { title = 'GAME OVER'; sub = 'CPU wins this round'; }
+  let title = 'GAME OVER', sub = 'Better luck next time', isWin = false;
+  if (result === 'p1-win') { title = 'YOU WIN!'; sub = subOverride || `${foe} has been defeated!`; isWin = true; }
+  else if (result === 'cpu-win') { sub = subOverride || `${foe} wins this round`; }
+  else if (result === 'draw') { title = 'DRAW'; sub = subOverride || ''; }
 
   titleEl.textContent = title;
   titleEl.className = 'go-title' + (isWin ? ' win' : '');
   subEl.textContent = sub;
   scoreEl.textContent = g1.score.toLocaleString();
-
+  scoreEl.className = 'go-score-val';
   recEl.classList.remove('show');
   rankEl.innerHTML = '';
-  scoreEl.className = 'go-score-val';
+
+  rb.textContent = 'Play Again'; rb.disabled = false;
+  rb.style.display = (mode === 'on' && !net.open) ? 'none' : '';
+  if (mode === 'on') { net.myReady = false; net.peerReady = false; }
 
   if (mode === '1p') {
     const idx = addScore(g1.score);
@@ -1109,13 +1466,13 @@ function endGame(result) {
 function goMenu() {
   running = false;
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-  stopFx();
-  setTimeout(() => { goX.clearRect(0,0,goC.width,goC.height); cfX.clearRect(0,0,cfC.width,cfC.height); }, 50);
-  getEl('goOverlay').classList.remove('show');
+  if (mode === 'on') closeNet();
+  hideGo();
   const wrapper = getEl('gameWrapper');
   wrapper.innerHTML = '';
-  wrapper.className = 'wrapper';
-  g1 = null; g2 = null;
+  wrapper.className = '';
+  g1 = null; g2 = null; mode = '1p';
+  resetLobby();
   getEl('modeScreen').classList.remove('hidden');
 }
 
@@ -1123,7 +1480,9 @@ function goMenu() {
 //  KEYBOARD
 // ═══════════════════════════════════════════
 document.addEventListener('keydown', e => {
-  if (!running || !g1 || !g1.cur) return;
+  if (!running || !g1 || !g1.cur || g1.dead || (mode === 'on' && myDone)) return;
+  // 押しっぱなしで連発させないキー
+  if (e.repeat && [' ','c','C','Shift','p','P'].includes(e.key)) { e.preventDefault(); return; }
   if (paused && e.key !== 'p' && e.key !== 'P') return;
   switch (e.key) {
     case 'ArrowLeft':  e.preventDefault(); g1.cur.move(-1, g1.board); break;
@@ -1138,46 +1497,80 @@ document.addEventListener('keydown', e => {
       e.preventDefault(); g1.cur.rotate(-1, g1.board); break;
     case 'c': case 'C': case 'Shift':
       e.preventDefault(); g1.hold(); break;
-    case ' ':
+    case ' ': {
       e.preventDefault();
-      { const d = g1.cur.hardDrop(g1.board);
-        g1.score += d * 2; g1.updateUI();
-        g1.cur.merge(g1.board);
-        g1.clearLines(lines => { if (g2) g2.sendGarbage(lines); });
-        g1.spawn();
-        if (g1.cur.collides(g1.board)) { endGame(mode === '2p' ? 'cpu-win' : 'over'); return; }
-        g1.dropCnt = 0; }
+      const d = g1.cur.hardDrop(g1.board);
+      g1.score += d * 2; g1.updateUI();
+      g1.cur.merge(g1.board);
+      g1.clearLines(onP1Clear);
+      g1.spawn();
+      if (g1.cur.collides(g1.board)) g1.dead = true; // 次のフレームで終了処理
+      g1.dropCnt = 0;
       break;
+    }
     case 'p': case 'P': e.preventDefault(); togglePause(); break;
   }
 });
 
 // ═══════════════════════════════════════════
-//  OVERLAY BUTTONS
+//  BUTTONS
 // ═══════════════════════════════════════════
-getEl('goRestart').addEventListener('click', () => {
-  getEl('goOverlay').classList.remove('show');
-  stopFx();
-  setTimeout(() => { goX.clearRect(0,0,goC.width,goC.height); cfX.clearRect(0,0,cfC.width,cfC.height); }, 50);
+bind(getEl('goRestart'), () => {
+  if (mode === 'on') {
+    if (!net.open) { goMenu(); return; }
+    const rb = getEl('goRestart');
+    net.myReady = true;
+    netSend({ t: 'rematch' });
+    rb.textContent = 'Waiting...'; rb.disabled = true;
+    tryRematch();
+    return;
+  }
+  hideGo();
   startGame();
 });
-getEl('goMenu').addEventListener('click', () => {
-  getEl('goOverlay').classList.remove('show');
-  goMenu();
-});
+bind(getEl('goMenu'), goMenu);
 
-// ═══════════════════════════════════════════
-//  MODE BUTTONS
-// ═══════════════════════════════════════════
-getEl('btn1p').addEventListener('click', () => {
-  getEl('modeScreen').classList.add('hidden');
-  initGame('1p');
-  startGame();
+bind(getEl('btn1p'), () => { getEl('modeScreen').classList.add('hidden'); initGame('1p'); startGame(); });
+bind(getEl('btn2p'), () => { getEl('modeScreen').classList.add('hidden'); initGame('2p'); startGame(); });
+bind(getEl('btnOn'), () => { resetLobby(); getEl('lobby').classList.remove('hidden'); });
+
+// ── Lobby buttons ──
+bind(getEl('tabQuick'), () => { roomCleanup(); showPane('quick'); lbStatus(''); });
+bind(getEl('quickStart'), quickMatch);
+bind(getEl('quickCancel'), () => { roomCleanup(); closeNet(); lbStatus('キャンセルしました'); });
+bind(getEl('tabAuto'), () => { roomCleanup(); showPane('auto'); lbStatus(''); });
+bind(getEl('roomCreate'), roomCreate);
+bind(getEl('roomJoin'), roomJoin);
+bind(getEl('tabHost'), () => {
+  roomCleanup(); showPane('host');
+  if (getEl('hostCode').value) return;
+  lbStatus('コードを生成中…');
+  hostCreate()
+    .then(c => { getEl('hostCode').value = c; lbStatus('コードを相手に送ってください'); })
+    .catch(err => lbStatus('エラー: ' + err.message));
 });
-getEl('btn2p').addEventListener('click', () => {
-  getEl('modeScreen').classList.add('hidden');
-  initGame('2p');
-  startGame();
+bind(getEl('tabJoin'), () => { roomCleanup(); showPane('join'); lbStatus(''); });
+bind(getEl('hostConnect'), async () => {
+  try { await hostAccept(getEl('hostAnswer').value); lbStatus('接続中…'); }
+  catch(e) { lbStatus('返信コードが正しくありません'); }
+});
+bind(getEl('guestMake'), async () => {
+  lbStatus('返信コードを生成中…');
+  try {
+    getEl('guestAnswer').value = await guestJoin(getEl('guestOffer').value);
+    lbStatus('返信コードをホストに送ってください。ホストが接続すると始まります');
+  } catch(e) { lbStatus('ホストのコードが正しくありません'); }
+});
+bind(getEl('lbBack'), () => { roomCleanup(); closeNet(); resetLobby(); getEl('lobby').classList.add('hidden'); });
+document.querySelectorAll('[data-copy]').forEach(b => {
+  b.addEventListener('click', () => {
+    const el = getEl(b.dataset.copy);
+    if (!el.value) return;
+    el.select();
+    const done = () => { b.textContent = 'コピーしました'; };
+    if (navigator.clipboard) navigator.clipboard.writeText(el.value).then(done).catch(() => { document.execCommand('copy'); done(); });
+    else { document.execCommand('copy'); done(); }
+  });
 });
 
 })();
