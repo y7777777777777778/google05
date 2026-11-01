@@ -12,7 +12,7 @@ body{margin:0;background:linear-gradient(#0001 1px,#fff0 1px) 0 0/64px 64px,line
 main{max-width:1000px;margin:0 auto;padding:8px}
 .cab{position:relative;border-radius:26px;padding:42px 48px 12px 12px;background:#f7f7f2;border:5px solid #e8438f;box-shadow:0 0 0 3px #fff,0 12px 0 #a31e5c,0 18px 30px #0007;overflow:hidden}
 .sw{overflow-x:auto;border-radius:12px;border:6px solid #fff4d6;box-shadow:0 0 0 3px #ffe14d,0 0 0 5px #b3166d}
-.scr{container-type:inline-size;position:relative;aspect-ratio:16/9;min-width:680px;border:3px solid #111;border-radius:6px;overflow:hidden;color:#fff;background:linear-gradient(115deg,#fff0 40%,#ffffff1c 50%,#fff0 60%),radial-gradient(ellipse at 40% 35%,#34c95c,#0f8f36 78%);box-shadow:inset 0 0 6cqw #0008;user-select:none}
+.scr{container-type:inline-size;position:relative;aspect-ratio:16/9;min-width:520px;border:3px solid #111;border-radius:6px;overflow:hidden;color:#fff;background:linear-gradient(115deg,#fff0 40%,#ffffff1c 50%,#fff0 60%),radial-gradient(ellipse at 40% 35%,#34c95c,#0f8f36 78%);box-shadow:inset 0 0 6cqw #0008;user-select:none}
 .scr>*{position:absolute}
 .last{left:2%;top:3%;width:60%;height:8%;display:flex;gap:.3cqw;align-items:stretch}
 .last em{font:900 1.5cqw/1 "Noto Sans JP";align-self:center;color:#ffe14d;margin-right:.5cqw;font-style:normal}
@@ -57,15 +57,17 @@ main{max-width:1000px;margin:0 auto;padding:8px}
 .fr{margin-top:12px;height:58px;border-radius:12px;display:flex;align-items:center;justify-content:space-around;background:repeating-conic-gradient(from 0deg at 50% 130%,#ff9a3c 0 8deg,#ff5fae 8deg 16deg);border:3px solid #fff}
 .fr b{font:400 clamp(13px,3vw,22px) var(--fx);color:#fff;-webkit-text-stroke:5px #7a0a46;paint-order:stroke fill;font-style:italic}
 .tr{width:62px;height:34px;background:#1a1a1a;border-bottom:9px solid #ff8a1f;border-radius:6px}
-.ol{margin-top:14px;background:#fff4d6;border:3px solid #e8438f;border-radius:14px;padding:10px 14px;color:#4a1038;font:700 14px "Noto Sans JP",sans-serif}.ol b{color:#d6258a}#tk{min-height:22px;margin:4px 0;color:#188038}#rk{margin:4px 0 0;padding:0;list-style:none}#rk li{display:flex;gap:8px;padding:2px 0}#rk li b{margin-left:auto}
-#oth{margin:4px 0 0;padding:0;list-style:none}#oth li{display:flex;gap:8px;padding:2px 0}#oth li b{margin-left:auto}.win2{color:#188038}.lose2{color:#d93025}
-#cm{height:150px;overflow-y:auto;background:#fff;border-radius:8px;padding:6px;margin:6px 0;font-weight:400}#cm p{margin:2px 0;word-break:break-all}#ci{flex:1;padding:8px;border:2px solid #e8438f;border-radius:8px;font:inherit}#ba{width:110px;padding:8px;border:2px solid #e8438f;border-radius:8px;font:inherit}#bm{min-height:20px;margin-top:4px;color:#d6258a}.bb{padding:8px 16px}
+main{display:grid;grid-template-columns:1fr 1fr;gap:14px}.cab{grid-column:1/-1}.ol:has(#cm){grid-column:1/-1}@media(max-width:640px){main{grid-template-columns:1fr}}
+.ol{margin:0;background:linear-gradient(#10286e,#071340);border:3px solid #ffd21f;border-radius:16px;padding:12px 16px;color:#fff;font:700 14px "Noto Sans JP",sans-serif;box-shadow:0 4px 0 #0006,inset 0 0 24px #000a}.ol b{color:#ffe14d}
+#tk{min-height:22px;margin:4px 0;color:#7dffa0}#rk{margin:4px 0 0;padding:0;list-style:none}#rk li{display:flex;gap:8px;padding:2px 0}#rk li b{margin-left:auto}
+#oth{margin:4px 0 0;padding:0;list-style:none}#oth li{display:flex;gap:8px;padding:2px 0}#oth li b{margin-left:auto}.win2{color:#5df28a!important}.lose2{color:#ff8a8a!important}
+#cm{height:150px;overflow-y:auto;background:#000a;border:2px solid #4b6fd6;border-radius:8px;padding:6px 8px;margin:6px 0;font-weight:400;color:#fff}#cm p{margin:2px 0;word-break:break-all}#ci{flex:1;padding:8px;border:2px solid #e8438f;border-radius:8px;font:inherit}#ba{width:110px;padding:8px;border:2px solid #e8438f;border-radius:8px;font:inherit}#bm{min-height:20px;margin-top:4px;color:#d6258a}.bb{padding:8px 16px}
 #md{position:fixed;inset:0;background:#000b;display:grid;place-items:center;z-index:20;overflow:auto}#md[hidden]{display:none}[hidden]{display:none!important}
 .mc{position:relative;background:linear-gradient(#10286e,#071340);border:4px solid #ffd21f;border-radius:16px;padding:16px;width:min(94vw,420px);color:#fff;font:700 13px "Noto Sans JP";box-shadow:0 0 30px #ffd21f66,inset 0 0 30px #000a;margin:8px}
 .mh{font:400 22px var(--fx);color:#ffe14d;text-shadow:0 0 10px #ffb300;text-align:center}.mh small{display:block;font:700 11px "Noto Sans JP";color:#fff;text-shadow:none}.hint{text-align:center;color:#9fb4ff;margin-top:6px}
 #mx{position:absolute;right:10px;top:4px;border:0;background:none;font-size:26px;cursor:pointer;color:#fff}
 .mc label{display:block;margin-top:8px;color:#ffe14d}
-.mc input{width:100%;padding:8px 12px;margin:3px 0;border:2px solid #4b6fd6;border-radius:6px;background:#000;color:#ffe14d;font:400 22px var(--fx);text-align:right;letter-spacing:.1em;outline:none}.mc input:focus{border-color:#ffd21f;box-shadow:0 0 10px #ffd21f}
+.mc input{width:100%;padding:8px 12px;margin:3px 0;border:2px solid #4b6fd6;border-radius:6px;background:#000;color:#ffe14d;font:400 22px var(--fx);text-align:right;letter-spacing:.1em;outline:none}.mc input:focus,.mc input.on{border-color:#ffd21f;box-shadow:0 0 10px #ffd21f}
 .led{display:flex;align-items:baseline;gap:6px;background:#000;border:2px solid #4b6fd6;border-radius:8px;padding:6px 12px;margin-top:8px}.led small{flex:1;color:#9fb4ff}.led b{font:400 32px var(--fx);color:#ffe14d;text-shadow:0 0 10px #ffb300}.led.s b{font-size:22px;color:#7cf;text-shadow:none}.led em{font-style:normal}
 .cd{height:72px;border-radius:10px;background:linear-gradient(120deg,#ffd21f,#ff8a1f 40%,#e0368f);padding:8px 12px;display:flex;flex-direction:column;justify-content:space-between;color:#3a0a2a;box-shadow:0 4px 0 #0006}.cd b{font:400 20px var(--fx);letter-spacing:.15em}
 .row{display:flex;gap:8px;margin-top:8px}.row button{flex:1;padding:8px 2px;font:700 12px "Noto Sans JP";border:0;border-radius:6px;background:#2b4aa8;color:#fff;cursor:pointer}.row .bb{font-size:16px;padding:12px;background:linear-gradient(#ffe14d,#e8a100);color:#3a2300;box-shadow:0 3px 0 #7a5200}
@@ -194,14 +196,14 @@ ball={a:rot+th,r:150+Math.max(0,1-q*4)*60+Math.abs(Math.sin(q*9*Math.PI))*(1-q)*
 draw();p<1?requestAnimationFrame(f):done(res,win)})(performance.now())}
 function done(n,win){ball={a:-Math.PI/2,r:150};rot=-ORD.indexOf(n)*ST;draw();const tb=tot(),net=win-tb,from=medal;
 for(const k in bet)if(B[k].n.includes(n))$(k).classList.add('win');
-hist.push(n);hist=hist.slice(-50);sv('rp_hist',hist);hh();for(const k in bet)delete bet[k];medal+=win;
+for(const k in bet)delete bet[k];medal+=win;
 if(win>0){banner(`<span>クレジット</span><b>${win}<span style="font-size:.4em">枚</span></b><span>ゲット！</span>`);boom(win>=300?110:win>=100?70:28);
 if(win>=100){$('sc').classList.add('shake');setTimeout(()=>$('sc').classList.remove('shake'),1600)}say(`出目 ${n}　`+(net>0?`+${net}枚！`:'戻り '+win+'枚'))}
 else say(tb?`出目 ${n}　残念… -${tb}枚`:`出目 ${n}`);
 cnt(from,medal,()=>{if(medal<=0){medal=500;say('メダルがなくなったので500枚プレゼント！')}ui();saveOnline(win);})}
 function saveOnline(win){const b=Math.max(lg('rp_best',0),medal);sv('rp_best',b);if(window.rpSave)window.rpSave(medal,b,win)}
 window.rpSetMedal=m=>{if(!busy&&!tot()){medal=m;ui()}};
-window.RP={ORD,B,bet:()=>({...bet}),tot:()=>tot(),lock(){busy=true;last={...bet}},unlock(){busy=false;document.querySelectorAll('.win').forEach(e=>e.classList.remove('win'));say('BET受付中！')},spinTo,medal:()=>medal,busy:()=>busy,addMedal(d){medal+=d;ui();saveOnline(0)}};
+window.RP={ORD,B,bet:()=>({...bet}),tot:()=>tot(),lock(){busy=true;last={...bet}},unlock(){busy=false;document.querySelectorAll('.win').forEach(e=>e.classList.remove('win'));say('BET受付中！')},spinTo,setHist:a=>{hist=a;hh()},medal:()=>medal,busy:()=>busy,addMedal(d){medal+=d;ui();saveOnline(0)}};
 hh();ui();draw();
 </script><script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -235,7 +237,9 @@ function tick(){const t=sn(),r=Math.floor(t/CYC),ph=t-r*CYC;if(r!==curR)newRound
   else{el('tm').textContent='00';if(!locked){locked=true;RP.lock()}
     if(resIdx==null&&!asked){asked=1;ensure(r)}
     if(resIdx!=null&&!spun){spun=true;RP.spinTo(resIdx,Math.max(0,ph-BETM))}}
-  render(ph)}
+  render(ph);drawLast()}
+let lastDocs=[],lastSig='';
+function drawLast(){const t=sn(),r=Math.floor(t/CYC),ph=t-r*CYC,nums=lastDocs.filter(d=>+d.id<r||(+d.id===r&&ph>=BETM+SPINM)).slice(0,12).map(d=>RP.ORD[d.idx]),sig=nums.join(',');if(sig===lastSig)return;lastSig=sig;RP.setHist(nums.reverse())}
 window.rpBets=()=>{if(!uid||locked)return;clearTimeout(bt);bt=setTimeout(()=>{if(locked)return;const b=RP.bet(),n=RP.tot(),ref=doc(db,'rounds',String(curR),'bets',uid);(n?setDoc(ref,{name,bets:b,total:n}):deleteDoc(ref)).catch(()=>{})},250)};
 window.rpSave=(medal,best,win)=>{if(!uid)return;
   setDoc(doc(db,'players',uid),{name,medal,best,updated:serverTimestamp()}).catch(()=>{});
@@ -243,7 +247,7 @@ window.rpSave=(medal,best,win)=>{if(!uid)return;
 function send(){const t=el('ci').value.trim().slice(0,100);if(!t||!uid)return;el('ci').value='';addDoc(collection(db,'chat'),{uid,name,text:t,t:serverTimestamp()}).catch(()=>{})}
 el('cs').onclick=send;el('ci').onkeydown=e=>{if(e.key==='Enter')send()};
 // ---- BANK ポップアップ ----
-const show=()=>{el('ma').hidden=reg();el('mb').hidden=!reg();el('lo').hidden=!reg();el('mn').textContent=acct?acct.u:'';el('mm').textContent=RP.medal()};
+const show=()=>{el('ma').hidden=reg();el('mb').hidden=!reg();el('lo').hidden=!reg();setAct(reg()?el('ba'):(act&&act.id!=='ba'?act:el('un')));el('mn').textContent=acct?acct.u:'';el('mm').textContent=RP.medal()};
 el('bank').onclick=()=>{el('md').hidden=false;bm('');show()};
 el('mx').onclick=()=>{el('md').hidden=true};el('md').onclick=e=>{if(e.target===el('md'))el('md').hidden=true};
 const hashPw=async(n,pw)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ru-bank:'+n+':'+pw)))].map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -260,25 +264,27 @@ el('lo').onclick=async()=>{keep(null);await setUser(false);bm('ログアウト�
 function openLog(){if(unLg)unLg();unLg=null;el('bl').textContent='';if(!reg())return;
   unLg=onSnapshot(query(collection(db,'bank',acct.u,'log'),orderBy('t','desc'),limit(8)),s=>{const d=el('bl');d.textContent='';
     s.docs.forEach(x=>{const v=x.data(),p=document.createElement('div');p.textContent=(v.t?v.t.toDate().toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'…')+'　'+v.type+' '+v.amount+'枚（残高 '+v.balance+'）';d.append(p)})},()=>{})}
-async function bankOp(sg){const n=Math.floor(+el('ba').value);if(!reg())return bm('ログインしてください');if(!(n>0))return bm('枚数を入力してください');
+async function bankOp(sg){const n=Math.floor(+el('ba').value);if(!reg())return bm('ログインしてください');if(!(n>0))return bm('枚数をテンキーで入力してください');
   const ref=doc(db,'bank',acct.u),lg=doc(collection(db,'bank',acct.u,'log'));
-  try{await runTransaction(db,async tx=>{const s=await tx.get(ref),b=s.exists()?s.data().balance:0,nb=sg>0?b+n:b-n;
-      if(sg>0&&n>RP.medal())throw'メダルが足りません';if(nb<0)throw'バンクの残高が足りません';
-      tx.set(ref,{balance:nb,updated:serverTimestamp()});tx.set(lg,{type:sg>0?'預入':'引出',amount:n,balance:nb,t:serverTimestamp()})});
-    RP.addMedal(-sg*n);el('ba').value='';bm(n+(sg>0?'枚を預けました':'枚を引き出しました'));show()}
-  catch(e){bm(typeof e==='string'?e:'失敗しました')}}
+  try{const nb=await runTransaction(db,async tx=>{const s=await tx.get(ref),b=s.exists()?s.data().balance:0,nb=sg>0?b+n:b-n;
+      if(sg>0&&n>RP.medal())throw'お手持ちのメダルが足りません';if(nb<0)throw'お預かり残高が足りません';
+      tx.set(ref,{balance:nb,updated:serverTimestamp()});tx.set(lg,{type:sg>0?'預入':'引出',amount:n,balance:nb,t:serverTimestamp()});return nb});
+    RP.addMedal(-sg*n);el('bk').dataset.v=nb;el('bk').textContent=nb.toLocaleString();el('ba').value='';bm(n+(sg>0?'枚お預かりしました':'枚お渡ししました'));show()}
+  catch(e){bm(typeof e==='string'?e:e.code==='permission-denied'?'権限エラー：Firestoreのルールを firestore.rules の内容に更新してください':'失敗しました（'+(e.code||e)+'）')}}
 el('bd').onclick=()=>bankOp(1);el('bw').onclick=()=>bankOp(-1);
-let act=null;for(const id of['un','pw','ba']){el(id).onfocus=()=>{act=el(id)};el(id).oninput=()=>{if(id!=='pw')el(id).value=el(id).value.replace(/[^0-9]/g,'')}}
-document.querySelectorAll('.kp button').forEach(b=>b.onclick=()=>{const t=b.dataset.k;if(!act)act=el(reg()?'ba':'un');if(t==='C'){act.value='';return}const mx=act.id==='pw'?4:act.id==='un'?12:9;if(act.value.length+t.length<=mx)act.value+=t});
+let act=null;function setAct(e){act=e;for(const id of['un','pw','ba'])el(id).classList.toggle('on',el(id)===e)}
+for(const id of['un','pw','ba']){el(id).onfocus=()=>setAct(el(id));el(id).oninput=()=>{if(id!=='pw')el(id).value=el(id).value.replace(/[^0-9]/g,'')}}
+document.querySelectorAll('.kp button').forEach(b=>b.onclick=()=>{const t=b.dataset.k;if(!act)setAct(el(reg()?'ba':'un'));if(t==='C'){act.value='';return}const mx=act.id==='pw'?4:act.id==='un'?12:9;if(act.value.length+t.length<=mx)act.value+=t});
 document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const q=b.dataset.q,c=+el('ba').value||0;el('ba').value=String(q==='m'?RP.medal():q==='b'?+el('bk').dataset.v||0:c+(+q))});
 // ---- ユーザー切替・初期化 ----
 async function setUser(){uid=LID();name=nick();
   if(!started){try{const d=await getDoc(doc(db,'players',uid));if(d.exists()&&d.data().medal>0)window.rpSetMedal(d.data().medal)}catch(e){}}
   if(unBk)unBk();unBk=null;el('bk').textContent='0';el('bk').dataset.v=0;
-  if(reg())unBk=onSnapshot(doc(db,'bank',acct.u),d=>{const v=d.exists()?d.data().balance:0;el('bk').dataset.v=v;el('bk').textContent=v.toLocaleString()},()=>{});
+  if(reg())unBk=onSnapshot(doc(db,'bank',acct.u),d=>{const v=d.exists()?d.data().balance:0;el('bk').dataset.v=v;el('bk').textContent=v.toLocaleString()},e=>bm('バンクの読み込みに失敗（'+e.code+'）'));
   openLog();show();if(!started){started=true;initOnce()}}
 async function initOnce(){try{await sync()}catch(e){}
   beat();setInterval(beat,20000);watchPresence();setInterval(watchPresence,30000);
+  onSnapshot(query(collection(db,'rounds'),orderBy('t','desc'),limit(14)),s=>{lastDocs=s.docs.map(d=>({id:d.id,idx:d.data().idx}));drawLast()});
   onSnapshot(query(collection(db,'players'),orderBy('best','desc'),limit(5)),s=>{const ol=el('rk');ol.textContent='';
     s.docs.forEach((d,i)=>{const li=document.createElement('li'),b=document.createElement('b');li.append((i+1)+'. '+d.data().name);b.textContent=d.data().best;li.append(b);ol.append(li)});
     if(!s.docs.length)ol.innerHTML='<li>まだ記録がありません</li>'});
