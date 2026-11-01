@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ルーカン 管理</title>
+<style>
+:root{color-scheme:light dark;font-family:"Noto Sans JP",system-ui,sans-serif}
+body{margin:0;padding:16px;max-width:980px;margin-inline:auto}
+header{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}h1{font-size:20px;margin:0}
+section{border:1px solid #8884;border-radius:12px;padding:12px 16px;margin:12px 0}h2{font-size:16px;margin:0 0 8px}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{border-bottom:1px solid #8883;padding:6px;text-align:left;vertical-align:top}
+input{width:90px;padding:4px}button{padding:4px 10px;cursor:pointer}small{opacity:.6;word-break:break-all}
+#msg{color:#d33;font-weight:700}ul{padding-left:18px;margin:4px 0}#cl li{display:flex;gap:8px;margin:2px 0}
+</style></head><body>
+<header><h1>🎰 ルーカン（ルーレット＆バンク管理）</h1><a href="ru.html">ゲームを開く</a><span id="who"></span><input id="au" placeholder="ユーザー名" style="width:120px"><input id="ap" type="password" placeholder="パスワード" style="width:120px"><button id="login">ログイン</button><button id="logout" hidden>ログアウト</button></header>
+<p id="msg"></p>
+<div id="app" hidden>
+<section><h2>ルーレット</h2><div id="ri"></div><div>今回の出目：<b id="rr">未確定</b></div><div>今回のBET：<ul id="rb"></ul></div><div>直近の出目：<span id="rh"></span></div></section>
+<section><h2>バンク／プレイヤー　バンク合計：<span id="bt">0</span>枚</h2>
+<table><thead><tr><th>プレイヤー</th><th>所持メダル</th><th>最高</th><th>バンク残高</th><th></th></tr></thead><tbody id="pb"></tbody></table>
+<pre id="lg"></pre><small>所持メダルの変更は、本人がプレイ中だと、次の保存で上書きされます。メダルの付与は、バンク残高の変更で行うのがおすすめです。</small></section>
+<section><h2>チャット</h2><ul id="cl"></ul></section>
+</div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getFirestore,doc,getDoc,getDocs,setDoc,deleteDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const app=initializeApp({
+  apiKey:"AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
+  authDomain:"fir-66339.firebaseapp.com",
+  projectId:"fir-66339",
+  storageBucket:"fir-66339.firebasestorage.app",
+  messagingSenderId:"876017617963",
+  appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"});
+const db=getFirestore(app),$=id=>document.getElementById(id),CYC=36000,BETM=20000,SPINM=9500,say=t=>$('msg').textContent=t;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let P={},Bk={},rn=-1,unR,unB,started=false;
+const hashPw=async(n,pw)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ru-bank:'+n+':'+pw)))].map(x=>x.toString(16).padStart(2,'0')).join('');
+function enter(n){$('login').hidden=true;$('au').hidden=true;$('ap').hidden=true;$('logout').hidden=false;$('who').textContent='管理者：'+n;say('');$('app').hidden=false;run()}
+async function tryLogin(n,h){try{const d=await getDoc(doc(db,'users',n));if(d.exists()&&d.data().pwHash===h&&d.data().isAdmin===true){sessionStorage.setItem('rk',JSON.stringify({n,h}));enter(n);return true}}catch(e){say('失敗：'+(e.code||e))}return false}
+$('login').onclick=async()=>{const n=$('au').value.trim();if(!(await tryLogin(n,await hashPw(n,$('ap').value))))say('ユーザー名かパスワードが違う、または管理者ではありません（Firestoreの users の該当ドキュメントに isAdmin: true を追加してください）')};
+$('logout').onclick=()=>{sessionStorage.removeItem('rk');location.reload()};
+(async()=>{try{const a=JSON.parse(sessionStorage.getItem('rk')||'null');if(a)await tryLogin(a.n,a.h)}catch(e){}})();
+function drawP(){const ids=[...new Set([...Object.keys(P),...Object.keys(Bk)])];let tot=0;
+  $('pb').innerHTML=ids.map(id=>{const p=P[id]||{},b=+(Bk[id]||{}).balance||0;tot+=b;
+    return`<tr data-id="${esc(id)}"><td>${esc(p.name||'(不明)')}<br><small>${esc(id)}</small></td><td><input class="m" type="number" value="${+p.medal||0}"> <button data-a="m">設定</button></td><td>${+p.best||0}</td><td><input class="b" type="number" value="${b}"> <button data-a="b">設定</button></td><td><button data-a="l">履歴</button> <button data-a="d">削除</button></td></tr>`}).join('')||'<tr><td colspan="5">まだいません</td></tr>';
+  $('bt').textContent=tot}
+$('pb').onclick=async e=>{const a=e.target.dataset.a;if(!a)return;const tr=e.target.closest('tr'),id=tr.dataset.id,n=f=>Math.max(0,Math.floor(+tr.querySelector(f).value||0));
+  try{if(a==='m'){const v=n('.m'),p=P[id]||{};await setDoc(doc(db,'players',id),{name:p.name||'ゲスト',medal:v,best:Math.max(+p.best||0,v),updated:serverTimestamp()})}
+  else if(a==='b')await setDoc(doc(db,'bank',id.replace(/^u/,'')),{balance:n('.b'),updated:serverTimestamp()});
+  else if(a==='l'){const q=await getDocs(query(collection(db,'bank',id.replace(/^u/,''),'log'),orderBy('t','desc'),limit(20)));$('lg').textContent=(P[id]?.name||id)+' の履歴\n'+(q.docs.map(d=>{const v=d.data();return(v.t?v.t.toDate().toLocaleString('ja-JP'):'')+'　'+v.type+' '+v.amount+'枚（残高 '+v.balance+'）'}).join('\n')||'履歴なし')}
+  else if(a==='d'&&confirm('このプレイヤーとバンクを削除しますか？')){await deleteDoc(doc(db,'players',id));await deleteDoc(doc(db,'bank',id.replace(/^u/,'')))}}
+  catch(er){say('失敗：'+(er.code||er))}};
+function tick(){const t=Date.now(),r=Math.floor(t/CYC),ph=t-r*CYC;
+  if(r!==rn){rn=r;if(unR)unR();if(unB)unB();
+    unR=onSnapshot(doc(db,'rounds',String(r)),s=>{$('rr').textContent=s.exists()?s.data().idx-1:'未確定'});
+    unB=onSnapshot(collection(db,'rounds',String(r),'bets'),s=>{const ul=$('rb');ul.textContent='';
+      s.forEach(d=>{const x=d.data(),li=document.createElement('li');li.textContent=x.name+'　BET'+x.total+'枚';ul.append(li)});if(s.empty)ul.innerHTML='<li>なし</li>'})}
+  $('ri').textContent='ラウンド '+r+'　'+(ph<BETM?'BET受付中（残り'+Math.ceil((BETM-ph)/1000)+'秒）':ph<BETM+SPINM?'回転中':'結果表示中')}
+function run(){if(started)return;started=true;
+  onSnapshot(collection(db,'players'),s=>{P={};s.forEach(d=>P[d.id]=d.data());drawP()});
+  onSnapshot(collection(db,'bank'),s=>{Bk={};s.forEach(d=>Bk['u'+d.id]=d.data());drawP()});
+  onSnapshot(query(collection(db,'chat'),orderBy('t','desc'),limit(50)),s=>{const ul=$('cl');ul.textContent='';
+    s.docs.forEach(d=>{const x=d.data(),li=document.createElement('li'),sp=document.createElement('span'),b=document.createElement('button');
+      sp.textContent=x.name+'：'+x.text;b.textContent='削除';b.onclick=()=>deleteDoc(doc(db,'chat',d.id)).catch(e=>say('失敗：'+e.code));li.append(b,sp);ul.append(li)});
+    if(s.empty)ul.innerHTML='<li>なし</li>'});
+  onSnapshot(query(collection(db,'rounds'),orderBy('t','desc'),limit(10)),s=>{$('rh').textContent=s.docs.map(d=>d.data().idx-1).join('　')||'なし'});
+  tick();setInterval(tick,500)}
+</script></body></html>
