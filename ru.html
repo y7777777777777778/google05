@@ -118,7 +118,7 @@ G('a','1st6(1~6)',R(1,6),3,'w');G('b','2nd6(7~12)',R(7,12),3,'w');G('d','3rd6(13
 G('lo','1-9',R(1,9),2,'w');G('hi','10-18',R(10,18),2,'w');G('ev','EVEN',R(1,18).filter(x=>x%2==0),2,'w');G('od','ODD',R(1,18).filter(x=>x%2),2,'w');
 G('rd','◆',RED,2,'r');G('bk','◆',R(1,18).filter(x=>!RED.includes(x)),2,'k');
 const lg=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-let chip=1,medal=lg('rp_medal',301)||500,busy=false,rot=0,ball=null,hist=lg('rp_hist',[]),last={},ani=false,parts=[],tmr=null,tl=0;
+let chip=1,medal=Math.max(0,+lg('rp_medal',301)||0),busy=false,rot=0,ball=null,hist=lg('rp_hist',[]),last={},ani=false,parts=[],tmr=null,tl=0;
 function cell(k,s,r){const d=document.createElement('div'),b=B[k];d.className='c '+b.c;d.style.gridColumn=s||'';d.style.gridRow=r||'';d.id=k;d.textContent=b.l;if(b.l==='◆')d.innerHTML='<i class="dm '+(k==='rd'?'r':'k')+'"></i>';
 d.onclick=()=>add(k,1);d.oncontextmenu=e=>{e.preventDefault();add(k,-1)};let t;
 d.ontouchstart=()=>t=setTimeout(()=>{add(k,-1);t=1},600);d.ontouchend=e=>{if(t==1)e.preventDefault();clearTimeout(t)};$('g').append(d)}
@@ -200,7 +200,7 @@ for(const k in bet)delete bet[k];medal+=win;
 if(win>0){banner(`<span>クレジット</span><b>${win}<span style="font-size:.4em">枚</span></b><span>ゲット！</span>`);boom(win>=300?110:win>=100?70:28);
 if(win>=100){$('sc').classList.add('shake');setTimeout(()=>$('sc').classList.remove('shake'),1600)}say(`出目 ${n}　`+(net>0?`+${net}枚！`:'戻り '+win+'枚'))}
 else say(tb?`出目 ${n}　残念… -${tb}枚`:`出目 ${n}`);
-cnt(from,medal,()=>{if(medal<=0){medal=500;say('メダルがなくなったので500枚プレゼント！')}ui();saveOnline(win);})}
+cnt(from,medal,()=>{if(medal<=0&&!tot())say('メダルがなくなりました。バンクから引き出してください');ui();saveOnline(win);})}
 function saveOnline(win){const b=Math.max(lg('rp_best',0),medal);sv('rp_best',b);if(window.rpSave)window.rpSave(medal,b,win)}
 window.rpSetMedal=m=>{if(!busy&&!tot()){medal=m;ui()}};
 window.RP={ORD,B,bet:()=>({...bet}),tot:()=>tot(),lock(){busy=true;last={...bet}},unlock(){busy=false;document.querySelectorAll('.win').forEach(e=>e.classList.remove('win'));say('BET受付中！')},spinTo,setHist:a=>{hist=a;hh()},medal:()=>medal,busy:()=>busy,addMedal(d){medal+=d;ui();saveOnline(0)}};
@@ -256,7 +256,7 @@ async function doAuth(kind){if(RP.busy())return bm('ルーレット回転中は�
   const n=el('un').value.trim(),pw=el('pw').value;
   if(!/^[0-9]{4,12}$/.test(n))return bm('ユーザー名は数字の4〜12桁です（例 20261031）');if(!/^[0-9]{4}$/.test(pw))return bm('パスワードは4桁の数字です');
   try{const h=await hashPw(n,pw),ref=doc(db,'users',n);
-    if(kind==='su'){await runTransaction(db,async tx=>{if((await tx.get(ref)).exists())throw'そのユーザー名は使われています';tx.set(ref,{pwHash:h,createdAt:serverTimestamp()})});keep({u:n,h});await setUser();RP.addMedal(0);bm('登録しました！')}
+    if(kind==='su'){await runTransaction(db,async tx=>{if((await tx.get(ref)).exists())throw'そのユーザー名は使われています';tx.set(ref,{pwHash:h,createdAt:serverTimestamp()})});const g=LID();keep({u:n,h});await setUser();RP.addMedal(0);await setDoc(doc(db,'players',g),{medal:0,updated:serverTimestamp()},{merge:true}).catch(()=>{});bm('登録しました！')}
     else{const d=await getDoc(ref);if(!d.exists()||d.data().pwHash!==h)throw'ユーザー名かパスワードが違います';keep({u:n,h});await setUser();bm('ログインしました')}
     el('pw').value=''}catch(e){bm(typeof e==='string'?e:'失敗しました（'+(e.code||e)+'）')}}
 el('li').onclick=()=>doAuth('li');el('su').onclick=()=>doAuth('su');
@@ -265,10 +265,10 @@ function openLog(){if(unLg)unLg();unLg=null;el('bl').textContent='';if(!reg())re
   unLg=onSnapshot(query(collection(db,'bank',acct.u,'log'),orderBy('t','desc'),limit(8)),s=>{const d=el('bl');d.textContent='';
     s.docs.forEach(x=>{const v=x.data(),p=document.createElement('div');p.textContent=(v.t?v.t.toDate().toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'…')+'　'+v.type+' '+v.amount+'枚（残高 '+v.balance+'）';d.append(p)})},()=>{})}
 async function bankOp(sg){const n=Math.floor(+el('ba').value);if(!reg())return bm('ログインしてください');if(!(n>0))return bm('枚数をテンキーで入力してください');
-  const ref=doc(db,'bank',acct.u),lg=doc(collection(db,'bank',acct.u,'log'));
-  try{const nb=await runTransaction(db,async tx=>{const s=await tx.get(ref),b=s.exists()?s.data().balance:0,nb=sg>0?b+n:b-n;
-      if(sg>0&&n>RP.medal())throw'お手持ちのメダルが足りません';if(nb<0)throw'お預かり残高が足りません';
-      tx.set(ref,{balance:nb,updated:serverTimestamp()});tx.set(lg,{type:sg>0?'預入':'引出',amount:n,balance:nb,t:serverTimestamp()});return nb});
+  const ref=doc(db,'bank',acct.u),pref=doc(db,'players',uid),lg=doc(collection(db,'bank',acct.u,'log'));
+  try{const nb=await runTransaction(db,async tx=>{const s=await tx.get(ref),ps=await tx.get(pref),pm=ps.exists()&&typeof ps.data().medal==='number'?ps.data().medal:RP.medal(),b=s.exists()?s.data().balance:0,nb=sg>0?b+n:b-n;
+      if(sg>0&&(n>RP.medal()||n>pm))throw'お手持ちのメダルが足りません';if(nb<0)throw'お預かり残高が足りません';
+      tx.set(pref,{medal:pm-sg*n,updated:serverTimestamp()},{merge:true});tx.set(ref,{balance:nb,updated:serverTimestamp()});tx.set(lg,{type:sg>0?'預入':'引出',amount:n,balance:nb,t:serverTimestamp()});return nb});
     RP.addMedal(-sg*n);el('bkv').dataset.v=nb;el('bkv').textContent=nb.toLocaleString();el('ba').value='';bm(n+(sg>0?'枚お預かりしました':'枚お渡ししました'));show()}
   catch(e){bm(typeof e==='string'?e:e.code==='permission-denied'?'権限エラー：Firestoreのルールを firestore.rules の内容に更新してください':'失敗しました（'+(e.code||e)+'）')}}
 el('bd').onclick=()=>bankOp(1);el('bw').onclick=()=>bankOp(-1);
@@ -280,7 +280,7 @@ document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const q=b.datase
 async function setUser(){const old=uid;uid=reg()?'U'+acct.u:LID();name=nick();
   if(old&&old!==uid&&!locked&&curR>=0)deleteDoc(doc(db,'rounds',String(curR),'bets',old)).catch(()=>{});
   if(!RP.busy())el('clr').click();
-  try{const d=await getDoc(doc(db,'players',uid));if(d.exists()&&d.data().medal>0)window.rpSetMedal(d.data().medal)}catch(e){}
+  try{const d=await getDoc(doc(db,'players',uid));if(d.exists()&&typeof d.data().medal==='number')window.rpSetMedal(d.data().medal);else if(old&&old[0]==='U'&&!reg())window.rpSetMedal(0)}catch(e){}
   if(unBk)unBk();unBk=null;el('bkv').textContent='0';el('bkv').dataset.v=0;
   if(reg())unBk=onSnapshot(doc(db,'bank',acct.u),d=>{const v=d.exists()?d.data().balance:0;el('bkv').dataset.v=v;el('bkv').textContent=v.toLocaleString()},e=>bm('バンクの読み込みに失敗（'+e.code+'）'));
   openLog();show();if(!started){started=true;initOnce()}}
