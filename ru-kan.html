@@ -2,26 +2,48 @@
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ルーカン 管理</title>
 <style>
-:root{color-scheme:light dark;font-family:"Noto Sans JP",system-ui,sans-serif}
-body{margin:0;padding:16px;max-width:980px;margin-inline:auto}
-header{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}h1{font-size:20px;margin:0}
-section{border:1px solid #8884;border-radius:12px;padding:12px 16px;margin:12px 0}h2{font-size:16px;margin:0 0 8px}
-table{width:100%;border-collapse:collapse;font-size:14px}td,th{border-bottom:1px solid #8883;padding:6px;text-align:left;vertical-align:top}
-input{width:90px;padding:4px}button{padding:4px 10px;cursor:pointer}small{opacity:.6;word-break:break-all}
-#msg{color:#d33;font-weight:700}ul{padding-left:18px;margin:4px 0}#cl li{display:flex;gap:8px;margin:2px 0}
+:root{color-scheme:light dark;font-family:"Noto Sans JP",system-ui,sans-serif;--bk:#1b9e4b;--hd:#2a6fdb}
+body{margin:0;padding:16px;max-width:1040px;margin-inline:auto;line-height:1.5}
+header{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:8px}h1{font-size:20px;margin:0}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}nav a{padding:4px 12px;border:1px solid #8886;border-radius:999px;text-decoration:none;font-size:13px}
+section{border:1px solid #8884;border-radius:12px;padding:12px 16px;margin:14px 0}h2{font-size:16px;margin:0 0 8px}
+h2 small,.note{font-weight:400;font-size:12px;opacity:.7}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.card{border-radius:10px;padding:10px 14px;background:#8881}.card b{display:block;font-size:24px}.card.bk b{color:var(--bk)}.card.hd b{color:var(--hd)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}td,th{border-bottom:1px solid #8883;padding:8px 6px;text-align:left;vertical-align:top}
+td.bk{background:#1b9e4b12}td.hd{background:#2a6fdb12}
+.num{font-size:22px;font-weight:700}.num small{font-size:12px;font-weight:400}.bk .num{color:var(--bk)}.hd .num{color:var(--hd)}
+.ed{display:flex;gap:4px;align-items:center;margin-top:6px;flex-wrap:wrap}.ed span{font-size:12px;opacity:.7;width:56px}
+input,select{padding:4px 6px;font:inherit;font-size:14px}input[type=number]{width:84px}button{padding:4px 10px;cursor:pointer;font:inherit;font-size:13px}
+small{opacity:.7;word-break:break-all}
+#msg{min-height:24px;font-weight:700;color:#d33}#msg.ok{color:#1b9e4b}
+ul{padding-left:18px;margin:4px 0}#cl li,#nl li{display:flex;gap:8px;margin:3px 0}
+.row2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+pre{white-space:pre-wrap;font-size:13px}
 </style></head><body>
-<header><h1>🎰 ルーカン（ルーレット＆バンク管理）</h1><a href="ru.html">ゲームを開く</a><span id="who"></span></header>
-<p id="msg"></p>
-<div id="app">
-<section><h2>ルーレット</h2><div id="ri"></div><div>今回の出目：<b id="rr">未確定</b></div><div>今回のBET：<ul id="rb"></ul></div><div>直近の出目：<span id="rh"></span></div></section>
-<section><h2>全ユーザーとバンク　アカウント：<span id="uc">0</span>　バンク合計：<span id="bt">0</span>枚</h2>
-<table><thead><tr><th>ユーザー名</th><th>バンク残高</th><th>残高の変更</th><th>その他</th></tr></thead><tbody id="pb"></tbody></table>
-<pre id="lg"></pre><small>このページは誰でも操作できます（制限なし）。</small></section>
-<section><h2>チャット</h2><ul id="cl"></ul></section>
-</div>
+<header><h1>🎰 ルーカン（ルーレット＆バンク管理）</h1><a href="roulette_party.html">ゲームを開く</a></header>
+<nav><a href="#s-user">ユーザー</a><a href="#s-bonus">ログインボーナス</a><a href="#s-notice">お知らせ</a><a href="#s-game">ルーレット</a><a href="#s-chat">チャット</a></nav>
+<div id="msg"></div>
+<section><div class="cards"><div class="card">アカウント数<b id="uc">0</b></div><div class="card bk">🏦 バンク合計<b id="bt">0</b></div><div class="card hd">🎰 手持ち合計<b id="ht">0</b></div></div></section>
+
+<section id="s-user"><h2>ユーザー別のメダル <small>🏦バンク＝預けているメダル　🎰手持ち＝ゲームで使うメダル</small></h2>
+<div class="tw"><table><thead><tr><th>ユーザー</th><th>🏦 バンク残高</th><th>🎰 手持ち</th><th>その他</th></tr></thead><tbody id="pb"></tbody></table></div>
+<pre id="lg"></pre>
+<p class="note">手持ちを変更すると、プレイ中のユーザーにも反映されます（回転中は終了後）。このページは誰でも操作できます（制限なし）。</p></section>
+
+<section id="s-bonus"><h2>ログインボーナス <small>1日1回・日本時間0時で更新・バンクに入金</small></h2>
+<div class="row2"><label><input type="checkbox" id="be"> 有効にする</label> 枚数 <input id="ba" type="number" min="0" value="100"> 枚 <button id="bs">保存</button> <b id="bst"></b></div></section>
+
+<section id="s-notice"><h2>お知らせ <small>宛先を選んで送信</small></h2>
+<div class="row2"><select id="nto"></select><input id="ntx" style="flex:1;min-width:200px" maxlength="200" placeholder="お知らせ内容（200文字まで）"><button id="nadd">送信</button></div>
+<ul id="nl"></ul></section>
+
+<section id="s-game"><h2>ルーレット</h2><div id="ri"></div><div>今回の出目：<b id="rr">未確定</b></div><div>今回のBET：<ul id="rb"></ul></div><div>直近の出目：<span id="rh"></span></div></section>
+<section id="s-chat"><h2>チャット</h2><ul id="cl"></ul></section>
+
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getFirestore,doc,getDoc,getDocs,setDoc,addDoc,updateDoc,runTransaction,deleteDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{getFirestore,doc,getDocs,setDoc,addDoc,updateDoc,runTransaction,deleteDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp({
   apiKey:"AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
   authDomain:"fir-66339.firebaseapp.com",
@@ -29,24 +51,43 @@ const app=initializeApp({
   storageBucket:"fir-66339.firebasestorage.app",
   messagingSenderId:"876017617963",
   appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"});
-const db=getFirestore(app),$=id=>document.getElementById(id),CYC=36000,BETM=20000,SPINM=9500,say=t=>$('msg').textContent=t;
+const db=getFirestore(app),$=id=>document.getElementById(id),CYC=36000,BETM=20000,SPINM=9500;
+const say=(t,ok)=>{const e=$('msg');e.textContent=t||'';e.className=ok?'ok':''};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let P={},Bk={},rn=-1,unR,unB,started=false;
+let Bk={},U={},Pl={},rn=-1,unR,unB,started=false;
 const hashPw=async(n,pw)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ru-bank:'+n+':'+pw)))].map(x=>x.toString(16).padStart(2,'0')).join('');
-$('app').hidden=false;
-let U={};
-function drawP(){if(document.activeElement&&$('pb').contains(document.activeElement))return;
-  const ids=Object.keys(U).sort((a,b)=>((U[b].createdAt||{}).seconds||0)-((U[a].createdAt||{}).seconds||0));let tot=0;
-  $('pb').innerHTML=ids.map(id=>{const b=+(Bk[id]||{}).balance||0;tot+=b;const c=U[id].createdAt&&U[id].createdAt.toDate?U[id].createdAt.toDate().toLocaleDateString('ja-JP'):'';
-    return`<tr data-id="${esc(id)}"><td><b>${esc(id)}</b>${U[id].isAdmin?' 👑':''}<br><small>登録 ${c}</small></td><td><b>${b}</b>枚</td><td><input class="b" type="number" value="${b}"> <button data-a="s">設定</button><br><input class="d" type="number" placeholder="±増減"> <button data-a="a">加減</button></td><td><input class="p" maxlength="4" placeholder="新PIN" style="width:64px"> <button data-a="p">PIN変更</button><br><button data-a="l">履歴</button> <button data-a="x">削除</button></td></tr>`}).join('')||'<tr><td colspan="4">ユーザーがいません</td></tr>';
-  $('bt').textContent=tot;$('uc').textContent=ids.length}
-$('pb').onclick=async e=>{const a=e.target.dataset.a;if(!a)return;const tr=e.target.closest('tr'),id=tr.dataset.id,rf=doc(db,'bank',id),lg=()=>doc(collection(db,'bank',id,'log'));
-  try{if(a==='s'){const v=Math.max(0,Math.floor(+tr.querySelector('.b').value||0));await setDoc(rf,{balance:v,updated:serverTimestamp()});await setDoc(lg(),{type:'管理者設定',amount:v,balance:v,t:serverTimestamp()})}
-  else if(a==='a'){const dv=Math.floor(+tr.querySelector('.d').value||0);if(!dv)return;await runTransaction(db,async tx=>{const s=await tx.get(rf),nb=Math.max(0,(s.exists()?s.data().balance:0)+dv);tx.set(rf,{balance:nb,updated:serverTimestamp()});tx.set(lg(),{type:dv>0?'管理者付与':'管理者回収',amount:Math.abs(dv),balance:nb,t:serverTimestamp()})})}
-  else if(a==='p'){const pin=tr.querySelector('.p').value;if(!/^[0-9]{4}$/.test(pin))return say('PINは4桁の数字です');await updateDoc(doc(db,'users',id),{pwHash:await hashPw(id,pin)});say('')}
-  else if(a==='l'){const q=await getDocs(query(collection(db,'bank',id,'log'),orderBy('t','desc'),limit(20)));$('lg').textContent=id+' の履歴\n'+(q.docs.map(d=>{const v=d.data();return(v.t?v.t.toDate().toLocaleString('ja-JP'):'')+'　'+v.type+' '+v.amount+'枚（残高 '+v.balance+'）'}).join('\n')||'履歴なし')}
-  else if(a==='x'&&confirm(id+' を削除しますか？バンクの残高と履歴も消えます。')){const q=await getDocs(collection(db,'bank',id,'log'));for(const d of q.docs)await deleteDoc(d.ref);await deleteDoc(rf);await deleteDoc(doc(db,'users',id))}}
-  catch(er){say('失敗：'+(er.code||er))}};
+function drawP(force){const ae=document.activeElement;if(!force&&ae&&ae.tagName==='INPUT'&&$('pb').contains(ae))return;
+  const ids=Object.keys(U).sort((a,b)=>((U[b].createdAt||{}).seconds||0)-((U[a].createdAt||{}).seconds||0));let tot=0,ht=0;
+  $('pb').innerHTML=ids.map(id=>{const b=+(Bk[id]||{}).balance||0,h=+(Pl['U'+id]||{}).medal||0;tot+=b;ht+=h;const c=U[id].createdAt&&U[id].createdAt.toDate?U[id].createdAt.toDate().toLocaleDateString('ja-JP'):'';
+    return`<tr data-id="${esc(id)}"><td><b>${esc(id)}</b>${U[id].isAdmin?' 👑':''}<br><small>登録 ${c}</small></td>
+<td class="bk"><div class="num">${b.toLocaleString()}<small> 枚</small></div>
+<div class="ed"><span>この数に</span><input class="b" type="number" value="${b}"><button data-a="s" data-t="bk">設定</button></div>
+<div class="ed"><span>増減</span><input class="d" type="number" placeholder="±"><button data-a="a" data-t="bk">加減</button></div></td>
+<td class="hd"><div class="num">${h.toLocaleString()}<small> 枚</small></div>
+<div class="ed"><span>この数に</span><input class="hb" type="number" value="${h}"><button data-a="s" data-t="hd">設定</button></div>
+<div class="ed"><span>増減</span><input class="hdv" type="number" placeholder="±"><button data-a="a" data-t="hd">加減</button></div></td>
+<td><div class="ed"><input class="p" maxlength="4" placeholder="新PIN" style="width:64px"><button data-a="p">PIN変更</button></div>
+<div class="ed"><button data-a="l">履歴</button><button data-a="x">削除</button></div></td></tr>`}).join('')||'<tr><td colspan="4">ユーザーがいません</td></tr>';
+  $('bt').textContent=tot.toLocaleString();$('ht').textContent=ht.toLocaleString();$('uc').textContent=ids.length}
+$('pb').onclick=async e=>{const a=e.target.dataset.a;if(!a)return;const tr=e.target.closest('tr'),id=tr.dataset.id,bank=e.target.dataset.t==='bk',
+  rf=bank?doc(db,'bank',id):doc(db,'players','U'+id),fld=bank?'balance':'medal',lg=()=>doc(collection(db,'bank',id,'log'));
+  try{if(a==='s'){const v=Math.max(0,Math.floor(+tr.querySelector(bank?'.b':'.hb').value||0));
+      if(bank){await setDoc(rf,{balance:v,updated:serverTimestamp()});await setDoc(lg(),{type:'管理者設定',amount:v,balance:v,t:serverTimestamp()})}
+      else await setDoc(rf,{medal:v,updated:serverTimestamp()},{merge:true});
+      say(id+' の'+(bank?'バンク残高':'手持ち')+'を '+v+' 枚に設定しました',true)}
+    else if(a==='a'){const dv=Math.floor(+tr.querySelector(bank?'.d':'.hdv').value||0);if(!dv)return say('増減の枚数を入力してください');
+      await runTransaction(db,async tx=>{const s=await tx.get(rf),cur=s.exists()&&typeof s.data()[fld]==='number'?s.data()[fld]:0,nb=Math.max(0,cur+dv);
+        tx.set(rf,{[fld]:nb,updated:serverTimestamp()},{merge:true});
+        if(bank)tx.set(lg(),{type:dv>0?'管理者付与':'管理者回収',amount:Math.abs(dv),balance:nb,t:serverTimestamp()})});
+      say(id+' の'+(bank?'バンク残高':'手持ち')+'を '+(dv>0?'+':'')+dv+' 枚しました',true)}
+    else if(a==='p'){const pin=tr.querySelector('.p').value;if(!/^[0-9]{4}$/.test(pin))return say('PINは4桁の数字です');await updateDoc(doc(db,'users',id),{pwHash:await hashPw(id,pin)});say(id+' のPINを変更しました',true)}
+    else if(a==='l'){const q=await getDocs(query(collection(db,'bank',id,'log'),orderBy('t','desc'),limit(20)));$('lg').textContent=id+' のバンク履歴\n'+(q.docs.map(d=>{const v=d.data();return(v.t?v.t.toDate().toLocaleString('ja-JP'):'')+'　'+v.type+' '+v.amount+'枚（残高 '+v.balance+'）'}).join('\n')||'履歴なし');say('')}
+    else if(a==='x'&&confirm(id+' を削除しますか？バンク残高・履歴・手持ちメダル・ランキング記録・ボーナス受取記録も消えます。')){const q=await getDocs(collection(db,'bank',id,'log'));for(const d of q.docs)await deleteDoc(d.ref);await deleteDoc(doc(db,'bank',id));await deleteDoc(doc(db,'players','U'+id));await deleteDoc(doc(db,'bonusClaims',id));await deleteDoc(doc(db,'users',id));say(id+' を削除しました',true)}}
+  catch(er){say('失敗：'+(er.code||er))}
+  drawP(true)};
+function drawSel(){const sel=$('nto'),v=sel.value||'all';sel.innerHTML='<option value="all">全員</option>'+Object.keys(U).map(id=>`<option value="${esc(id)}">${esc(id)} さん宛</option>`).join('');sel.value=[...sel.options].some(o=>o.value===v)?v:'all'}
+$('bs').onclick=()=>setDoc(doc(db,'config','bonus'),{enabled:$('be').checked,amount:Math.max(0,Math.floor(+$('ba').value||0)),updated:serverTimestamp()}).then(()=>say('ログインボーナスの設定を保存しました',true)).catch(e=>say('失敗：'+(e.code||e)));
+$('nadd').onclick=()=>{const t=$('ntx').value.trim().slice(0,200);if(!t)return say('お知らせ内容を入力してください');addDoc(collection(db,'notices'),{text:t,to:$('nto').value,t:serverTimestamp()}).then(()=>{$('ntx').value='';say('お知らせを送信しました',true)}).catch(e=>say('失敗：'+(e.code||e)))};
 function tick(){const t=Date.now(),r=Math.floor(t/CYC),ph=t-r*CYC;
   if(r!==rn){rn=r;if(unR)unR();if(unB)unB();
     unR=onSnapshot(doc(db,'rounds',String(r)),s=>{$('rr').textContent=s.exists()?s.data().idx-1:'未確定'});
@@ -54,8 +95,14 @@ function tick(){const t=Date.now(),r=Math.floor(t/CYC),ph=t-r*CYC;
       s.forEach(d=>{const x=d.data(),li=document.createElement('li');li.textContent=x.name+'　BET'+x.total+'枚';ul.append(li)});if(s.empty)ul.innerHTML='<li>なし</li>'})}
   $('ri').textContent='ラウンド '+r+'　'+(ph<BETM?'BET受付中（残り'+Math.ceil((BETM-ph)/1000)+'秒）':ph<BETM+SPINM?'回転中':'結果表示中')}
 function run(){if(started)return;started=true;
-  onSnapshot(collection(db,'users'),s=>{U={};s.forEach(d=>U[d.id]=d.data());drawP()});
+  onSnapshot(collection(db,'users'),s=>{U={};s.forEach(d=>U[d.id]=d.data());drawP();drawSel()});
   onSnapshot(collection(db,'bank'),s=>{Bk={};s.forEach(d=>Bk[d.id]=d.data());drawP()});
+  onSnapshot(collection(db,'players'),s=>{Pl={};s.forEach(d=>Pl[d.id]=d.data());drawP()});
+  onSnapshot(doc(db,'config','bonus'),s=>{const d=s.exists()?s.data():{};if(document.activeElement!==$('ba'))$('ba').value=d.amount??100;$('be').checked=!!d.enabled;$('bst').textContent=d.enabled?'現在：有効（'+(d.amount||0)+'枚）':'現在：無効'});
+  onSnapshot(query(collection(db,'notices'),orderBy('t','desc'),limit(50)),s=>{const ul=$('nl');ul.textContent='';
+    s.docs.forEach(d=>{const x=d.data(),li=document.createElement('li'),sp=document.createElement('span'),b=document.createElement('button');
+      sp.textContent=(x.to==='all'?'【全員】':'【'+x.to+' さん宛】')+x.text;b.textContent='削除';b.onclick=()=>deleteDoc(doc(db,'notices',d.id)).catch(e=>say('失敗：'+(e.code||e)));li.append(b,sp);ul.append(li)});
+    if(s.empty)ul.innerHTML='<li>なし</li>'});
   onSnapshot(query(collection(db,'chat'),orderBy('t','desc'),limit(50)),s=>{const ul=$('cl');ul.textContent='';
     s.docs.forEach(d=>{const x=d.data(),li=document.createElement('li'),sp=document.createElement('span'),b=document.createElement('button');
       sp.textContent=x.name+'：'+x.text;b.textContent='削除';b.onclick=()=>deleteDoc(doc(db,'chat',d.id)).catch(e=>say('失敗：'+e.code));li.append(b,sp);ul.append(li)});
