@@ -40,6 +40,7 @@ td.bk,td.hd{border-radius:8px;margin:4px 0}
 <section id="s-mt"><h2>🔧 メンテナンス <small>オンにすると、ゲーム画面が全員に表示できなくなります</small> <b id="mts"></b></h2>
 <div class="row2"><label><input type="checkbox" id="mton"> メンテナンスを有効にする</label></div>
 <div class="row2" style="margin-top:6px"><textarea id="mtmsg" rows="2" maxlength="200" style="flex:1;min-width:220px;font:inherit;padding:6px" placeholder="表示するメッセージ（空なら標準の文章）"></textarea></div>
+<div class="row2" style="margin-top:6px">検証用に許可するユーザー <select id="mtsel"></select><button id="mtadd">追加</button></div><div class="row2" id="mtal" style="margin-top:4px"></div>
 <div class="row2" style="margin-top:6px">終了予定（任意・自動で解除）<input type="datetime-local" id="mtuntil"><button id="mt30">30分後</button><button id="mt60">1時間後</button><button id="mtclr">予定なし</button></div>
 <div class="row2" style="margin-top:8px"><button id="mtsave" style="font-weight:700">保存して反映</button></div></section>
 
@@ -76,7 +77,7 @@ const app=initializeApp({
 const db=getFirestore(app),$=id=>document.getElementById(id),CYC=36000,BETM=20000,SPINM=9500;
 const say=(t,ok)=>{const e=$('msg');e.textContent=t||'';e.className=ok?'ok':''};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let Bk={},U={},Pl={},rn=-1,unR,unB,started=false,rkP='h',rkK='',unRk=null,RK=[];
+let Bk={},U={},Pl={},rn=-1,unR,unB,started=false,rkP='h',rkK='',unRk=null,RK=[],ALLOW=[];
 const hashPw=async(n,pw)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ru-bank:'+n+':'+pw)))].map(x=>x.toString(16).padStart(2,'0')).join('');
 function drawP(force){const ae=document.activeElement;if(!force&&ae&&ae.tagName==='INPUT'&&$('pb').contains(ae))return;
   const ids=Object.keys(U).sort((a,b)=>((U[b].createdAt||{}).seconds||0)-((U[a].createdAt||{}).seconds||0));let tot=0,ht=0;
@@ -136,11 +137,15 @@ document.querySelectorAll('.rp').forEach(b=>b.onclick=()=>{rkP=b.dataset.p;rkK='
 $('rall').onclick=async()=>{if(!RK.length)return say('削除する記録がありません');if(!confirm('この期間の記録 '+RK.length+' 件を削除しますか？'))return;try{for(const x of RK)await deleteDoc(doc(db,'scores',x.id));say('削除しました',true)}catch(e){say('失敗：'+(e.code||e))}};
 $('rold').onclick=async()=>{try{const cur=Object.values(pKeys()),q=await getDocs(collection(db,'scores'));let n=0;for(const d of q.docs)if(!cur.includes(d.data().pk)){await deleteDoc(d.ref);n++}say('過去の期間の記録を '+n+' 件削除しました',true)}catch(e){say('失敗：'+(e.code||e))}};
 $('rwipe').onclick=async()=>{if(!confirm('全期間のランキング記録をすべて削除しますか？'))return;try{const q=await getDocs(collection(db,'scores'));for(const d of q.docs)await deleteDoc(d.ref);say('全期間の記録を削除しました（'+q.size+'件）',true)}catch(e){say('失敗：'+(e.code||e))}};
+function drawAl(){const b=$('mtal');b.textContent='';if(!ALLOW.length){b.textContent='許可ユーザー：なし（全員メンテナンス表示）';return}
+  b.append('許可中：');ALLOW.forEach(id=>{const s=document.createElement('span'),x=document.createElement('button');s.textContent=id+' ';x.textContent='×';x.onclick=()=>saveAllow(ALLOW.filter(v=>v!==id));s.append(x);s.style.cssText='border:1px solid #8886;border-radius:999px;padding:2px 8px';b.append(s)})}
+const saveAllow=a=>setDoc(doc(db,'config','maintenance'),{allow:a,updated:serverTimestamp()},{merge:true}).then(()=>say('許可ユーザーを更新しました',true)).catch(e=>say('失敗：'+(e.code||e)));
+$('mtadd').onclick=()=>{const v=$('mtsel').value;if(!v)return say('追加するユーザーを選んでください');if(ALLOW.includes(v))return say('すでに許可されています');saveAllow([...ALLOW,v])};
 const toLocal=ms=>new Date(ms-new Date(ms).getTimezoneOffset()*60000).toISOString().slice(0,16);
 $('mt30').onclick=()=>$('mtuntil').value=toLocal(Date.now()+30*60000);$('mt60').onclick=()=>$('mtuntil').value=toLocal(Date.now()+60*60000);$('mtclr').onclick=()=>$('mtuntil').value='';
 $('mtsave').onclick=()=>{const v=$('mtuntil').value,u=v?new Date(v).getTime():null;if(v&&!(u>Date.now())&&$('mton').checked)return say('終了予定が過去の時刻です');
-  setDoc(doc(db,'config','maintenance'),{on:$('mton').checked,msg:$('mtmsg').value.trim().slice(0,200),until:u,updated:serverTimestamp()}).then(()=>say($('mton').checked?'メンテナンスを開始しました':'メンテナンスを解除しました',true)).catch(e=>say('失敗：'+(e.code||e)))};
-function drawSel(){const sel=$('nto'),v=sel.value||'all';sel.innerHTML='<option value="all">全員</option>'+Object.keys(U).map(id=>`<option value="${esc(id)}">${esc(id)} さん宛</option>`).join('');sel.value=[...sel.options].some(o=>o.value===v)?v:'all'}
+  setDoc(doc(db,'config','maintenance'),{on:$('mton').checked,msg:$('mtmsg').value.trim().slice(0,200),until:u,allow:ALLOW,updated:serverTimestamp()}).then(()=>say($('mton').checked?'メンテナンスを開始しました':'メンテナンスを解除しました',true)).catch(e=>say('失敗：'+(e.code||e)))};
+function drawSel(){$('mtsel').innerHTML=Object.keys(U).map(id=>`<option value="${esc(id)}">${esc(id)}${(Pl['U'+id]||{}).name?'（'+esc(Pl['U'+id].name)+'）':''}</option>`).join('');const sel=$('nto'),v=sel.value||'all';sel.innerHTML='<option value="all">全員</option>'+Object.keys(U).map(id=>`<option value="${esc(id)}">${esc(id)} さん宛</option>`).join('');sel.value=[...sel.options].some(o=>o.value===v)?v:'all'}
 $('bs').onclick=()=>setDoc(doc(db,'config','bonus'),{enabled:$('be').checked,amount:Math.max(0,Math.floor(+$('ba').value||0)),updated:serverTimestamp()}).then(()=>say('ログインボーナスの設定を保存しました',true)).catch(e=>say('失敗：'+(e.code||e)));
 $('nadd').onclick=()=>{const t=$('ntx').value.trim().slice(0,200);if(!t)return say('お知らせ内容を入力してください');addDoc(collection(db,'notices'),{text:t,to:$('nto').value,t:serverTimestamp()}).then(()=>{$('ntx').value='';say('お知らせを送信しました',true)}).catch(e=>say('失敗：'+(e.code||e)))};
 function tick(){const t=Date.now(),r=Math.floor(t/CYC),ph=t-r*CYC;
@@ -153,7 +158,7 @@ function run(){if(started)return;started=true;
   onSnapshot(collection(db,'users'),s=>{U={};s.forEach(d=>U[d.id]=d.data());drawP();drawSel()});
   onSnapshot(collection(db,'bank'),s=>{Bk={};s.forEach(d=>Bk[d.id]=d.data());drawP()});
   onSnapshot(collection(db,'players'),s=>{Pl={};s.forEach(d=>Pl[d.id]=d.data());drawP()});
-  onSnapshot(doc(db,'config','maintenance'),s=>{const d=s.exists()?s.data():{},ae=document.activeElement.id;if(ae!=='mtmsg')$('mtmsg').value=d.msg||'';if(ae!=='mtuntil')$('mtuntil').value=d.until?toLocal(d.until):'';$('mton').checked=!!d.on;
+  onSnapshot(doc(db,'config','maintenance'),s=>{const d=s.exists()?s.data():{},ae=document.activeElement.id;if(ae!=='mtmsg')$('mtmsg').value=d.msg||'';if(ae!=='mtuntil')$('mtuntil').value=d.until?toLocal(d.until):'';$('mton').checked=!!d.on;ALLOW=Array.isArray(d.allow)?d.allow:[];drawAl();
     $('mts').textContent=d.on?(d.until&&Date.now()>=d.until?'🟢 通常稼働（予定時刻で自動解除済み）':'🔴 メンテナンス中'):'🟢 通常稼働'});
   onSnapshot(doc(db,'config','bonus'),s=>{const d=s.exists()?s.data():{};if(document.activeElement!==$('ba'))$('ba').value=d.amount??100;$('be').checked=!!d.enabled;$('bst').textContent=d.enabled?'現在：有効（'+(d.amount||0)+'枚）':'現在：無効'});
   onSnapshot(query(collection(db,'notices'),orderBy('t','desc'),limit(50)),s=>{const ul=$('nl');ul.textContent='';
