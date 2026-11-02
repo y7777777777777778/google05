@@ -309,7 +309,7 @@ const pv=()=>{const p=el('pv');if(!p)return;const n=Math.floor(+el('ba').value)|
   p.append(l)};
 const upd=()=>{if(!el('mm'))return;const m=RP.medal(),b=+el('bkv').dataset.v||0;el('mm').textContent=m.toLocaleString();el('mxd').textContent=m.toLocaleString();el('mxw').textContent=b.toLocaleString();pv()};
 window.rpUi=upd;
-function watchPl(){if(unPl)unPl();unPl=onSnapshot(doc(db,'players',uid),d=>{if(bop||!d.exists())return;const m=d.data().medal;if(typeof m!=='number'||m===sv0||m===RP.medal()+RP.tot())return;sv0=m;
+function watchPl(){if(unPl)unPl();unPl=onSnapshot(doc(db,'players',uid),d=>{if(d.exists()&&d.data().name&&d.data().name!==name&&!d.metadata.hasPendingWrites){name=String(d.data().name);localStorage.setItem('rp_name',name)}if(bop||!d.exists())return;const m=d.data().medal;if(typeof m!=='number'||m===sv0||m===RP.medal()+RP.tot())return;sv0=m;
   const ap=()=>{if(RP.busy())return setTimeout(ap,2000);el('clr').click();window.rpSetMedal(m);RP.addMedal(0);bm('手持ちメダルが管理者により '+m+' 枚に変更されました',true)};ap()})}
 const show=()=>{if(!reg()){step=1;el('md').hidden=false}else if(step<2)step=2;el('mx').hidden=!reg();
   el('ma').hidden=reg();el('mb').hidden=!reg();for(const n of[2,3,4])el('p'+n).hidden=!(reg()&&step===n);
