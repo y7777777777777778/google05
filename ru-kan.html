@@ -1,4 +1,4 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ルーカン 管理</title>
 <style>
@@ -19,10 +19,21 @@ small{opacity:.7;word-break:break-all}
 #msg{min-height:24px;font-weight:700;color:#d33}#msg.ok{color:#1b9e4b}
 ul{padding-left:18px;margin:4px 0}#cl li,#nl li{display:flex;gap:8px;margin:3px 0}
 .row2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-pre{white-space:pre-wrap;font-size:13px}
+pre{white-space:pre-wrap;font-size:13px}.rp.on{background:#ffe14d;color:#000;font-weight:700}
+
+@media(max-width:700px){
+body{padding:10px}.tw{overflow:visible}
+table{min-width:0}thead{display:none}table,tbody,tr,td{display:block;width:100%}
+tr{border:1px solid #8884;border-radius:10px;margin:10px 0;padding:6px 8px}
+td{border:0;padding:6px 4px}td::before{content:attr(data-l);display:block;font-size:12px;font-weight:700;opacity:.6;margin-bottom:2px}
+td.bk,td.hd{border-radius:8px;margin:4px 0}
+.ed span{width:64px}input,select,button{font-size:16px}button{padding:8px 12px}
+.row2{gap:6px}#ntx{min-width:0!important;flex-basis:100%}
+.cards{grid-template-columns:repeat(3,1fr)}.card{padding:8px 10px}.card b{font-size:18px}
+}
 </style></head><body>
 <header><h1>🎰 ルーカン（ルーレット＆バンク管理）</h1><a href="roulette_party.html">ゲームを開く</a></header>
-<nav><a href="#s-user">ユーザー</a><a href="#s-bonus">ログインボーナス</a><a href="#s-notice">お知らせ</a><a href="#s-game">ルーレット</a><a href="#s-chat">チャット</a></nav>
+<nav><a href="#s-user">ユーザー</a><a href="#s-bonus">ログインボーナス</a><a href="#s-notice">お知らせ</a><a href="#s-rank">ランキング</a><a href="#s-game">ルーレット</a><a href="#s-chat">チャット</a></nav>
 <div id="msg"></div>
 <section><div class="cards"><div class="card">アカウント数<b id="uc">0</b></div><div class="card bk">🏦 バンク合計<b id="bt">0</b></div><div class="card hd">🎰 手持ち合計<b id="ht">0</b></div></div></section>
 
@@ -37,6 +48,11 @@ pre{white-space:pre-wrap;font-size:13px}
 <section id="s-notice"><h2>お知らせ <small>宛先を選んで送信</small></h2>
 <div class="row2"><select id="nto"></select><input id="ntx" style="flex:1;min-width:200px" maxlength="200" placeholder="お知らせ内容（200文字まで）"><button id="nadd">送信</button></div>
 <ul id="nl"></ul></section>
+
+<section id="s-rank"><h2>ランキング <small>期間ごとの最高メダル数（日本時間・週は月曜はじまり）</small></h2>
+<div class="row2"><button class="rp on" data-p="h">1時間</button><button class="rp" data-p="d">1日</button><button class="rp" data-p="w">1週間</button> <b id="rkk"></b></div>
+<ol id="rkl2"></ol>
+<div class="row2"><button id="rall">この期間の記録を全削除</button><button id="rold">過去の期間の記録を整理</button><button id="rwipe">全期間の記録を全削除</button></div></section>
 
 <section id="s-game"><h2>ルーレット</h2><div id="ri"></div><div>今回の出目：<b id="rr">未確定</b></div><div>今回のBET：<ul id="rb"></ul></div><div>直近の出目：<span id="rh"></span></div></section>
 <section id="s-chat"><h2>チャット</h2><ul id="cl"></ul></section>
@@ -54,19 +70,19 @@ const app=initializeApp({
 const db=getFirestore(app),$=id=>document.getElementById(id),CYC=36000,BETM=20000,SPINM=9500;
 const say=(t,ok)=>{const e=$('msg');e.textContent=t||'';e.className=ok?'ok':''};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let Bk={},U={},Pl={},rn=-1,unR,unB,started=false;
+let Bk={},U={},Pl={},rn=-1,unR,unB,started=false,rkP='h',rkK='',unRk=null,RK=[];
 const hashPw=async(n,pw)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ru-bank:'+n+':'+pw)))].map(x=>x.toString(16).padStart(2,'0')).join('');
 function drawP(force){const ae=document.activeElement;if(!force&&ae&&ae.tagName==='INPUT'&&$('pb').contains(ae))return;
   const ids=Object.keys(U).sort((a,b)=>((U[b].createdAt||{}).seconds||0)-((U[a].createdAt||{}).seconds||0));let tot=0,ht=0;
   $('pb').innerHTML=ids.map(id=>{const b=+(Bk[id]||{}).balance||0,h=+(Pl['U'+id]||{}).medal||0;tot+=b;ht+=h;const c=U[id].createdAt&&U[id].createdAt.toDate?U[id].createdAt.toDate().toLocaleDateString('ja-JP'):'';
-    return`<tr data-id="${esc(id)}"><td><b>${esc(id)}</b>${U[id].isAdmin?' 👑':''}<br>名前：<b>${esc((Pl['U'+id]||{}).name||'未設定')}</b><br><small>登録 ${c}</small></td>
-<td class="bk"><div class="num">${b.toLocaleString()}<small> 枚</small></div>
+    return`<tr data-id="${esc(id)}"><td data-l="ユーザー"><b>${esc(id)}</b>${U[id].isAdmin?' 👑':''}<br>名前：<b>${esc((Pl['U'+id]||{}).name||'未設定')}</b><br><small>登録 ${c}</small></td>
+<td class="bk" data-l="🏦 バンク残高"><div class="num">${b.toLocaleString()}<small> 枚</small></div>
 <div class="ed"><span>この数に</span><input class="b" type="number" value="${b}"><button data-a="s" data-t="bk">設定</button></div>
 <div class="ed"><span>増減</span><input class="d" type="number" placeholder="±"><button data-a="a" data-t="bk">加減</button></div></td>
-<td class="hd"><div class="num">${h.toLocaleString()}<small> 枚</small></div>
+<td class="hd" data-l="🎰 手持ち"><div class="num">${h.toLocaleString()}<small> 枚</small></div>
 <div class="ed"><span>この数に</span><input class="hb" type="number" value="${h}"><button data-a="s" data-t="hd">設定</button></div>
 <div class="ed"><span>増減</span><input class="hdv" type="number" placeholder="±"><button data-a="a" data-t="hd">加減</button></div></td>
-<td><div class="ed"><input class="p" maxlength="4" placeholder="新PIN" style="width:64px"><button data-a="p">PIN変更</button></div>
+<td data-l="その他"><div class="ed"><input class="p" maxlength="4" placeholder="新PIN" style="width:64px"><button data-a="p">PIN変更</button></div>
 <div class="ed"><span>名前</span><input class="nm" maxlength="12" placeholder="ニックネーム" style="width:110px" value="${esc((Pl['U'+id]||{}).name||'')}"><button data-a="n">名前変更</button></div>
 <div class="ed"><span>会員番号</span><input class="nid" placeholder="新番号" style="width:100px" maxlength="12"><input class="npin" placeholder="新PIN" style="width:64px" maxlength="4"><button data-a="r">番号変更</button></div>
 <div class="ed"><button data-a="l">履歴</button><button data-a="x">削除</button></div></td></tr>`}).join('')||'<tr><td colspan="4">ユーザーがいません</td></tr>';
@@ -105,6 +121,15 @@ $('pb').onclick=async e=>{const a=e.target.dataset.a;if(!a)return;const tr=e.tar
     else if(a==='x'&&confirm(id+' を削除しますか？バンク残高・履歴・手持ちメダル・ランキング記録・ボーナス受取記録も消えます。')){const q=await getDocs(collection(db,'bank',id,'log'));for(const d of q.docs)await deleteDoc(d.ref);await deleteDoc(doc(db,'bank',id));await deleteDoc(doc(db,'players','U'+id));await deleteDoc(doc(db,'bonusClaims',id));await deleteDoc(doc(db,'users',id));say(id+' を削除しました',true)}}
   catch(er){say('失敗：'+(er.code||er))}
   drawP(true)};
+const pKeys=()=>{const j=new Date(Date.now()+32400000),iso=j.toISOString(),dow=(j.getUTCDay()+6)%7,wk=new Date(j.getTime()-dow*86400000).toISOString().slice(0,10);return{h:'h|'+iso.slice(0,13),d:'d|'+iso.slice(0,10),w:'w|'+wk}};
+const lab=k=>{const v=k.split('|')[1],m=+v.slice(5,7)+'/'+(+v.slice(8,10));return k[0]==='h'?m+' '+(+v.slice(11,13))+'時台':k[0]==='d'?m+'（今日）':m+' の週（月曜〜）'};
+function drawRk(){const ol=$('rkl2');ol.textContent='';RK.slice().sort((a,b)=>b.best-a.best).forEach(x=>{const li=document.createElement('li'),b=document.createElement('button');b.textContent='削除';b.onclick=()=>deleteDoc(doc(db,'scores',x.id)).then(()=>say(x.name+' の記録を削除しました',true)).catch(e=>say('失敗：'+(e.code||e)));li.append(b,' '+x.name+'（'+String(x.uid).replace(/^U/,'')+'）　'+x.best+' 枚');ol.append(li)});if(!RK.length)ol.innerHTML='<li>記録なし</li>'}
+function watchRank(){const k=pKeys()[rkP];if(k===rkK)return;rkK=k;if(unRk)unRk();$('rkk').textContent='集計期間：'+lab(k);
+  unRk=onSnapshot(query(collection(db,'scores'),where('pk','==',k)),s=>{RK=s.docs.map(d=>({id:d.id,...d.data()}));drawRk()})}
+document.querySelectorAll('.rp').forEach(b=>b.onclick=()=>{rkP=b.dataset.p;rkK='';document.querySelectorAll('.rp').forEach(x=>x.classList.toggle('on',x===b));watchRank()});
+$('rall').onclick=async()=>{if(!RK.length)return say('削除する記録がありません');if(!confirm('この期間の記録 '+RK.length+' 件を削除しますか？'))return;try{for(const x of RK)await deleteDoc(doc(db,'scores',x.id));say('削除しました',true)}catch(e){say('失敗：'+(e.code||e))}};
+$('rold').onclick=async()=>{try{const cur=Object.values(pKeys()),q=await getDocs(collection(db,'scores'));let n=0;for(const d of q.docs)if(!cur.includes(d.data().pk)){await deleteDoc(d.ref);n++}say('過去の期間の記録を '+n+' 件削除しました',true)}catch(e){say('失敗：'+(e.code||e))}};
+$('rwipe').onclick=async()=>{if(!confirm('全期間のランキング記録をすべて削除しますか？'))return;try{const q=await getDocs(collection(db,'scores'));for(const d of q.docs)await deleteDoc(d.ref);say('全期間の記録を削除しました（'+q.size+'件）',true)}catch(e){say('失敗：'+(e.code||e))}};
 function drawSel(){const sel=$('nto'),v=sel.value||'all';sel.innerHTML='<option value="all">全員</option>'+Object.keys(U).map(id=>`<option value="${esc(id)}">${esc(id)} さん宛</option>`).join('');sel.value=[...sel.options].some(o=>o.value===v)?v:'all'}
 $('bs').onclick=()=>setDoc(doc(db,'config','bonus'),{enabled:$('be').checked,amount:Math.max(0,Math.floor(+$('ba').value||0)),updated:serverTimestamp()}).then(()=>say('ログインボーナスの設定を保存しました',true)).catch(e=>say('失敗：'+(e.code||e)));
 $('nadd').onclick=()=>{const t=$('ntx').value.trim().slice(0,200);if(!t)return say('お知らせ内容を入力してください');addDoc(collection(db,'notices'),{text:t,to:$('nto').value,t:serverTimestamp()}).then(()=>{$('ntx').value='';say('お知らせを送信しました',true)}).catch(e=>say('失敗：'+(e.code||e)))};
@@ -128,6 +153,6 @@ function run(){if(started)return;started=true;
       sp.textContent=x.name+'：'+x.text;b.textContent='削除';b.onclick=()=>deleteDoc(doc(db,'chat',d.id)).catch(e=>say('失敗：'+e.code));li.append(b,sp);ul.append(li)});
     if(s.empty)ul.innerHTML='<li>なし</li>'});
   onSnapshot(query(collection(db,'rounds'),orderBy('t','desc'),limit(10)),s=>{$('rh').textContent=s.docs.map(d=>d.data().idx-1).join('　')||'なし'});
-  tick();setInterval(tick,500)}
+  watchRank();tick();setInterval(()=>{tick();watchRank()},500)}
 run();
 </script></body></html>
