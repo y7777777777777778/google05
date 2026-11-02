@@ -132,8 +132,8 @@ G('rd','◆',RED,2,'r');G('bk','◆',R(1,18).filter(x=>!RED.includes(x)),2,'k');
 const lg=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let medal=Math.max(0,+lg('rpc_medal',500)||500),busy=false,rot=0,ball=null,hist=lg('rpc_hist',[]),last={},ani=false,parts=[];
 function cell(k,s,r){const d=document.createElement('div'),b=B[k];d.className='c '+b.c;d.style.gridColumn=s||'';d.style.gridRow=r||'';d.id=k;d.textContent=b.l;if(b.l==='◆')d.innerHTML='<i class="dm '+(k==='rd'?'r':'k')+'"></i>';
-d.onclick=()=>add(k,1);d.oncontextmenu=e=>{e.preventDefault();add(k,-1)};let t;
-d.ontouchstart=()=>t=setTimeout(()=>{add(k,-1);t=1},600);d.ontouchend=e=>{if(t==1)e.preventDefault();clearTimeout(t)};$('g').append(d)}
+d.onclick=()=>add(k,1);d.oncontextmenu=e=>{e.preventDefault();add(k,-1)};let t,lp=false;
+d.ontouchstart=()=>{lp=false;t=setTimeout(()=>{lp=true;add(k,-1)},600)};d.ontouchend=e=>{if(lp)e.preventDefault();clearTimeout(t)};$('g').append(d)}
 const gap=()=>$('g').append(document.createElement('i'));
 cell('n0','1','span 3');
 for(let r=0;r<3;r++){for(let c=0;c<6;c++)cell('n'+(c*3+3-r));cell('c'+(3-r))}
