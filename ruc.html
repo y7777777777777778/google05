@@ -216,7 +216,7 @@ if(win>=100||hit>0){$('sc').classList.add('shake');setTimeout(()=>$('sc').classL
 say(`出目 ${n}　`+(net>0?`+${net}枚！`:'戻り '+win+'枚'))}
 else{say(tb?`出目 ${n}　`+(near?'惜しい！':'残念…')+` -${tb}枚`:`出目 ${n}`)}
 hist.push(n);hist=hist.slice(-40);sv('rpc_hist',hist);hh();
-cnt(from,medal,()=>{ui();busy=false;$('spin').disabled=false;if(medal<=0&&!tot())say('メダルがなくなりました。下の「チート設定」で増やしてください')})}
+cnt(from,medal,()=>{ui();$('cmed').value=medal;busy=false;$('spin').disabled=false;if(medal<=0&&!tot())say('メダルがなくなりました。下の「チート設定」で増やしてください')})}
 // ---- 数字の選択肢を作成 ----
 for(let i=0;i<=18;i++){const o=document.createElement('option');o.value=i;o.textContent=i+(i===0?'（緑）':RED.includes(i)?'（赤）':'（黒）');$('setNum').append(o)}
 // ---- チート設定（オフライン・ローカルのみ） ----
@@ -234,6 +234,5 @@ $('spin').onclick=()=>{
   spinTo(idx);
 };
 hh();ui();draw();
-setInterval(()=>{if(!busy)$('cmed').value=medal},500);
 </script>
 </body></html>
