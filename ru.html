@@ -95,7 +95,9 @@ main{display:grid;grid-template-columns:1fr 1fr;gap:14px}.cab{grid-column:1/-1}.
 .opt .oi{font-size:54px;margin:8px 0}.opt p{margin:4px 6px;font-weight:400}.opt .om{margin:8px 6px 0;padding:4px;background:#000;border-radius:6px}.opt .om b{display:block;font:400 20px var(--fx);color:#ffe14d}
 .opt:active{transform:scale(.97)}
 .done{text-align:center;padding:16px 0;font:900 16px "Noto Sans JP"}.done b{display:block;font:400 36px var(--fx);color:#ffe14d;margin-top:6px}
-.mc #ba{font:400 30px var(--fx)}.opt.gf .oh{background:linear-gradient(#ff7ac0,#d6258a)}.tt.gf{color:#ff9bd0}
+.mc #ba{font:400 30px var(--fx)}.row button:disabled,.bb:disabled{opacity:.45;cursor:not-allowed}
+#gl{display:grid;gap:6px;max-height:190px;overflow:auto;margin:6px 0}.gi{padding:10px;border:2px solid #4b6fd6;border-radius:8px;background:#0b1f6b;color:#fff;text-align:left;font:700 13px "Noto Sans JP";cursor:pointer}.gi.on{background:#ffe14d;color:#3a2300;border-color:#ffd21f}.gi.half{border-style:dashed;color:#ffb86b}.gi.half.on{color:#3a2300}
+.opt.gf .oh{background:linear-gradient(#ff7ac0,#d6258a)}.tt.gf{color:#ff9bd0}
 #cf{position:fixed;inset:0;pointer-events:none;z-index:9}
 </style></head><body><main>
 <div class="cab"><div class="sd">ROULETTE PARTY</div><div class="tp"><i class="bt"></i><i class="bt k"></i><i class="bt w"></i><b>タッチ・デ・ルーレットパーティー</b><i class="bt w"></i><i class="bt k"></i><i class="bt"></i></div><div class="sw"><div class="scr" id="sc">
@@ -122,6 +124,7 @@ main{display:grid;grid-template-columns:1fr 1fr;gap:14px}.cab{grid-column:1/-1}.
 <div class="hint" id="hn"></div>
 <label>会員番号（数字4〜12桁）</label><input id="un" inputmode="none" maxlength="12" autocomplete="off" placeholder="例 20261031">
 <label>暗証番号（数字4桁）</label><input id="pw" type="password" inputmode="none" maxlength="4" autocomplete="off" placeholder="●●●●">
+<div id="nnb" hidden><label>ニックネーム（12文字まで・ゲーム内の表示名）</label><input id="nn" maxlength="12" autocomplete="off" placeholder="ニックネーム" style="text-align:left;font:700 16px 'Noto Sans JP',sans-serif;letter-spacing:0"></div>
 <div id="k1"><div class="kp" id="kp"><button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button><button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button><button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button><button data-k="C">訂正</button><button data-k="0">0</button><button data-k="00">00</button></div></div>
 <div class="row"><button class="bb" id="go">ログイン</button></div></div>
 <div id="mb" hidden>
@@ -139,7 +142,7 @@ main{display:grid;grid-template-columns:1fr 1fr;gap:14px}.cab{grid-column:1/-1}.
 </div>
 <div id="p3" hidden>
 <div class="tt" id="t3"></div>
-<div id="gbox" hidden><label>贈る相手（会員番号）</label><input id="gt" inputmode="none" maxlength="12" autocomplete="off" placeholder="会員番号"><div class="row q"><button id="half">🎲 ユーザー「1/2」に贈る（1/2で2倍・1/2で消滅）</button></div><label>贈る枚数</label></div>
+<div id="gbox" hidden><label>贈る相手を一覧から選んでください</label><input id="gt" type="hidden"><div id="gl"></div><label>贈る枚数</label></div>
 <input id="ba" inputmode="none" maxlength="9" autocomplete="off" placeholder="0">
 <div class="row q"><button data-q="10">+10</button><button data-q="100">+100</button><button data-q="1000">+1000</button></div>
 <div class="row q"><button id="qmax" data-q="m">最大</button><button data-q="x">クリア</button></div>
@@ -266,7 +269,7 @@ const app=initializeApp({
   appId:"1:876017617963:web:5ba304f8f6e0d9dff0ae6e"});
 const db=getFirestore(app),el=id=>document.getElementById(id),t0=Date.now(),RP=window.RP;
 const CYC=36000,BETM=20000,SPINM=9500; // 1ラウンド36秒: BET20秒→回転9.5秒→結果表示
-let uid=null,acct=null,name='',unP=null,unB=null,unR=null,unBk=null,unLg=null,off=0,curR=-1,resIdx=null,spun=false,locked=false,asked=0,others={},bt=null,started=false,NT=[],unPl=null,sv0=null,bop=false,step=1,op=1,res={op:1,n:0};
+let uid=null,acct=null,name='',unP=null,unB=null,unR=null,unBk=null,unLg=null,off=0,curR=-1,resIdx=null,spun=false,locked=false,asked=0,others={},bt=null,started=false,NT=[],unPl=null,sv0=null,bop=false,PL=[],step=1,op=1,res={op:1,n:0};
 const sn=()=>Date.now()+off,reg=()=>!!acct,bm=(t,ok)=>{const e=el('bm');e.textContent=t||'';e.className=!t?'':ok===true?'ok':'ng'};
 const nick=()=>{let n=localStorage.getItem('rp_name')||'';if(!n){n=(prompt('ニックネームを入力（12文字まで）')||'ゲスト').trim().slice(0,12)||'ゲスト';localStorage.setItem('rp_name',n)}return n};
 const beat=()=>setDoc(doc(db,'presence',uid),{t:serverTimestamp()}).catch(()=>{});
@@ -289,55 +292,61 @@ function tick(){const t=sn(),r=Math.floor(t/CYC),ph=t-r*CYC;if(r!==curR)newRound
   render(ph);drawLast()}
 let lastDocs=[],lastSig='';
 function drawLast(){const t=sn(),r=Math.floor(t/CYC),ph=t-r*CYC,nums=lastDocs.filter(d=>+d.id<r||(+d.id===r&&ph>=BETM+SPINM)).slice(0,12).map(d=>RP.ORD[d.idx]),sig=nums.join(',');if(sig===lastSig)return;lastSig=sig;RP.setHist(nums.reverse())}
-window.rpBets=()=>{if(!uid||locked)return;clearTimeout(bt);bt=setTimeout(()=>{if(locked)return;const b=RP.bet(),n=RP.tot(),ref=doc(db,'rounds',String(curR),'bets',uid);(n?setDoc(ref,{name,bets:b,total:n}):deleteDoc(ref)).catch(()=>{})},250)};
-window.rpSave=(medal,best,win)=>{if(!uid)return;sv0=medal;
+window.rpBets=()=>{if(!uid||locked||!reg())return;clearTimeout(bt);bt=setTimeout(()=>{if(locked)return;const b=RP.bet(),n=RP.tot(),ref=doc(db,'rounds',String(curR),'bets',uid);(n?setDoc(ref,{name,bets:b,total:n}):deleteDoc(ref)).catch(()=>{})},250)};
+window.rpSave=(medal,best,win)=>{if(!uid||!reg())return;sv0=medal;
   setDoc(doc(db,'players',uid),{name,medal,best,updated:serverTimestamp()}).catch(()=>{});
   if(win>=100)addDoc(collection(db,'feed'),{uid,name,win,t:serverTimestamp()}).catch(()=>{})};
-function send(){const t=el('ci').value.trim().slice(0,100);if(!t||!uid)return;el('ci').value='';addDoc(collection(db,'chat'),{uid,name,text:t,t:serverTimestamp()}).catch(()=>{})}
+function send(){const t=el('ci').value.trim().slice(0,100);if(!t||!uid||!reg())return;el('ci').value='';addDoc(collection(db,'chat'),{uid,name,text:t,t:serverTimestamp()}).catch(()=>{})}
 el('cs').onclick=send;el('ci').onkeydown=e=>{if(e.key==='Enter')send()};
 // ---- BANK ポップアップ ----
 window.rpGuest=()=>!reg();
-const stat=()=>{el('st').textContent=reg()?'👤 会員 '+acct.u+'　🏦 預け '+(+el('bkv').dataset.v||0).toLocaleString()+'枚':'👤 ゲスト（BANKで新規登録すると500枚プレゼント！）'};
+const stat=()=>{el('st').textContent=reg()?'👤 会員 '+acct.u+'　🏦 預け '+(+el('bkv').dataset.v||0).toLocaleString()+'枚':'👤 未ログイン'};
 const pv=()=>{const p=el('pv');if(!p)return;const n=Math.floor(+el('ba').value)||0,m=RP.medal(),b=+el('bkv').dataset.v||0,f=x=>x.toLocaleString(),mx=op<0?b:m,l=document.createElement('div');p.textContent='';
   if(!n)l.textContent='最大 '+f(mx)+' 枚まで入力できます';
   else if(n>mx){l.textContent='⚠ '+(op<0?'バンク':'手持ち')+'が足りません（最大 '+f(mx)+' 枚）';l.className='ng'}
-  else if(op===0){const t=el('gt').value;l.textContent=t==='1/2'?'🎲 1/2で手持ち +'+f(n)+'枚（2倍）／ 1/2で '+f(n)+'枚が消滅':t?t+' さんのバンクに '+f(n)+'枚入金　手持ち '+f(m)+' → '+f(m-n)+'枚':'贈る相手を入力してください';l.className=t?'okk':'ng'}
+  else if(op===0){const t=el('gt').value;l.textContent=t==='1/2'?'🎲 1/2で手持ち +'+f(n)+'枚（2倍）／ 1/2で '+f(n)+'枚が消滅':t?(el('gt').dataset.n||t)+' さんのバンクに '+f(n)+'枚入金　手持ち '+f(m)+' → '+f(m-n)+'枚':'贈る相手を選んでください';l.className=t?'okk':'ng'}
   else{l.textContent=op>0?'手持ち '+f(m)+' → '+f(m-n)+'枚　／　バンク '+f(b)+' → '+f(b+n)+'枚':'手持ち '+f(m)+' → '+f(m+n)+'枚　／　バンク '+f(b)+' → '+f(b-n)+'枚';l.className='okk'}
   p.append(l)};
 const upd=()=>{if(!el('mm'))return;const m=RP.medal(),b=+el('bkv').dataset.v||0;el('mm').textContent=m.toLocaleString();el('mxd').textContent=m.toLocaleString();el('mxw').textContent=b.toLocaleString();pv()};
 window.rpUi=upd;
 function watchPl(){if(unPl)unPl();unPl=onSnapshot(doc(db,'players',uid),d=>{if(bop||!d.exists())return;const m=d.data().medal;if(typeof m!=='number'||m===sv0||m===RP.medal()+RP.tot())return;sv0=m;
   const ap=()=>{if(RP.busy())return setTimeout(ap,2000);el('clr').click();window.rpSetMedal(m);RP.addMedal(0);bm('手持ちメダルが管理者により '+m+' 枚に変更されました',true)};ap()})}
-const show=()=>{if(!reg())step=1;else if(step<2)step=2;
+const show=()=>{if(!reg()){step=1;el('md').hidden=false}else if(step<2)step=2;el('mx').hidden=!reg();
   el('ma').hidden=reg();el('mb').hidden=!reg();for(const n of[2,3,4])el('p'+n).hidden=!(reg()&&step===n);
   document.querySelectorAll('#stp span').forEach(x=>{const n=+x.dataset.s;x.classList.toggle('on',n===step);x.classList.toggle('dn',n<step)});
   (step===3?el('k2'):el('k1')).append(el('kp'));
-  if(step===3){el('t3').textContent=op>0?'預け入れる枚数を入力してください':op<0?'払い出す枚数を入力してください':'メダルを贈る相手と枚数を入力してください';el('t3').className='tt '+(op>0?'dep':op<0?'wd':'gf');el('qmax').dataset.q=op<0?'b':'m';el('gbox').hidden=op!==0;setAct(op===0&&!el('gt').value?el('gt'):el('ba'))}
+  if(step===3){el('t3').textContent=op>0?'預け入れる枚数を入力してください':op<0?'払い出す枚数を入力してください':'メダルを贈る相手と枚数を入力してください';el('t3').className='tt '+(op>0?'dep':op<0?'wd':'gf');el('qmax').dataset.q=op<0?'b':'m';el('gbox').hidden=op!==0;setAct(el('ba'));if(op===0)drawGl()}
   else if(step===1)setAct(act&&act.id!=='ba'?act:el('un'));
   if(step===4){el('rt').textContent=res.msg||((res.op>0?'預け入れ':'払い出し')+'が完了しました');el('rn').textContent=res.n.toLocaleString()+'枚'}
   el('mn').textContent=acct?acct.u:'';stat();upd()};
 el('bank').onclick=()=>{el('md').hidden=false;bm('');if(reg())step=2;show()};
-el('mx').onclick=()=>{el('md').hidden=true};el('md').onclick=e=>{if(e.target===el('md'))el('md').hidden=true};
+el('mx').onclick=()=>{el('md').hidden=true};el('md').onclick=e=>{if(reg()&&e.target===el('md'))el('md').hidden=true};
 const hashPw=async(n,pw)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ru-bank:'+n+':'+pw)))].map(x=>x.toString(16).padStart(2,'0')).join('');
 const keep=a=>{acct=a;a?localStorage.setItem('rp_acct',JSON.stringify(a)):localStorage.removeItem('rp_acct')};
 async function doAuth(kind){if(RP.busy())return bm('ルーレット回転中は操作できません');
   const n=el('un').value.trim(),pw=el('pw').value;
   if(!/^[0-9]{4,12}$/.test(n))return bm('ユーザー名は数字の4〜12桁です（例 20261031）');if(!/^[0-9]{4}$/.test(pw))return bm('パスワードは4桁の数字です');
+  if(kind==='su'){const nn=el('nn').value.trim().slice(0,12);if(!nn)return bm('ニックネームを入力してください');localStorage.setItem('rp_name',nn)}
   try{const h=await hashPw(n,pw),ref=doc(db,'users',n);
     if(kind==='su'){await runTransaction(db,async tx=>{if((await tx.get(ref)).exists())throw'そのユーザー名は使われています';tx.set(ref,{pwHash:h,createdAt:serverTimestamp()})});const g=LID();keep({u:n,h});await setUser();RP.addMedal(500);banner('<span>新規登録ボーナス</span><b>500<span style="font-size:.4em">枚</span></b><span>プレゼント！</span>');boom(70);await setDoc(doc(db,'players',g),{medal:0,updated:serverTimestamp()},{merge:true}).catch(()=>{});bm('登録しました！ 500枚プレゼントしました',true)}
     else{const d=await getDoc(ref);if(!d.exists()||d.data().pwHash!==h)throw'ユーザー名かパスワードが違います';keep({u:n,h});await setUser();bm('ログインしました',true)}
     el('pw').value=''}catch(e){bm(typeof e==='string'?e:'失敗しました（'+(e.code||e)+'）')}}
-let mode='li';const setMode=m=>{mode=m;el('tl').classList.toggle('on',m==='li');el('tn').classList.toggle('on',m==='su');el('go').textContent=m==='li'?'ログイン':'新規登録する';el('hn').textContent=m==='li'?'登録済みの会員番号と暗証番号を入力してください':'好きな会員番号と暗証番号を決めてください。登録すると500枚プレゼント！';bm('')};
+let mode='li';const setMode=m=>{mode=m;el('tl').classList.toggle('on',m==='li');el('tn').classList.toggle('on',m==='su');el('go').textContent=m==='li'?'ログイン':'新規登録する';el('hn').textContent=m==='li'?'ゲームを始めるにはログインが必要です。初めての方は「新規登録」へ（500枚プレゼント！）':'好きな会員番号と暗証番号を決めてください。登録すると500枚プレゼント！';el('nnb').hidden=m!=='su';bm('')};
 el('tl').onclick=()=>setMode('li');el('tn').onclick=()=>setMode('su');el('go').onclick=()=>doAuth(mode);setMode('li');
 el('lgo').onclick=async()=>{if(RP.busy())return bm('ルーレット回転中は操作できません');keep(null);await setUser();bm('ログアウトしました',true)};
 function openLog(){if(unLg)unLg();unLg=null;el('bl').textContent='';if(!reg())return;
   unLg=onSnapshot(query(collection(db,'bank',acct.u,'log'),orderBy('t','desc'),limit(8)),s=>{const d=el('bl');d.textContent='';
     s.docs.forEach(x=>{const v=x.data(),p=document.createElement('div');p.textContent=(v.t?v.t.toDate().toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'…')+'　'+v.type+' '+(/引出|回収|送金|はずれ/.test(v.type)?'-':/設定/.test(v.type)?'':'+')+v.amount+'枚（残高 '+v.balance+'）';p.className=/預入|受取|当たり/.test(v.type)?'in':/引出|送金|はずれ/.test(v.type)?'out':'ot';d.append(p)})},()=>{})}
-async function giftOp(){const n=Math.floor(+el('ba').value),to=el('gt').value.trim(),half=to==='1/2';
-  if(!reg())return bm('ログインしてください');if(!(to&&(half||/^[0-9]{4,12}$/.test(to))))return bm('贈る相手の会員番号を入力してください（または 1/2）');
+function drawGl(){const gl=el('gl'),cur=el('gt').value;gl.textContent='';
+  const mk=(v,label,cls,name)=>{const b=document.createElement('button');b.className='gi '+cls+(cur===v?' on':'');b.textContent=label;b.onclick=()=>{el('gt').value=v;el('gt').dataset.n=name;drawGl();pv()};gl.append(b)};
+  mk('1/2','🎲 ユーザー「1/2」（1/2で2倍・1/2で消滅）','half','ユーザー1/2');
+  PL.filter(x=>!acct||x.u!==acct.u).sort((a,b)=>a.name.localeCompare(b.name,'ja')).forEach(x=>mk(x.u,x.name+'（会員 '+x.u+'）','',x.name))}
+function busyUi(b){bop=b;el('okb').disabled=b}
+async function giftOp(){if(bop)return;const n=Math.floor(+el('ba').value),to=el('gt').value.trim(),half=to==='1/2';
+  if(!reg())return bm('ログインしてください');if(!(to&&(half||/^[0-9]{4,12}$/.test(to))))return bm('贈る相手を一覧から選んでください');
   if(!(n>0))return bm('枚数を入力してください');if(!half&&to===acct.u)return bm('自分には贈れません');if(n>RP.medal())return bm('手持ちのメダルが足りません');
   const win=crypto.getRandomValues(new Uint32Array(1))[0]%2===0,pref=doc(db,'players',uid),sbr=doc(db,'bank',acct.u),slog=doc(collection(db,'bank',acct.u,'log')),tbr=doc(db,'bank',half?acct.u:to),ur=doc(db,'users',half?acct.u:to);
-  bop=true;
+  busyUi(true);
   try{await runTransaction(db,async tx=>{const ps=await tx.get(pref),sb=await tx.get(sbr),us=await tx.get(ur),tb=await tx.get(tbr),
       pm=ps.exists()&&typeof ps.data().medal==='number'?ps.data().medal:RP.medal(),sbal=sb.exists()?sb.data().balance:0;
       if(n>pm)throw'手持ちのメダルが足りません';
@@ -348,22 +357,22 @@ async function giftOp(){const n=Math.floor(+el('ba').value),to=el('gt').value.tr
       tx.set(tbr,{balance:nb,updated:serverTimestamp()});tx.set(doc(collection(db,'bank',to,'log')),{type:'受取',amount:n,balance:nb,t:serverTimestamp()});
       tx.set(slog,{type:'送金',amount:n,balance:sbal,t:serverTimestamp()});
       tx.set(doc(collection(db,'notices')),{text:acct.u+' さんからメダル'+n+'枚が届きました（バンクに入金）',to,t:serverTimestamp()})});
-    RP.addMedal(half?(win?n:-n):-n);bop=false;el('ba').value='';
-    res=half?{op:0,n:win?n*2:n,msg:win?'🎉 大当たり！メダルが2倍になりました':'💨 残念… メダルが消滅しました'}:{op:0,n,msg:to+' さんにメダルを贈りました'};
+    RP.addMedal(half?(win?n:-n):-n);busyUi(false);el('ba').value='';
+    res=half?{op:0,n:win?n*2:n,msg:win?'🎉 大当たり！メダルが2倍になりました':'💨 残念… メダルが消滅しました'}:{op:0,n,msg:(el('gt').dataset.n||to)+' さんにメダルを贈りました'};
     if(half&&win){banner('<span>1/2 当たり！</span><b>2倍</b>');boom(70)}
     step=4;show()}
-  catch(e){bop=false;bm(typeof e==='string'?e:e.code==='permission-denied'?'権限エラー：Firestoreのルールを更新してください':'失敗しました（'+(e.code||e)+'）')}}
-async function bankOp(sg){const n=Math.floor(+el('ba').value);if(!reg())return bm('ログインしてください');if(!(n>0))return bm('枚数をテンキーで入力してください');
+  catch(e){busyUi(false);bm(typeof e==='string'?e:e.code==='permission-denied'?'権限エラー：Firestoreのルールを更新してください':'失敗しました（'+(e.code||e)+'）')}}
+async function bankOp(sg){if(bop)return;const n=Math.floor(+el('ba').value);if(!reg())return bm('ログインしてください');if(!(n>0))return bm('枚数をテンキーで入力してください');
   const ref=doc(db,'bank',acct.u),pref=doc(db,'players',uid),lg=doc(collection(db,'bank',acct.u,'log'));
-  bop=true;try{const nb=await runTransaction(db,async tx=>{const s=await tx.get(ref),ps=await tx.get(pref),pm=ps.exists()&&typeof ps.data().medal==='number'?ps.data().medal:RP.medal(),b=s.exists()?s.data().balance:0,nb=sg>0?b+n:b-n;
+  busyUi(true);try{const nb=await runTransaction(db,async tx=>{const s=await tx.get(ref),ps=await tx.get(pref),pm=ps.exists()&&typeof ps.data().medal==='number'?ps.data().medal:RP.medal(),b=s.exists()?s.data().balance:0,nb=sg>0?b+n:b-n;
       if(sg>0&&(n>RP.medal()||n>pm))throw'お手持ちのメダルが足りません';if(nb<0)throw'お預かり残高が足りません';
       tx.set(pref,{medal:pm-sg*n,updated:serverTimestamp()},{merge:true});tx.set(ref,{balance:nb,updated:serverTimestamp()});tx.set(lg,{type:sg>0?'預入':'引出',amount:n,balance:nb,t:serverTimestamp()});return nb});
-    RP.addMedal(-sg*n);bop=false;el('bkv').dataset.v=nb;el('bkv').textContent=nb.toLocaleString();el('ba').value='';bm('');res={op:sg,n};step=4;show()}
-  catch(e){bop=false;bm(typeof e==='string'?e:e.code==='permission-denied'?'権限エラー：Firestoreのルールを firestore.rules の内容に更新してください':'失敗しました（'+(e.code||e)+'）')}}
+    RP.addMedal(-sg*n);busyUi(false);el('bkv').dataset.v=nb;el('bkv').textContent=nb.toLocaleString();el('ba').value='';bm('');res={op:sg,n};step=4;show()}
+  catch(e){busyUi(false);bm(typeof e==='string'?e:e.code==='permission-denied'?'権限エラー：Firestoreのルールを firestore.rules の内容に更新してください':'失敗しました（'+(e.code||e)+'）')}}
 el('bd').onclick=()=>{op=1;el('ba').value='';step=3;bm('');show()};el('bw').onclick=()=>{op=-1;el('ba').value='';step=3;bm('');show()};
 el('okb').onclick=()=>op===0?giftOp():bankOp(op);
-el('bg').onclick=()=>{op=0;el('ba').value='';el('gt').value='';step=3;bm('');show()};
-el('half').onclick=()=>{el('gt').value='1/2';setAct(el('ba'));pv()};el('bk3').onclick=()=>{step=2;bm('');show()};el('again').onclick=()=>{step=2;bm('');show()};
+el('bg').onclick=()=>{op=0;el('ba').value='';el('gt').value='';el('gt').dataset.n='';step=3;bm('');show()};
+el('bk3').onclick=()=>{step=2;bm('');show()};el('again').onclick=()=>{step=2;bm('');show()};
 el('fin').onclick=el('fin2').onclick=()=>{el('md').hidden=true;step=2};
 let act=null;function setAct(e){act=e;for(const id of['un','pw','ba','gt'])el(id).classList.toggle('on',el(id)===e)}
 for(const id of['un','pw','ba','gt']){el(id).onfocus=()=>setAct(el(id));el(id).oninput=()=>{if(id!=='pw')el(id).value=el(id).value.replace(/[^0-9]/g,'');pv()}}
@@ -384,16 +393,18 @@ async function claimBonus(){if(!reg())return;const u=acct.u,day=new Date(sn()+32
     if(got){banner(`<span>ログインボーナス</span><b>${got}<span style="font-size:.4em">枚</span></b><span>バンクに入金！</span>`);boom(28);bm('ログインボーナス '+got+'枚をバンクに入れました！',true)}}
   catch(e){}}
 // ---- ユーザー切替・初期化 ----
-async function setUser(){const old=uid;uid=reg()?'U'+acct.u:LID();name=nick();
+async function setUser(){const old=uid;uid=reg()?'U'+acct.u:LID();name=reg()?nick():'ゲスト';
   if(old&&old!==uid&&!locked&&curR>=0)deleteDoc(doc(db,'rounds',String(curR),'bets',old)).catch(()=>{});
   if(!RP.busy())el('clr').click();
-  try{const d=await getDoc(doc(db,'players',uid));if(d.exists()&&typeof d.data().medal==='number')window.rpSetMedal(d.data().medal);else if(old&&old[0]==='U'&&!reg())window.rpSetMedal(0)}catch(e){}
-  watchPl();if(unBk)unBk();unBk=null;el('bkv').textContent='0';el('bkv').dataset.v=0;
+  try{if(!reg())window.rpSetMedal(0);else{const d=await getDoc(doc(db,'players',uid));if(d.exists()&&typeof d.data().medal==='number')window.rpSetMedal(d.data().medal)}}catch(e){}
+  if(reg())watchPl();else if(unPl){unPl();unPl=null}
+  if(unBk)unBk();unBk=null;el('bkv').textContent='0';el('bkv').dataset.v=0;
   if(reg())unBk=onSnapshot(doc(db,'bank',acct.u),d=>{const v=d.exists()?d.data().balance:0;el('bkv').dataset.v=v;el('bkv').textContent=v.toLocaleString();stat();upd()},e=>bm('バンクの読み込みに失敗（'+e.code+'）'));
   openLog();show();drawNt();if(!started){started=true;initOnce()}if(reg())claimBonus()}
 async function initOnce(){try{await sync()}catch(e){}
   beat();setInterval(beat,20000);watchPresence();setInterval(watchPresence,30000);
   onSnapshot(query(collection(db,'rounds'),orderBy('t','desc'),limit(14)),s=>{lastDocs=s.docs.map(d=>({id:d.id,idx:d.data().idx}));drawLast()});
+  onSnapshot(query(collection(db,'players'),limit(300)),s=>{PL=s.docs.filter(d=>d.id[0]==='U'&&d.data().name).map(d=>({u:d.id.slice(1),name:String(d.data().name)}));if(op===0&&step===3)drawGl()});
   onSnapshot(query(collection(db,'players'),orderBy('best','desc'),limit(5)),s=>{const ol=el('rk');ol.textContent='';
     s.docs.forEach((d,i)=>{const li=document.createElement('li'),b=document.createElement('b');li.append((i+1)+'. '+d.data().name);b.textContent=d.data().best;li.append(b);ol.append(li)});
     if(!s.docs.length)ol.innerHTML='<li>まだ記録がありません</li>'});
