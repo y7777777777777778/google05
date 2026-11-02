@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ルーカン 管理</title>
 <style>
@@ -43,7 +43,7 @@ pre{white-space:pre-wrap;font-size:13px}
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getFirestore,doc,getDocs,setDoc,addDoc,updateDoc,runTransaction,deleteDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{getFirestore,doc,getDoc,where,getDocs,setDoc,addDoc,updateDoc,runTransaction,deleteDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp({
   apiKey:"AIzaSyDmv5WbPp6298HNLSOa6h0AMuieM0H6l1s",
   authDomain:"fir-66339.firebaseapp.com",
@@ -59,7 +59,7 @@ const hashPw=async(n,pw)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256
 function drawP(force){const ae=document.activeElement;if(!force&&ae&&ae.tagName==='INPUT'&&$('pb').contains(ae))return;
   const ids=Object.keys(U).sort((a,b)=>((U[b].createdAt||{}).seconds||0)-((U[a].createdAt||{}).seconds||0));let tot=0,ht=0;
   $('pb').innerHTML=ids.map(id=>{const b=+(Bk[id]||{}).balance||0,h=+(Pl['U'+id]||{}).medal||0;tot+=b;ht+=h;const c=U[id].createdAt&&U[id].createdAt.toDate?U[id].createdAt.toDate().toLocaleDateString('ja-JP'):'';
-    return`<tr data-id="${esc(id)}"><td><b>${esc(id)}</b>${U[id].isAdmin?' 👑':''}<br><small>登録 ${c}</small></td>
+    return`<tr data-id="${esc(id)}"><td><b>${esc(id)}</b>${U[id].isAdmin?' 👑':''}<br>名前：<b>${esc((Pl['U'+id]||{}).name||'未設定')}</b><br><small>登録 ${c}</small></td>
 <td class="bk"><div class="num">${b.toLocaleString()}<small> 枚</small></div>
 <div class="ed"><span>この数に</span><input class="b" type="number" value="${b}"><button data-a="s" data-t="bk">設定</button></div>
 <div class="ed"><span>増減</span><input class="d" type="number" placeholder="±"><button data-a="a" data-t="bk">加減</button></div></td>
@@ -67,6 +67,8 @@ function drawP(force){const ae=document.activeElement;if(!force&&ae&&ae.tagName=
 <div class="ed"><span>この数に</span><input class="hb" type="number" value="${h}"><button data-a="s" data-t="hd">設定</button></div>
 <div class="ed"><span>増減</span><input class="hdv" type="number" placeholder="±"><button data-a="a" data-t="hd">加減</button></div></td>
 <td><div class="ed"><input class="p" maxlength="4" placeholder="新PIN" style="width:64px"><button data-a="p">PIN変更</button></div>
+<div class="ed"><span>名前</span><input class="nm" maxlength="12" placeholder="ニックネーム" style="width:110px" value="${esc((Pl['U'+id]||{}).name||'')}"><button data-a="n">名前変更</button></div>
+<div class="ed"><span>会員番号</span><input class="nid" placeholder="新番号" style="width:100px" maxlength="12"><input class="npin" placeholder="新PIN" style="width:64px" maxlength="4"><button data-a="r">番号変更</button></div>
 <div class="ed"><button data-a="l">履歴</button><button data-a="x">削除</button></div></td></tr>`}).join('')||'<tr><td colspan="4">ユーザーがいません</td></tr>';
   $('bt').textContent=tot.toLocaleString();$('ht').textContent=ht.toLocaleString();$('uc').textContent=ids.length}
 $('pb').onclick=async e=>{const a=e.target.dataset.a;if(!a)return;const tr=e.target.closest('tr'),id=tr.dataset.id,bank=e.target.dataset.t==='bk',
@@ -82,6 +84,24 @@ $('pb').onclick=async e=>{const a=e.target.dataset.a;if(!a)return;const tr=e.tar
       say(id+' の'+(bank?'バンク残高':'手持ち')+'を '+(dv>0?'+':'')+dv+' 枚しました',true)}
     else if(a==='p'){const pin=tr.querySelector('.p').value;if(!/^[0-9]{4}$/.test(pin))return say('PINは4桁の数字です');await updateDoc(doc(db,'users',id),{pwHash:await hashPw(id,pin)});say(id+' のPINを変更しました',true)}
     else if(a==='l'){const q=await getDocs(query(collection(db,'bank',id,'log'),orderBy('t','desc'),limit(20)));$('lg').textContent=id+' のバンク履歴\n'+(q.docs.map(d=>{const v=d.data();return(v.t?v.t.toDate().toLocaleString('ja-JP'):'')+'　'+v.type+' '+v.amount+'枚（残高 '+v.balance+'）'}).join('\n')||'履歴なし');say('')}
+    else if(a==='n'){const v=tr.querySelector('.nm').value.trim().slice(0,12);if(!v)return say('名前を入力してください');await setDoc(doc(db,'players','U'+id),{name:v,updated:serverTimestamp()},{merge:true});say(id+' の名前を「'+v+'」に変更しました',true)}
+    else if(a==='r'){const nu=tr.querySelector('.nid').value.trim(),pin=tr.querySelector('.npin').value;
+      if(!/^[0-9]{4,12}$/.test(nu))return say('新しい会員番号は数字4〜12桁です');if(nu===id)return say('今と同じ番号です');
+      if(!/^[0-9]{4}$/.test(pin))return say('会員番号を変えるとPINが無効になるため、新しいPIN（4桁）も入力してください');
+      if(!confirm(id+' を '+nu+' に変更しますか？バンク・履歴・手持ち・お知らせも引き継ぎます。本人は新しい番号と新PINで再ログインが必要です。'))return;
+      if((await getDoc(doc(db,'users',nu))).exists())return say('その会員番号は既に使われています');
+      const us=await getDoc(doc(db,'users',id));if(!us.exists())return say('ユーザーが見つかりません');
+      const [bs,ps,cs]=await Promise.all([getDoc(doc(db,'bank',id)),getDoc(doc(db,'players','U'+id)),getDoc(doc(db,'bonusClaims',id))]);
+      const logs=await getDocs(collection(db,'bank',id,'log')),nts=await getDocs(query(collection(db,'notices'),where('to','==',id)));
+      await setDoc(doc(db,'users',nu),{...us.data(),pwHash:await hashPw(nu,pin)});
+      if(bs.exists())await setDoc(doc(db,'bank',nu),bs.data());
+      if(ps.exists())await setDoc(doc(db,'players','U'+nu),ps.data());
+      if(cs.exists())await setDoc(doc(db,'bonusClaims',nu),cs.data());
+      for(const d of logs.docs)await setDoc(doc(db,'bank',nu,'log',d.id),d.data());
+      for(const d of nts.docs)await updateDoc(d.ref,{to:nu});
+      for(const d of logs.docs)await deleteDoc(d.ref);
+      await deleteDoc(doc(db,'bank',id));await deleteDoc(doc(db,'players','U'+id));await deleteDoc(doc(db,'bonusClaims',id));await deleteDoc(doc(db,'users',id));
+      say(id+' → '+nu+' に変更しました（PINも新しくなりました）',true)}
     else if(a==='x'&&confirm(id+' を削除しますか？バンク残高・履歴・手持ちメダル・ランキング記録・ボーナス受取記録も消えます。')){const q=await getDocs(collection(db,'bank',id,'log'));for(const d of q.docs)await deleteDoc(d.ref);await deleteDoc(doc(db,'bank',id));await deleteDoc(doc(db,'players','U'+id));await deleteDoc(doc(db,'bonusClaims',id));await deleteDoc(doc(db,'users',id));say(id+' を削除しました',true)}}
   catch(er){say('失敗：'+(er.code||er))}
   drawP(true)};
