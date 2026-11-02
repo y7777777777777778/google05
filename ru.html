@@ -130,6 +130,11 @@ main{padding:4px;gap:10px}
 }
 @media(max-width:380px){.rb{width:60px;height:60px}.tp b{font-size:11px}}
 #mt{position:fixed;inset:0;z-index:50;background:linear-gradient(#10286e,#071340);display:grid;place-items:center;color:#fff;text-align:center;padding:20px}#mt .mtb{max-width:420px}#mt .mti{font-size:72px}#mt .mtt{font:400 28px var(--fx);color:#ffe14d;margin:8px 0 14px}#mt p{margin:8px 0;font:700 15px/1.7 "Noto Sans JP";white-space:pre-wrap}#mtu{color:#7dffa0}#mtb{position:fixed;left:0;right:0;top:0;z-index:40;background:#d6258a;color:#fff;text-align:center;font:700 12px "Noto Sans JP";padding:4px;padding-top:calc(4px + env(safe-area-inset-top,0px))}
+.c.hot::after,.c.cold::after{position:absolute;left:.2cqw;bottom:0;font-size:1.8cqw;text-shadow:none;pointer-events:none}.c.hot::after{content:'🔥'}.c.cold::after{content:'❄️'}
+.tbar{height:.9cqw;background:#0008;border-radius:1cqw;margin-top:.4cqw;overflow:hidden}.tbar i{display:block;height:100%;width:100%;background:#3dd16f;transition:width .25s linear}.tbar i.low{background:#ff4a4a}
+#tm.low{color:#ff6b6b!important;animation:ar .5s infinite}
+#toast{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-160%);z-index:45;background:linear-gradient(#ffe14d,#e8a100);color:#3a2300;font:900 15px "Noto Sans JP";padding:10px 18px;border-radius:999px;border:3px solid #fff;box-shadow:0 6px 18px #0008;transition:transform .45s cubic-bezier(.2,1.4,.4,1);max-width:92vw;text-align:center}#toast.on{transform:translate(-50%,0)}
+@media(max-width:640px){.c.hot::after,.c.cold::after{font-size:3.6cqw}.tbar{height:2cqw}}
 </style></head><body><main>
 <div class="cab"><div class="sd">ROULETTE PARTY</div><div class="tp"><i class="bt"></i><i class="bt k"></i><i class="bt w"></i><b>タッチ・デ・ルーレットパーティー</b><i class="bt w"></i><i class="bt k"></i><i class="bt"></i></div><div class="sw"><div class="scr" id="sc">
 <div class="last" id="hist"></div>
@@ -138,14 +143,14 @@ main{padding:4px;gap:10px}
 <div id="msg">チップを選んでマスをタッチ！</div>
 <div class="bp"><i>CHIP　BET <span id="tot">0</span></i><span id="chips"></span></div>
 <div class="bx" style="left:41%;width:21%"><small>CREDIT クレジット</small><b id="med">0</b></div>
-<div class="bx tm" style="left:64%;width:14%"><small>TIME</small><b id="tm">00</b></div>
+<div class="bx tm" style="left:64%;width:14%"><small>TIME</small><b id="tm">00</b><div class="tbar"><i id="tbi"></i></div></div>
 <div class="fg">FREEGAME<br><i>★</i><i>★</i><i>★</i></div>
 <div id="fl"></div><div id="bn"></div></div></div>
 <div class="ctl"><button class="rb" id="clr">CLEAR</button><button class="rb" id="re">REBET</button><button class="rb" id="bank">BANK</button><span id="st"></span></div><div class="fr"><i class="tr"></i><b>Touch ルーレットパーティー</b><i class="tr"></i></div></div>
 <div class="ol"><b>お知らせ</b><ul id="nt" style="margin:4px 0 0;padding:0;list-style:none"><li>読み込み中…</li></ul></div>
 <div class="ol"><div><b>ONLINE</b> <span id="onl">1</span>人</div><div style="margin-top:6px"><b>🏆 ランキング</b>（期間内の最高メダル数）</div><div class="rtabs"><button data-p="h" class="on">1時間</button><button data-p="d">1日</button><button data-p="w">1週間</button></div><div id="rl"></div><div id="tk"></div><ol id="rk"><li>読み込み中…</li></ol></div>
 <div class="ol"><div><b>今回のラウンド</b>　みんなのBET</div><ul id="oth"><li>読み込み中…</li></ul></div>
-<div class="ol"><b>チャット</b><div id="cm"></div><div style="display:flex;gap:6px"><input id="ci" maxlength="100" placeholder="メッセージ"><button id="cs">送信</button></div></div>
+<div class="ol"><b>チャット</b><div id="cm"></div><div id="stm" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"></div><div style="display:flex;gap:6px"><input id="ci" maxlength="100" placeholder="メッセージ"><button id="cs">送信</button></div></div>
 <div id="md" hidden><div class="mc"><button id="mx">×</button>
 <div class="mh">MEDAL BANK<small>メダルバンク</small></div>
 <div class="steps" id="stp"><span data-s="1">会員確認</span><span data-s="2">預入/払出</span><span data-s="3">枚数入力</span><span data-s="4">完了</span></div>
@@ -186,6 +191,7 @@ main{padding:4px;gap:10px}
 <div class="row"><button id="again">続けて取引する</button><button class="bb" id="fin2">終了</button></div>
 </div>
 </div></div></div>
+<div id="toast"></div>
 <div id="mt" hidden><div class="mtb"><div class="mti">🔧</div><div class="mtt">メンテナンス中</div><p id="mtm"></p><p id="mtu"></p><button id="mtl" class="bb" style="margin-top:14px;padding:10px 18px">関係者の方はこちら（ログイン）</button></div></div>
 <div id="mtb" hidden>🔧 メンテナンス中（検証用に許可されています）</div>
 <canvas id="cf"></canvas></main><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -200,6 +206,8 @@ G('a','1st6(1~6)',R(1,6),3,'w');G('b','2nd6(7~12)',R(7,12),3,'w');G('d','3rd6(13
 G('lo','1-9',R(1,9),2,'w');G('hi','10-18',R(10,18),2,'w');G('ev','EVEN',R(1,18).filter(x=>x%2==0),2,'w');G('od','ODD',R(1,18).filter(x=>x%2),2,'w');
 G('rd','◆',RED,2,'r');G('bk','◆',R(1,18).filter(x=>!RED.includes(x)),2,'k');
 const lg=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+function setHot(nums){const c={};nums.forEach(x=>{if(typeof x==='number')c[x]=(c[x]||0)+1});for(let i=0;i<=18;i++){const e=$('n'+i);if(!e)continue;const v=c[i]||0;e.classList.toggle('hot',v>=3);e.classList.toggle('cold',nums.length>=30&&v===0)}}
+let streak=0;
 let chip=1,medal=Math.max(0,+lg('rp_medal',0)||0),busy=false,rot=0,ball=null,hist=lg('rp_hist',[]),last={},ani=false,parts=[],tmr=null,tl=0;
 function cell(k,s,r){const d=document.createElement('div'),b=B[k];d.className='c '+b.c;d.style.gridColumn=s||'';d.style.gridRow=r||'';d.id=k;d.textContent=b.l;if(b.l==='◆')d.innerHTML='<i class="dm '+(k==='rd'?'r':'k')+'"></i>';
 d.onclick=()=>add(k,1);d.oncontextmenu=e=>{e.preventDefault();add(k,-1)};let t;
@@ -279,12 +287,15 @@ else{const q=(p-pd)/(1-pd);if(rs===null){rs=ball.a-rot;rT=tg+TW*Math.floor((rs-t
 const th=rT+(rs-rT)*Math.pow(1-q,2.2)+Math.sin(q*24)*(1-q)*(1-q)*.12;
 ball={a:rot+th,r:150+Math.max(0,1-q*4)*60+Math.abs(Math.sin(q*9*Math.PI))*(1-q)*(1-q)*26}}
 draw();p<1?requestAnimationFrame(f):done(res,win)})(performance.now())}
-function done(n,win){ball={a:-Math.PI/2,r:150};rot=-ORD.indexOf(n)*ST;draw();const tb=tot(),net=win-tb,from=medal;
+function done(n,win){ball={a:-Math.PI/2,r:150};rot=-ORD.indexOf(n)*ST;draw();const tb=tot(),net=win-tb,from=medal,num=typeof n==='number',hit=num?(bet['n'+n]||0):0,near=num&&tb>0&&win===0&&((bet['n'+(n-1)]||0)+(bet['n'+(n+1)]||0))>0;
 for(const k in bet)if(B[k].n.includes(n))$(k).classList.add('win');
 for(const k in bet)delete bet[k];medal+=win;
-if(win>0){banner(`<span>クレジット</span><b>${win}<span style="font-size:.4em">枚</span></b><span>ゲット！</span>`);boom(win>=300?110:win>=100?70:28);
-if(win>=100){$('sc').classList.add('shake');setTimeout(()=>$('sc').classList.remove('shake'),1600)}say(`出目 ${n}　`+(net>0?`+${net}枚！`:'戻り '+win+'枚'))}
-else say(tb?`出目 ${n}　残念… -${tb}枚`:`出目 ${n}`);
+if(tb>0)streak=win>0?streak+1:0;
+const sk=streak>=2?'　🔥'+streak+'連勝！':'';
+if(win>0){const ttl=hit>0?'ストレートアップ！':streak>=3?'🔥'+streak+'連勝！':'クレジット';banner(`<span>${ttl}</span><b>${win}<span style="font-size:.4em">枚</span></b><span>ゲット！</span>`);boom(hit>0?170:win>=300?110:win>=100?70:28);
+if(win>=100||hit>0){$('sc').classList.add('shake');setTimeout(()=>$('sc').classList.remove('shake'),1600)}
+say(`出目 ${n}　`+(net>0?`+${net}枚！`:'戻り '+win+'枚')+sk)}
+else{say(tb?`出目 ${n}　`+(near?'惜しい！':'残念…')+` -${tb}枚`:`出目 ${n}`)}
 cnt(from,medal,()=>{if(medal<=0&&!tot())say('メダルがなくなりました。バンクから引き出してください');ui();saveOnline(win);})}
 function saveOnline(win){const b=Math.max(lg('rp_best',0),medal);sv('rp_best',b);if(window.rpSave)window.rpSave(medal,b,win)}
 window.rpSetMedal=m=>{if(!busy&&!tot()){medal=m;ui()}};
@@ -317,14 +328,16 @@ function render(ph=sn()%CYC){const ul=el('oth'),fin=resIdx!=null&&ph>=BETM+SPINM
     if(fin){let w=0;for(const k in d.bets)if(RP.B[k]&&RP.B[k].n.includes(res))w+=(+d.bets[k]||0)*RP.B[k].m;const net=w-d.total;st=net>0?'勝 +'+net:net<0?'敗 '+net:'±0';cls=net>0?'win2':net<0?'lose2':''}
     li.append((id===uid?'★あなた':String(d.name).slice(0,12))+'　BET'+(+d.total||0)+'枚');b.textContent=st;b.className=cls;li.append(b);ul.append(li)});
   if(!ids.length)ul.innerHTML='<li>まだ誰もBETしていません</li>'}
+function tmFx(ph){const rem=Math.ceil((BETM-ph)/1000),low=ph<BETM&&rem<=5;el('tbi').style.width=Math.max(0,(BETM-ph)/BETM*100)+'%';el('tbi').classList.toggle('low',low);el('tm').classList.toggle('low',low);}
+function toast(t){const e=el('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),4200)}
 function tick(){const t=sn(),r=Math.floor(t/CYC),ph=t-r*CYC;if(r!==curR)newRound(r);
-  if(ph<BETM)el('tm').textContent=String(Math.ceil((BETM-ph)/1000)).padStart(2,'0');
-  else{el('tm').textContent='00';if(!locked){locked=true;RP.lock()}
+  if(ph<BETM){el('tm').textContent=String(Math.ceil((BETM-ph)/1000)).padStart(2,'0');tmFx(ph)}
+  else{el('tm').textContent='00';tmFx(BETM);if(!locked){locked=true;RP.lock()}
     if(resIdx==null&&!asked){asked=1;ensure(r)}
     if(resIdx!=null&&!spun){spun=true;RP.spinTo(resIdx,Math.max(0,ph-BETM))}}
   render(ph);drawLast();watchRank()}
 let lastDocs=[],lastSig='';
-function drawLast(){const t=sn(),r=Math.floor(t/CYC),ph=t-r*CYC,nums=lastDocs.filter(d=>+d.id<r||(+d.id===r&&ph>=BETM+SPINM)).slice(0,12).map(d=>RP.ORD[d.idx]),sig=nums.join(',');if(sig===lastSig)return;lastSig=sig;RP.setHist(nums.reverse())}
+function drawLast(){const t=sn(),r=Math.floor(t/CYC),ph=t-r*CYC,all=lastDocs.filter(d=>+d.id<r||(+d.id===r&&ph>=BETM+SPINM)).map(d=>RP.ORD[d.idx]),sig=all.join(',');if(sig===lastSig)return;lastSig=sig;RP.setHist(all.slice(0,12).reverse());setHot(all)}
 const pKeys=()=>{const j=new Date(sn()+32400000),iso=j.toISOString(),dow=(j.getUTCDay()+6)%7,wk=new Date(j.getTime()-dow*86400000).toISOString().slice(0,10);return{h:'h|'+iso.slice(0,13),d:'d|'+iso.slice(0,10),w:'w|'+wk}};
 const lab=k=>{const v=k.split('|')[1],m=+v.slice(5,7)+'/'+(+v.slice(8,10));return k[0]==='h'?m+' '+(+v.slice(11,13))+'時台':k[0]==='d'?m+'（今日）':m+' の週（月曜〜）'};
 function recordScores(m){if(!uid||!reg())return;const K=pKeys();for(const p of['h','d','w']){const pk=K[p],ref=doc(db,'scores',pk.replace('|','_')+'_'+uid);
@@ -340,6 +353,7 @@ window.rpSave=(medal,best,win)=>{if(!uid||!reg())return;sv0=medal;recordScores(m
   if(win>=100)addDoc(collection(db,'feed'),{uid,name,win,t:serverTimestamp()}).catch(()=>{})};
 function send(){const t=el('ci').value.trim().slice(0,100);if(!t||!uid||!reg())return;el('ci').value='';addDoc(collection(db,'chat'),{uid,name,text:t,t:serverTimestamp()}).catch(()=>{})}
 el('cs').onclick=send;el('ci').onkeydown=e=>{if(e.key==='Enter')send()};
+['🎉 おめでとう！','🔥 アツい！','😭 惜しい…','👏 ナイス！','🍀 運よ来い！'].forEach(t=>{const b=document.createElement('button');b.textContent=t;b.style.cssText='border:0;border-radius:999px;padding:6px 10px;background:#2b4aa8;color:#fff;font:700 12px "Noto Sans JP",sans-serif;cursor:pointer';b.onclick=()=>{el('ci').value=t;send()};el('stm').append(b)});
 // ---- BANK ポップアップ ----
 window.rpGuest=()=>!reg();
 const stat=()=>{el('st').textContent=reg()?'👤 会員 '+acct.u+'　🏦 預け '+(+el('bkv').dataset.v||0).toLocaleString()+'枚':'👤 未ログイン'};
@@ -445,10 +459,10 @@ async function setUser(){const old=uid;uid=reg()?'U'+acct.u:LID();name=reg()?nic
   openLog();show();drawNt();if(!started){started=true;initOnce()}mtApply();if(reg())claimBonus()}
 async function initOnce(){try{await sync()}catch(e){}
   beat();setInterval(beat,20000);watchPresence();setInterval(watchPresence,30000);
-  onSnapshot(query(collection(db,'rounds'),orderBy('t','desc'),limit(14)),s=>{lastDocs=s.docs.map(d=>({id:d.id,idx:d.data().idx}));drawLast()});
+  onSnapshot(query(collection(db,'rounds'),orderBy('t','desc'),limit(40)),s=>{lastDocs=s.docs.map(d=>({id:d.id,idx:d.data().idx}));drawLast()});
   onSnapshot(query(collection(db,'players'),limit(300)),s=>{PL=s.docs.filter(d=>d.id[0]==='U'&&d.data().name).map(d=>({u:d.id.slice(1),name:String(d.data().name)}));if(op===0&&step===3)drawGl()});
   onSnapshot(query(collection(db,'feed'),orderBy('t','desc'),limit(1)),s=>{s.docChanges().forEach(c=>{if(c.type!=='added')return;const d=c.doc.data();
-    if(d.uid===uid||!d.t||d.t.toMillis()<t0)return;el('tk').textContent=d.name+'さんが'+d.win+'枚ゲット！'})});
+    if(d.uid===uid||!d.t||d.t.toMillis()<t0)return;el('tk').textContent=d.name+'さんが'+d.win+'枚ゲット！';toast('🎉 '+d.name+' さんが '+d.win+'枚ゲット！')})});
   onSnapshot(query(collection(db,'chat'),orderBy('t','desc'),limit(30)),s=>{const c=el('cm');c.textContent='';[...s.docs].reverse().forEach(d=>{const x=d.data(),p=document.createElement('p'),b=document.createElement('b');b.textContent=x.name+'：';p.append(b,x.text);c.append(p)});c.scrollTop=c.scrollHeight});
   onSnapshot(query(collection(db,'notices'),orderBy('t','desc'),limit(50)),s=>{NT=s.docs.map(d=>d.data());drawNt()});
   tick();setInterval(tick,200)}
